@@ -3,7 +3,7 @@ import { Layout, Menu, Button, Image } from "antd";
 
 const { Header } = Layout;
 
-const Headerlanding = () => {
+const HeaderLanding = () => {
   return (
     <Layout className="layout">
       <Header
@@ -33,4 +33,4 @@ const Headerlanding = () => {
   );
 };
 
-export default Headerlanding;
+export default HeaderLanding;

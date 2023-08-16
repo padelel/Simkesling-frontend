@@ -1,17 +1,20 @@
 import React from "react";
 import MainLayout from "../components/MainLayout";
-import { Button, Carousel } from "antd";
+import { Button, Carousel, Space } from "antd";
 import { Header } from "antd/es/layout/layout";
-import Headerlanding from "./Header/Headerlanding";
-import Carrousellanding from "./landing/Carrousellanding";
-import Formlogin from "./login/Formlogin";
+import HeaderLanding from "../components/header/HeaderLanding";
+import CarrouselLanding from "../components/landing/CarrouselLanding";
+import FormLogin from "@/components/login/FormLogin";
+import Overview from "@/components/landing/Overview";
 
 const LandingPage: React.FC = () => {
   return (
     <>
-      <Headerlanding />
-      <Carrousellanding />
-      <Formlogin />
+      <Space direction="vertical" size="large" style={{ display: "flex" }}>
+        <HeaderLanding />
+        <CarrouselLanding />
+        <Overview />
+      </Space>
     </>
   );
 };

@@ -17,7 +17,7 @@ const contentStyle: React.CSSProperties = {
   backgroundRepeat: "no-repeat",
 };
 
-const Carrousellanding = () => {
+const CarrouselLanding = () => {
   const [size, setSize] = useState<SizeType>("large"); // default is 'middle'
 
   return (
@@ -47,4 +47,4 @@ const Carrousellanding = () => {
   );
 };
 
-export default Carrousellanding;
+export default CarrouselLanding;
