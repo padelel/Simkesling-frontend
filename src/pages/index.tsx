@@ -1,13 +1,17 @@
 import React from "react";
 import MainLayout from "../components/MainLayout";
-import { Button } from "antd";
+import { Button, Carousel } from "antd";
+import { Header } from "antd/es/layout/layout";
+import Headerlanding from "./Header/Headerlanding";
+import Carrousellanding from "./landing/Carrousellanding";
+import Formlogin from "./login/Formlogin";
 
 const LandingPage: React.FC = () => {
   return (
     <>
-      <h1>Welcome to the Landing Page</h1>
-      {/* Other content */}
-      <Button type="primary">ini text button</Button>
+      <Headerlanding />
+      <Carrousellanding />
+      <Formlogin />
     </>
   );
 };
