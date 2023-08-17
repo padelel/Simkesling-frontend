@@ -6,6 +6,7 @@ import HeaderLanding from "../components/header/HeaderLanding";
 import CarrouselLanding from "../components/landing/CarrouselLanding";
 import FormLogin from "@/components/login/FormLogin";
 import Overview from "@/components/landing/Overview";
+import FooterLanding from "@/components/footer/FooterLanding";
 
 const LandingPage: React.FC = () => {
   return (
@@ -14,6 +15,7 @@ const LandingPage: React.FC = () => {
         <HeaderLanding />
         <CarrouselLanding />
         <Overview />
+        {/* <FooterLanding /> */}
       </Space>
     </>
   );

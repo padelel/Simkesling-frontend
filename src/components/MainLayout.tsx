@@ -18,6 +18,25 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
   } = theme.useToken();
   const [collapsed, setCollapsed] = useState(false);
 
+  const items = [
+    {
+      icon: <UserOutlined />,
+      label: "Dashboard 1",
+    },
+    {
+      icon: <VideoCameraOutlined />,
+      label: "Profile",
+    },
+    {
+      icon: <UploadOutlined />,
+      label: "Cheetah",
+    },
+  ].map((item, index) => ({
+    key: String(index + 1),
+    icon: item.icon,
+    label: item.label,
+  }));
+
   return (
     <Layout style={{ minHeight: "100vh" }}>
       {/* STYLING */}
@@ -37,8 +56,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
         collapsible
         collapsed={collapsed}
         onCollapse={(value) => setCollapsed(value)}
-        style={{ background: colorBgContainer }}
-      >
+        style={{ background: colorBgContainer }}>
         {/* <Sider
         breakpoint="lg"
         collapsedWidth="0"
@@ -59,20 +77,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
           height={24}
           priority
         />
-        <Menu
-          mode="inline"
-          defaultSelectedKeys={["4"]}
-          items={[
-            UserOutlined,
-            VideoCameraOutlined,
-            UploadOutlined,
-            UserOutlined,
-          ].map((icon, index) => ({
-            key: String(index + 1),
-            icon: React.createElement(icon),
-            label: `nav ${index + 1}`,
-          }))}
-        />
+        <Menu mode="inline" defaultSelectedKeys={["1"]} items={items} />
       </Sider>
       <Layout>
         <Header style={{ padding: 0, background: colorBgContainer }}>
@@ -83,8 +88,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
             style={{
               padding: 12,
               background: colorBgContainer,
-            }}
-          >
+            }}>
             {/* Lorem ipsum dolor sit amet consectetur adipisicing elit. Officia */}
             {children}
           </div>

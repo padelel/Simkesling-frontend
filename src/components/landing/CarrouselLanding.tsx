@@ -4,6 +4,8 @@ import { LoginOutlined } from "@ant-design/icons";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import bg from "../../../public/gambar-carousel/Balaikota-Depok.jpg";
 import { SizeType } from "antd/es/config-provider/SizeContext";
+import { SpaceSize } from "antd/es/space";
+import Link from "next/link";
 
 const contentStyle: React.CSSProperties = {
   color: "#fff",
@@ -18,7 +20,8 @@ const contentStyle: React.CSSProperties = {
 };
 
 const CarrouselLanding = () => {
-  const [size, setSize] = useState<SizeType>("large"); // default is 'middle'
+  const [sizeButton, setSizeButton] = useState<SizeType>("large"); // default is 'middle'
+  const [size, setSize] = useState<SpaceSize | [SpaceSize, SpaceSize]>("small");
 
   return (
     <div className="flex" style={contentStyle}>
@@ -27,19 +30,21 @@ const CarrouselLanding = () => {
         <br />
         Kota Depok - Jawa Barat
       </h2>
-      <Space>
-        <Button
-          type="primary"
-          shape="round"
-          icon={<LoginOutlined />}
-          size={size}>
-          Login
-        </Button>
+      <Space size={size}>
+        <Link href="/loginpage/LoginPage" passHref>
+          <Button
+            type="primary"
+            shape="round"
+            icon={<LoginOutlined />}
+            size={sizeButton}>
+            Login
+          </Button>
+        </Link>
         <Button
           type="primary"
           shape="round"
           icon={<InfoCircleOutlined />}
-          size={size}>
+          size={sizeButton}>
           Tentang Kami
         </Button>
       </Space>

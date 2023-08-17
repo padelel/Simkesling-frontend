@@ -1,5 +1,7 @@
 import React from "react";
 import { Button, Card, Checkbox, Form, Input, Row } from "antd";
+import { LoginOutlined } from "@ant-design/icons";
+import Link from "next/link";
 
 const onFinish = (values: any) => {
   console.log("Success:", values);
@@ -55,9 +57,11 @@ const FormLogin = () => {
           </Form.Item>
 
           <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-            <Button type="primary" htmlType="submit">
-              Submit
-            </Button>
+            <Link href="/dashboard" passHref>
+              <Button icon={<LoginOutlined />} type="primary" htmlType="submit">
+                Login
+              </Button>
+            </Link>
           </Form.Item>
         </Form>
       </Card>
