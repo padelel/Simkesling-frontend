@@ -4,8 +4,8 @@ import MainLayout from "@/components/MainLayout";
 
 const DashboardPage: React.FC = () => {
   return (
-    <MainLayout title="Dashboard Page">
-      <h1>ini Dashboard</h1>
+    <MainLayout title={"Dashboard"}>
+      <h1>Dashboard</h1>
     </MainLayout>
   );
 };

@@ -1,7 +1,12 @@
 import {
   UploadOutlined,
   UserOutlined,
+  DashboardOutlined,
   VideoCameraOutlined,
+  CarOutlined,
+  OrderedListOutlined,
+  BarChartOutlined,
+  ProfileOutlined,
 } from "@ant-design/icons";
 import { Layout, Menu, theme } from "antd";
 import React, { ReactNode, useState } from "react";
@@ -20,27 +25,29 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
 
   const items = [
     {
-      icon: <UserOutlined />,
+      icon: <DashboardOutlined />,
       label: "Dashboard",
-      path: "/Dashboard",
     },
     {
-      icon: <VideoCameraOutlined />,
+      icon: <CarOutlined />,
       label: "Pengajuan Transporter",
     },
     {
-      icon: <UploadOutlined />,
+      icon: <OrderedListOutlined />,
       label: "Daftar Transporter",
     },
     {
-      icon: <UploadOutlined />,
+      icon: <BarChartOutlined />,
       label: "Laporan Limbah",
+    },
+    {
+      icon: <ProfileOutlined />,
+      label: "Profil Saya",
     },
   ].map((item, index) => ({
     key: String(index + 1),
     icon: item.icon,
     label: item.label,
-    path: item.path,
   }));
 
   return (
@@ -96,11 +103,16 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
           <br />
           Kota Depok
         </h4>
+        <div>
+          <h5 style={{ textAlign: "center" }}>
+            Puskesmas Pasir Gunung Selatan
+          </h5>
+        </div>
         <Menu mode="inline" defaultSelectedKeys={["1"]} items={items} />
       </Sider>
       <Layout>
         <Header style={{ padding: 0, background: colorBgContainer }}>
-          {title}
+          <h4>{title}</h4>
         </Header>
         <Content style={{ margin: "24px 16px 0" }}>
           <div

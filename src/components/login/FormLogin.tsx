@@ -27,7 +27,7 @@ const cardStyle = {
 
 const FormLogin = () => {
   return (
-    <Row type="flex" justify="center" align="center">
+    <Row justify="center">
       <Card style={cardStyle}>
         <Form
           name="basic"
@@ -57,7 +57,7 @@ const FormLogin = () => {
           </Form.Item>
 
           <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-            <Link href="/dashboard" passHref>
+            <Link href="/dashboardadmin" passHref>
               <Button icon={<LoginOutlined />} type="primary" htmlType="submit">
                 Login
               </Button>
