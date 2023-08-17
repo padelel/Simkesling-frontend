@@ -21,20 +21,26 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
   const items = [
     {
       icon: <UserOutlined />,
-      label: "Dashboard 1",
+      label: "Dashboard",
+      path: "/Dashboard",
     },
     {
       icon: <VideoCameraOutlined />,
-      label: "Profile",
+      label: "Pengajuan Transporter",
     },
     {
       icon: <UploadOutlined />,
-      label: "Cheetah",
+      label: "Daftar Transporter",
+    },
+    {
+      icon: <UploadOutlined />,
+      label: "Laporan Limbah",
     },
   ].map((item, index) => ({
     key: String(index + 1),
     icon: item.icon,
     label: item.label,
+    path: item.path,
   }));
 
   return (
@@ -70,13 +76,26 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
         style={{ background: colorBgContainer }}
       > */}
         {/* <div className="demo-logo-vertical" /> */}
-        <Image
-          src="/vercel.svg"
-          alt="Vercel Logo"
-          width={100}
-          height={24}
-          priority
-        />
+        <div
+          style={{
+            justifyContent: "center",
+            display: "flex",
+            marginTop: "30px",
+          }}>
+          <Image
+            src="/icon-navbar/kotadepok.png"
+            alt="Vercel Logo"
+            width={75}
+            height={75}
+            priority
+          />
+          <br />
+        </div>
+        <h4 style={{ textAlign: "center" }}>
+          Sistem Informasi Manajemen Kesehatan Lingkungan
+          <br />
+          Kota Depok
+        </h4>
         <Menu mode="inline" defaultSelectedKeys={["1"]} items={items} />
       </Sider>
       <Layout>
