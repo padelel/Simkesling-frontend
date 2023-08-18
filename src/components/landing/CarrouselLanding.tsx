@@ -31,7 +31,7 @@ const CarrouselLanding = () => {
         Kota Depok - Jawa Barat
       </h2>
       <Space size={size}>
-        <Link href="/loginpage/LoginPage" passHref>
+        <Link href="/loginpage" passHref>
           <Button
             type="primary"
             shape="round"

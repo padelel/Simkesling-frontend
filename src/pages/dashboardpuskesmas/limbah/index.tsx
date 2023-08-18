@@ -1,7 +1,7 @@
+import React from "react";
 import MainLayout from "@/components/MainLayout";
 import { Button, Space, Modal } from "antd";
 import Link from "next/link";
-import React from "react";
 import { Table } from "antd";
 import type { ColumnsType, TableProps } from "antd/es/table";
 import {
@@ -13,6 +13,10 @@ import {
 } from "@ant-design/icons";
 
 interface DataType {
+  metodePemusnahan: any;
+  beratLimbah: any;
+  tanggalPengangkutan: any;
+  nomorLaporan: any;
   status: any;
   namaTransporter: any;
   tanggalPengajuan: any;
@@ -24,34 +28,35 @@ interface DataType {
 
 const columns: ColumnsType<DataType> = [
   {
+    title: "Nomor Laporan",
+    dataIndex: "nomorLaporan",
+    defaultSortOrder: "descend",
+    sorter: (a, b) => a.nomorLaporan - b.nomorLaporan,
+  },
+  {
+    title: "Tanggal Pengangkutan",
+    dataIndex: "tanggalPengangkutan",
+    defaultSortOrder: "descend",
+    sorter: (a, b) =>
+      a.tanggalPengangkutan.localeCompare(b.tanggalPengangkutan),
+  },
+  {
     title: "Nama Transporter",
     dataIndex: "namaTransporter",
     defaultSortOrder: "descend",
-    sorter: (a, b) => a.namaTransporter - b.namaTransporter,
+    sorter: (a, b) => a.namaTransporter.localeCompare(b.namaTransporter),
   },
   {
-    title: "Tanggal Pengajuan",
-    dataIndex: "tanggalPengajuan",
+    title: "Berat Limbah",
+    dataIndex: "beratLimbah",
     defaultSortOrder: "descend",
-    sorter: (a, b) => a.tanggalPengajuan.localeCompare(b.tanggalPengajuan),
+    sorter: (a, b) => a.beratLimbah - b.beratLimbah,
   },
   {
-    title: "Status Pengajuan",
-    dataIndex: "status",
-    filters: [
-      {
-        text: "Menunggu",
-        value: "Menunggu",
-      },
-      {
-        text: "Ditolak",
-        value: "Ditolak",
-      },
-    ],
-    // specify the condition of filtering result
-    // here is that finding the name started with `value`
-    onFilter: (value: string, record) => record.status.indexOf(value) === 0,
-    sorter: (a, b) => a.status - b.status,
+    title: "Metode Pemusnahan",
+    dataIndex: "metodePemusnahan",
+    defaultSortOrder: "descend",
+    sorter: (a, b) => a.metodePemusnahan.localeCompare(b.metodePemusnahan),
   },
 
   {
@@ -80,27 +85,35 @@ const columns: ColumnsType<DataType> = [
 const data = [
   {
     key: "1",
+    nomorLaporan: "128673123",
+    tanggalPengangkutan: "17-08-2023",
     namaTransporter: "John Brown",
-    tanggalPengajuan: "17-08-2023",
-    status: "Menunggu",
+    beratLimbah: 30,
+    metodePemusnahan: "Pembakaran",
   },
   {
     key: "2",
-    namaTransporter: "Aohn Brown",
-    tanggalPengajuan: "19-08-2023",
-    status: "Menunggu",
+    nomorLaporan: "128673129",
+    tanggalPengangkutan: "17-09-2023",
+    namaTransporter: "John Brown",
+    beratLimbah: 35,
+    metodePemusnahan: "Pembakaran",
   },
   {
     key: "3",
-    namaTransporter: "Pohn Brown",
-    tanggalPengajuan: "27-08-2023",
-    status: "Ditolak",
+    nomorLaporan: "128673129",
+    tanggalPengangkutan: "17-08-2023",
+    namaTransporter: "Denis Brown",
+    beratLimbah: 40,
+    metodePemusnahan: "Pembakaran",
   },
   {
     key: "4",
-    namaTransporter: "Kohn Brown",
-    tanggalPengajuan: "17-09-2023",
-    status: "Ditolak",
+    nomorLaporan: "128673123",
+    tanggalPengangkutan: "17-10-2023",
+    namaTransporter: "John Brown",
+    beratLimbah: 50,
+    metodePemusnahan: "Pembakaran",
   },
 ];
 
@@ -134,12 +147,10 @@ const showDeleteConfirm = () => {
 
 const index = () => {
   return (
-    <MainLayout title="Pengajuan Transporter">
+    <MainLayout title="Daftar Limbah">
       <div>
-        <Link
-          href="/dashboardpuskesmas/pengajuantransporter/PagePengajuanTransporter"
-          passHref>
-          <Button type="primary">Tambah Transporter</Button>
+        <Link href="/dashboardpuskesmas/limbah/PageTambahLimbah" passHref>
+          <Button type="primary">Tambah Laporan Limbah</Button>
         </Link>
       </div>
 

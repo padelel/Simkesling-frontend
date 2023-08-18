@@ -7,6 +7,7 @@ import {
   OrderedListOutlined,
   BarChartOutlined,
   ProfileOutlined,
+  LogoutOutlined,
 } from "@ant-design/icons";
 import { Layout, Menu, theme } from "antd";
 import React, { ReactNode, useState } from "react";
@@ -43,6 +44,10 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
     {
       icon: <ProfileOutlined />,
       label: "Profil Saya",
+    },
+    {
+      icon: <LogoutOutlined />,
+      label: "Logout",
     },
   ].map((item, index) => ({
     key: String(index + 1),
@@ -125,7 +130,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
           </div>
         </Content>
         <Footer style={{ textAlign: "center" }}>
-          Ant Design ©2023 Created by Ant UED
+          SIMKESLING ©2023 Created by Keluarga Berencana
         </Footer>
       </Layout>
     </Layout>

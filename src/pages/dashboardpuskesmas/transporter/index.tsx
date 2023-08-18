@@ -1,8 +1,9 @@
 import MainLayout from "@/components/MainLayout";
-import { Button, Space, Modal } from "antd";
-import Link from "next/link";
-import React from "react";
 import { Table } from "antd";
+import React from "react";
+import { Button, Modal, Space } from "antd";
+import Link from "next/link";
+
 import type { ColumnsType, TableProps } from "antd/es/table";
 import {
   LoginOutlined,
@@ -16,6 +17,7 @@ interface DataType {
   status: any;
   namaTransporter: any;
   tanggalPengajuan: any;
+  tanggalBerakhir: any;
   key: React.Key;
   name: string;
   age: number;
@@ -36,22 +38,10 @@ const columns: ColumnsType<DataType> = [
     sorter: (a, b) => a.tanggalPengajuan.localeCompare(b.tanggalPengajuan),
   },
   {
-    title: "Status Pengajuan",
-    dataIndex: "status",
-    filters: [
-      {
-        text: "Menunggu",
-        value: "Menunggu",
-      },
-      {
-        text: "Ditolak",
-        value: "Ditolak",
-      },
-    ],
-    // specify the condition of filtering result
-    // here is that finding the name started with `value`
-    onFilter: (value: string, record) => record.status.indexOf(value) === 0,
-    sorter: (a, b) => a.status - b.status,
+    title: "Tanggal Berakhir",
+    dataIndex: "tanggalBerakhir",
+    defaultSortOrder: "descend",
+    sorter: (a, b) => a.tanggalPengajuan.localeCompare(b.tanggalBerakhir),
   },
 
   {
@@ -82,25 +72,25 @@ const data = [
     key: "1",
     namaTransporter: "John Brown",
     tanggalPengajuan: "17-08-2023",
-    status: "Menunggu",
+    tanggalBerakhir: "17-08-2025",
   },
   {
     key: "2",
     namaTransporter: "Aohn Brown",
     tanggalPengajuan: "19-08-2023",
-    status: "Menunggu",
+    tanggalBerakhir: "19-08-2025",
   },
   {
     key: "3",
     namaTransporter: "Pohn Brown",
     tanggalPengajuan: "27-08-2023",
-    status: "Ditolak",
+    tanggalBerakhir: "27-08-2025",
   },
   {
     key: "4",
     namaTransporter: "Kohn Brown",
     tanggalPengajuan: "17-09-2023",
-    status: "Ditolak",
+    tanggalBerakhir: "17-09-2025",
   },
 ];
 
@@ -134,15 +124,7 @@ const showDeleteConfirm = () => {
 
 const index = () => {
   return (
-    <MainLayout title="Pengajuan Transporter">
-      <div>
-        <Link
-          href="/dashboardpuskesmas/pengajuantransporter/PagePengajuanTransporter"
-          passHref>
-          <Button type="primary">Tambah Transporter</Button>
-        </Link>
-      </div>
-
+    <MainLayout title="Daftar Transporter">
       <div style={{ marginTop: "20px" }}>
         <Table columns={columns} dataSource={data} onChange={onChange} />;
       </div>
