@@ -78,13 +78,13 @@ const tabListNoTitle = [
 const FormPengajuanLimbah = () => {
   const [isCheckboxChecked, setIsCheckboxChecked] = useState(false);
 
-  const handleCheckboxChange = (e) => {
+  const handleCheckboxChange = (e: any) => {
     setIsCheckboxChecked(e.target.checked);
   };
 
   const [isCheckboxChecked1, setIsCheckboxChecked1] = useState(false);
 
-  const handleCheckboxChange1 = (e) => {
+  const handleCheckboxChange1 = (e: any) => {
     setIsCheckboxChecked1(e.target.checked);
   };
 

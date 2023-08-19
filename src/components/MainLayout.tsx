@@ -9,12 +9,12 @@ import {
   ProfileOutlined,
   LogoutOutlined,
 } from "@ant-design/icons";
-import { Layout, Menu, theme } from "antd";
-import React, { ReactNode, useState } from "react";
+import { Layout, Menu, theme, Typography } from "antd";
+import React, { ReactNode, useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import Link from "next/link";
 
+const { Title } = Typography;
 interface MainLayoutProps {
   children: ReactNode;
   title?: string;
@@ -26,62 +26,48 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
   const {
     token: { colorBgContainer },
   } = theme.useToken();
+  const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
 
   const items = [
     {
       icon: <DashboardOutlined />,
       label: "Dashboard",
-      url: "/dashboardpuskesmas",
+      path: "/dashboardpuskesmas",
     },
     {
       icon: <CarOutlined />,
       label: "Pengajuan Transporter",
-      url: "/dashboardpuskesmas/pengajuantransporter",
+      path: "/dashboardpuskesmas/pengajuantransporter",
     },
     {
       icon: <OrderedListOutlined />,
-      label: "List Transporter",
-      url: "/dashboardpuskesmas/transporter",
+      label: "Daftar Transporter",
+      path: "/dashboardpuskesmas/transporter",
     },
     {
       icon: <BarChartOutlined />,
       label: "Laporan Limbah",
-      url: "/dashboardpuskesmas/limbah",
+      path: "/dashboardpuskesmas/limbah",
     },
     {
       icon: <ProfileOutlined />,
       label: "Profil Saya",
-      url: "/dashboardpuskesmas/profilepuskesmas",
+      path: "/dashboardpuskesmas/profilepuskesmas",
     },
     {
       icon: <LogoutOutlined />,
       label: "Logout",
+      path: "/",
     },
   ].map((item, index) => ({
-    key: (index + 1).toString(),
-    icon: item.icon,
-    label: item.label,
-    url: item.url,
+    key: item.path,
+    ...item,
   }));
 
-  const router = useRouter();
-  const [selectedKey, setSelectedKey] = useState("1"); // Default selected key
-
-  const handleMenuItemClick = (url: any, key: any) => {
-    console.debug("handleMenuItemClick:", key, url);
-    if (url) {
-      setSelectedKey(key);
-      router.push(url);
-    }
-  };
-  const handleMenuClick = (isi: any) => {
-    console.debug(isi);
-    // console.debug("handleMenuItemClick:", key, url);
-    // if (url) {
-    //   setSelectedKey(key);
-    //   router.push(url);
-    // }
+  const onClickMenu = (item: any) => {
+    const clicked = items.find((_item) => _item.key === item.key);
+    router.push(clicked!.path);
   };
 
   return (
@@ -142,23 +128,20 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
             Puskesmas Pasir Gunung Selatan
           </h5>
         </div>
-        <Menu mode="inline" onClick={handleMenuClick}>
-          {items.map((item, index) => {
-            console.log(item);
-            return (
-              <Menu.Item
-                key={item.key}
-                icon={item.icon}
-                onClick={() => handleMenuItemClick(item.url, item.key)}>
-                <Link href={item.url ?? ""}>{item.label}</Link>
-              </Menu.Item>
-            );
-          })}
-        </Menu>
+        <Menu
+          mode="inline"
+          defaultSelectedKeys={[router.pathname]}
+          selectedKeys={[router.pathname]}
+          items={items}
+          onClick={onClickMenu}
+        />
       </Sider>
       <Layout>
         <Header style={{ padding: 0, background: colorBgContainer }}>
-          <h4>{title}</h4>
+          {/* <div style={{ display: "flex", justifyContent: "center" }}>
+            <h2>{title}</h2>
+          </div> */}
+          <Title level={5}>{title}</Title>
         </Header>
         <Content style={{ margin: "24px 16px 0" }}>
           <div

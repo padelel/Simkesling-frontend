@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Button,
+  Divider,
   Form,
   Input,
   Select,
@@ -59,6 +60,48 @@ const props: UploadProps = {
 };
 
 const FormPengajuanTransporter = () => {
+  const [rowCount, setRowCount] = useState(1);
+
+  const handleReduceRow = () => {
+    setRowCount(rowCount - 1);
+  };
+  const handleAddRow = () => {
+    setRowCount(rowCount + 1);
+  };
+
+  const renderRows = () => {
+    const rows = [];
+
+    for (let i = 0; i < rowCount; i++) {
+      rows.push(
+        <>
+          <Form.Item label="Upload MOU">
+            <Upload {...props}>
+              <Button icon={<UploadOutlined />}>
+                Klik Untuk Upload MOU Transporter
+              </Button>
+            </Upload>
+          </Form.Item>
+          <Form.Item label="Masa Berlaku MOU">
+            <RangePicker
+              showTime={{ format: "HH:mm" }}
+              format="YYYY-MM-DD HH:mm"
+              onChange={onChange}
+              onOk={onOk}
+            />
+          </Form.Item>
+          <Divider />
+        </>
+      );
+    }
+
+    return rows;
+  };
+  const [showMOUFields, setShowMOUFields] = useState(false);
+
+  const toggleMOUFields = () => {
+    setShowMOUFields(!showMOUFields);
+  };
   return (
     <>
       <Form {...layout} name="control-hooks" style={{ maxWidth: 600 }}>
@@ -107,21 +150,21 @@ const FormPengajuanTransporter = () => {
         <Form.Item name="email" label="Email" rules={[{ required: true }]}>
           <Input />
         </Form.Item>
-        <Form.Item label="Upload MOU">
-          <Upload {...props}>
-            <Button icon={<UploadOutlined />}>
-              Klik Untuk Upload MOU Transporter
+
+        <Divider />
+
+        <Form.Item {...tailLayout}>
+          <Space size="small">
+            <Button type="primary" onClick={handleAddRow}>
+              Tambah Baris MOU
             </Button>
-          </Upload>
+            <Button type="primary" onClick={handleReduceRow}>
+              Kurangi Baris MOU
+            </Button>
+          </Space>
         </Form.Item>
-        <Form.Item label="Masa Berlaku MOU">
-          <RangePicker
-            showTime={{ format: "HH:mm" }}
-            format="YYYY-MM-DD HH:mm"
-            onChange={onChange}
-            onOk={onOk}
-          />
-        </Form.Item>
+
+        {renderRows()}
 
         <Form.Item {...tailLayout}>
           <Button type="primary" htmlType="submit">
