@@ -10,6 +10,7 @@ import {
   EyeOutlined,
   DeleteOutlined,
 } from "@ant-design/icons";
+import ModalValidasiTransporter from "@/components/admin/validasi/ModalValidasiTransporter";
 
 interface DataType {
   status: any;
@@ -58,15 +59,7 @@ const columns: ColumnsType<DataType> = [
     key: "action",
     render: (_, record) => (
       <Space size="middle">
-        <Button icon={<EditOutlined />} style={{ backgroundColor: "yellow" }}>
-          Edit
-        </Button>
-        <Button icon={<EyeOutlined />} type="primary">
-          View
-        </Button>
-        <Button icon={<DeleteOutlined />} type="primary" danger>
-          Delete
-        </Button>
+        <ModalValidasiTransporter/>
       </Space>
     ),
   },
@@ -111,13 +104,6 @@ const onChange: TableProps<DataType>["onChange"] = (
 const index = () => {
   return (
     <MainLayout title="Pengajuan Transporter">
-      <div>
-        <Link
-          href="/admin/manajementransporter/PengajuanTransporter"
-          passHref>
-          <Button type="primary">Tambah Transporter</Button>
-        </Link>
-      </div>
 
       <div style={{ marginTop: "20px" }}>
         <Table columns={columns} dataSource={data} onChange={onChange} />;

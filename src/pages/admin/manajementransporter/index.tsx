@@ -110,7 +110,7 @@ const onChange: TableProps<DataType>["onChange"] = (
 
 const index = () => {
   return (
-    <MainLayout title="Pengajuan Transporter">
+    <MainLayout title="Tabel Transporter">
       <div>
         <Link
           href="/admin/manajementransporter/PengajuanTransporter"

@@ -58,28 +58,6 @@ const columns: ColumnsType<DataType> = [
     defaultSortOrder: "descend",
     sorter: (a, b) => a.metodePemusnahan.localeCompare(b.metodePemusnahan),
   },
-
-  {
-    title: "Action",
-    key: "action",
-    render: (_, record) => (
-      <Space size="middle">
-        <Button icon={<EditOutlined />} style={{ backgroundColor: "yellow" }}>
-          Edit
-        </Button>
-        <Button icon={<EyeOutlined />} type="primary">
-          View
-        </Button>
-        <Button
-          onClick={showDeleteConfirm}
-          icon={<DeleteOutlined />}
-          type="primary"
-          danger>
-          Delete
-        </Button>
-      </Space>
-    ),
-  },
 ];
 
 const data = [
@@ -126,39 +104,14 @@ const onChange: TableProps<DataType>["onChange"] = (
   console.log("params", pagination, filters, sorter, extra);
 };
 
-const { confirm } = Modal;
-
-const showDeleteConfirm = () => {
-  confirm({
-    title: "Are you sure delete this task?",
-    icon: <ExclamationCircleFilled />,
-    content: "Some descriptions",
-    okText: "Yes",
-    okType: "danger",
-    cancelText: "No",
-    onOk() {
-      console.log("OK");
-    },
-    onCancel() {
-      console.log("Cancel");
-    },
-  });
-};
-
-const index = () => {
+const TabelNotifikasi = () => {
   return (
-    <MainLayout title="Tabel Laporan">
-      <div>
-        <Link href="/dashboardpuskesmas/limbah/PageTambahLimbah" passHref>
-          <Button type="primary">Tambah Laporan Limbah</Button>
-        </Link>
-      </div>
-
+    <>
       <div style={{ marginTop: "20px" }}>
         <Table columns={columns} dataSource={data} onChange={onChange} />;
       </div>
-    </MainLayout>
+    </>
   );
 };
 
-export default index;
+export default TabelNotifikasi;

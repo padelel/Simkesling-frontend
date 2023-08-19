@@ -126,7 +126,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
                     </div>
                 </Content>
                 <Footer style={{ textAlign: "center" }}>
-                    SISTEM INFORMASI MANAJEMEN KESEHATAN LINGKUNGAN KOTA DEPOK
+                    SIMKESLING ©2023 Created by Keluarga Berencana
                 </Footer>
             </Layout>
         </Layout>
