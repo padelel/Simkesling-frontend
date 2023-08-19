@@ -9,9 +9,12 @@ import {
   ProfileOutlined,
   LogoutOutlined,
 } from "@ant-design/icons";
-import { Layout, Menu, theme } from "antd";
-import React, { ReactNode, useState } from "react";
+import { Layout, Menu, theme, Typography } from "antd";
+import React, { ReactNode, useEffect, useState } from "react";
 import Image from "next/image";
+import { useRouter } from "next/router";
+
+const { Title } = Typography;
 interface MainLayoutProps {
   children: ReactNode;
   title?: string;
@@ -22,38 +25,49 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
   const {
     token: { colorBgContainer },
   } = theme.useToken();
+  const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
 
   const items = [
     {
       icon: <DashboardOutlined />,
       label: "Dashboard",
+      path: "/dashboardpuskesmas",
     },
     {
       icon: <CarOutlined />,
       label: "Pengajuan Transporter",
+      path: "/dashboardpuskesmas/pengajuantransporter",
     },
     {
       icon: <OrderedListOutlined />,
       label: "Daftar Transporter",
+      path: "/dashboardpuskesmas/transporter",
     },
     {
       icon: <BarChartOutlined />,
       label: "Laporan Limbah",
+      path: "/dashboardpuskesmas/limbah",
     },
     {
       icon: <ProfileOutlined />,
       label: "Profil Saya",
+      path: "/dashboardpuskesmas/profilepuskesmas",
     },
     {
       icon: <LogoutOutlined />,
       label: "Logout",
+      path: "/",
     },
   ].map((item, index) => ({
-    key: String(index + 1),
-    icon: item.icon,
-    label: item.label,
+    key: item.path,
+    ...item,
   }));
+
+  const onClickMenu = (item: any) => {
+    const clicked = items.find((_item) => _item.key === item.key);
+    router.push(clicked!.path);
+  };
 
   return (
     <Layout style={{ minHeight: "100vh" }}>
@@ -74,7 +88,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
         collapsible
         collapsed={collapsed}
         onCollapse={(value) => setCollapsed(value)}
-        style={{ background: colorBgContainer }}>
+        style={{ background: colorBgContainer }}
+      >
         {/* <Sider
         breakpoint="lg"
         collapsedWidth="0"
@@ -93,7 +108,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
             justifyContent: "center",
             display: "flex",
             marginTop: "30px",
-          }}>
+          }}
+        >
           <Image
             src="/icon-navbar/kotadepok.png"
             alt="Vercel Logo"
@@ -113,18 +129,28 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
             Puskesmas Pasir Gunung Selatan
           </h5>
         </div>
-        <Menu mode="inline" defaultSelectedKeys={["1"]} items={items} />
+        <Menu
+          mode="inline"
+          defaultSelectedKeys={[router.pathname]}
+          selectedKeys={[router.pathname]}
+          items={items}
+          onClick={onClickMenu}
+        />
       </Sider>
       <Layout>
         <Header style={{ padding: 0, background: colorBgContainer }}>
-          <h4>{title}</h4>
+          {/* <div style={{ display: "flex", justifyContent: "center" }}>
+            <h2>{title}</h2>
+          </div> */}
+          <Title level={5}>{title}</Title>
         </Header>
         <Content style={{ margin: "24px 16px 0" }}>
           <div
             style={{
               padding: 12,
               background: colorBgContainer,
-            }}>
+            }}
+          >
             {/* Lorem ipsum dolor sit amet consectetur adipisicing elit. Officia */}
             {children}
           </div>
