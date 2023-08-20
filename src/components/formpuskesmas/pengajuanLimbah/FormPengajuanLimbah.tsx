@@ -13,7 +13,12 @@ import {
   message,
 } from "antd";
 
-import { LoginOutlined, UploadOutlined } from "@ant-design/icons";
+import {
+  LoginOutlined,
+  UploadOutlined,
+  PlusOutlined,
+  MinusCircleOutlined,
+} from "@ant-design/icons";
 
 import { DatePicker, Space } from "antd";
 import type { DatePickerProps, RangePickerProps } from "antd/es/date-picker";
@@ -49,6 +54,7 @@ const tailLayout = {
 const props: UploadProps = {
   name: "file",
   action: "https://www.mocky.io/v2/5cc8019d300000980a055e76",
+  multiple: true,
   headers: {
     authorization: "authorization-text",
   },
@@ -77,42 +83,46 @@ const tabListNoTitle = [
 
 const FormPengajuanLimbah = () => {
   const [isCheckboxChecked, setIsCheckboxChecked] = useState(false);
+  const [isCheckboxChecked1, setIsCheckboxChecked1] = useState(false);
 
   const handleCheckboxChange = (e: any) => {
     setIsCheckboxChecked(e.target.checked);
   };
 
-  const [isCheckboxChecked1, setIsCheckboxChecked1] = useState(false);
-
   const handleCheckboxChange1 = (e: any) => {
     setIsCheckboxChecked1(e.target.checked);
   };
 
-  const [rowCount, setRowCount] = useState(1);
+  // const pemusnahValidationRules = isCheckboxChecked
+  //   ? [
+  //       {
+  //         required: true,
+  //         message: "Masukan Ukuran Pemusnah Mandiri",
+  //       },
+  //     ]
+  //   : [{ required: false }];
 
-  const handleAddRow = () => {
-    setRowCount(rowCount + 1);
+  // const pemusnahValidationRules1 = isCheckboxChecked1
+  //   ? [{ required: true, message: "Masukan Ukuran Pemusnah Mandiri" }]
+  //   : [{ required: false, message: "" }];
+
+  const handleNextButton = () => {
+    // Update the activeTabKey2 state
+    setActiveTabKey2("limbahCair");
   };
 
-  const renderRows = () => {
-    const rows = [];
-
-    for (let i = 0; i < rowCount; i++) {
-      rows.push(
-        <Space key={i} style={{ marginTop: 10 }} size="small">
-          <Input style={{ width: 150 }} placeholder="Kategori" />
-          <Input style={{ width: 150 }} placeholder="Catatan" />
-          <InputNumber style={{ width: 150 }} placeholder="Berat" /> Kg
-        </Space>
-      );
-    }
-
-    return rows;
+  const handlePreviousButton = () => {
+    // Update the activeTabKey2 state
+    setActiveTabKey2("limbahPadat");
   };
 
   const contentListNoTitle: Record<string, React.ReactNode> = {
     limbahPadat: (
-      <Form {...layout} name="control-hooks" style={{ maxWidth: 600 }}>
+      <Form
+        onFinish={handleNextButton}
+        {...layout}
+        name="control-hooks"
+        style={{ maxWidth: 600 }}>
         <h2 style={{ display: "flex", justifyContent: "center" }}>
           Pencatatan Limbah Padat
         </h2>
@@ -128,6 +138,12 @@ const FormPengajuanLimbah = () => {
           </Select>
         </Form.Item>
         <Form.Item
+          name="namaPemusnah"
+          label="Nama Pemusnah"
+          rules={[{ required: true }]}>
+          <Input />
+        </Form.Item>
+        <Form.Item
           name="metodePemusnahan"
           label="Metode Pemusnahan"
           rules={[{ required: true }]}>
@@ -135,58 +151,94 @@ const FormPengajuanLimbah = () => {
         </Form.Item>
         <Divider />
         <Form.Item name="ukuranTPS" label="Memiliki TPS?">
+          {/* rules={pemusnahValidationRules} */}
           <Checkbox style={{ marginLeft: 10 }} onChange={handleCheckboxChange}>
             Iya
           </Checkbox>
-          <InputNumber disabled={!isCheckboxChecked} min={0} defaultValue={0} />{" "}
+          <InputNumber
+            disabled={!isCheckboxChecked}
+            value={isCheckboxChecked ? 0 : undefined}
+            defaultValue={isCheckboxChecked ? 1 : undefined}
+          />{" "}
           /Ukuran (m2)
         </Form.Item>
         <Form.Item name="ukuranPemusnah" label="Memiliki Pemusnah Mandiri?">
+          {/* rules={pemusnahValidationRules1} */}
           <Checkbox style={{ marginLeft: 10 }} onChange={handleCheckboxChange1}>
             Iya
           </Checkbox>
           <InputNumber
             disabled={!isCheckboxChecked1}
-            min={0}
-            defaultValue={0}
+            value={isCheckboxChecked1 ? 0 : undefined}
+            defaultValue={isCheckboxChecked1 ? 1 : undefined}
           />{" "}
           /Ukuran (m2)
         </Form.Item>
-
         <Divider />
-        <Form.Item
-          name="beratLimbah"
-          label="Total Limbah Padat(Kg)"
-          rules={[{ required: true }]}>
-          <InputNumber min={1} defaultValue={1} />
+        <Form.Item name="beratLimbah" label="Total Limbah Padat(Kg)" rules={[]}>
+          <InputNumber min={0} defaultValue={0} />
         </Form.Item>
         <Form.Item
           name="beratLimbahNonCovid"
           label="Total Limbah NonCovid(Kg)"
-          rules={[{ required: true }]}>
-          <InputNumber min={1} defaultValue={1} />
+          rules={[]}>
+          <InputNumber min={0} defaultValue={0} />
         </Form.Item>
         <Form.Item
           name="totalBeratLimbah"
           label="Total Limbah Covid(Kg)"
-          rules={[{ required: true }]}>
-          <InputNumber min={1} defaultValue={1} />
+          rules={[]}>
+          <InputNumber min={0} defaultValue={0} />
         </Form.Item>
         <Divider />
-        <div>
-          <h3>Detail Limbah Padat</h3>
-          <Button type="primary" onClick={handleAddRow}>
-            Tambah Baris
-          </Button>
-        </div>
-        <br />
-        <Form.Item name="totalDetailLimbah" rules={[{ required: true }]}>
-          {renderRows()}
-        </Form.Item>
 
+        <Form.List name="detailLimbahDynamic">
+          {(fields, { add, remove }) => (
+            <>
+              {fields.map(({ key, name, ...restField }) => (
+                <Space
+                  key={key}
+                  style={{ display: "flex", marginBottom: 8 }}
+                  align="baseline">
+                  <Form.Item
+                    {...restField}
+                    name={[name, "kategoriLimbahPadat"]}
+                    rules={[
+                      { required: true, message: "Masukan Kategori Limbah" },
+                    ]}>
+                    <Input style={{ width: 150 }} placeholder="Kategori" />
+                  </Form.Item>
+                  <Form.Item
+                    {...restField}
+                    name={[name, "catatanLimbahPadat"]}
+                    rules={[{}]}>
+                    <Input style={{ width: 150 }} placeholder="Catatan" />
+                  </Form.Item>
+                  <Form.Item
+                    {...restField}
+                    name={[name, "beratLimbahPadat"]}
+                    rules={[
+                      { required: true, message: "Masukan Berat Limbah" },
+                    ]}>
+                    <Input style={{ width: 150 }} placeholder="Berat" />
+                  </Form.Item>
+                  <MinusCircleOutlined onClick={() => remove(name)} />
+                </Space>
+              ))}
+              <Form.Item>
+                <Button
+                  type="dashed"
+                  onClick={() => add()}
+                  block
+                  icon={<PlusOutlined />}>
+                  Tambahkan List Detail Limbah Padat
+                </Button>
+              </Form.Item>
+            </>
+          )}
+        </Form.List>
         <Divider />
         <h3>Upload Catatan</h3>
-
         <Form.Item label="Upload Manifest">
           <Upload {...props}>
             <Button icon={<UploadOutlined />}>
@@ -199,10 +251,9 @@ const FormPengajuanLimbah = () => {
             <Button icon={<UploadOutlined />}>Klik Untuk Upload Logbook</Button>
           </Upload>
         </Form.Item>
-
         <Form.Item {...tailLayout}>
           <Button type="primary" htmlType="submit">
-            Submit
+            Next
           </Button>
         </Form.Item>
       </Form>
@@ -212,17 +263,11 @@ const FormPengajuanLimbah = () => {
         <h2 style={{ display: "flex", justifyContent: "center" }}>
           Pencatatan Limbah Cair
         </h2>
-        <Form.Item
-          name="debitLimbah"
-          label="Debit Limbah Cair"
-          rules={[{ required: true }]}>
-          <InputNumber min={1} defaultValue={1} /> (Kg)
+        <Form.Item name="debitLimbah" label="Debit Limbah Cair">
+          <Input />
         </Form.Item>
-        <Form.Item
-          name="kapasitasInpal"
-          label="Kapasitas Inpal"
-          rules={[{ required: true }]}>
-          <InputNumber min={1} defaultValue={1} /> (m3)
+        <Form.Item name="kapasitasInpal" label="Kapasitas Inpal">
+          <Input />
         </Form.Item>
 
         <Divider />
@@ -241,26 +286,30 @@ const FormPengajuanLimbah = () => {
         </Form.Item>
 
         <Form.Item {...tailLayout}>
-          <Button type="primary" htmlType="submit">
-            Submit
-          </Button>
+          <Space>
+            <Button type="primary" onClick={handlePreviousButton}>
+              Previous
+            </Button>
+            <Button type="primary" htmlType="submit">
+              Submit
+            </Button>
+          </Space>
         </Form.Item>
       </Form>
     ),
   };
 
   const [activeTabKey2, setActiveTabKey2] = useState<string>("limbahPadat");
-  const onTab2Change = (key: string) => {
-    setActiveTabKey2(key);
-  };
+  // const onTab2Change = (key: string) => {
+  //   setActiveTabKey2(key);
+  // };
 
   return (
     <>
       <Card
         style={{ width: "100%" }}
         tabList={tabListNoTitle}
-        activeTabKey={activeTabKey2}
-        onTabChange={onTab2Change}>
+        activeTabKey={activeTabKey2}>
         <div style={{ display: "flex", justifyContent: "center" }}>
           {contentListNoTitle[activeTabKey2]}
         </div>

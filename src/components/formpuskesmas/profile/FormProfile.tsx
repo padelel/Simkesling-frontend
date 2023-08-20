@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Button,
   Form,
@@ -45,30 +45,68 @@ const props: UploadProps = {
 };
 
 const FormProfile = () => {
+  const [form, setForm] = useState({
+    nama: "",
+    noizin: "",
+    kecamatan: "",
+    email: "",
+    alamat: "",
+  });
+
+  const handleChangeInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+    console.log(event);
+    setForm({
+      ...form,
+      [event.target.name]: event.target.value,
+    });
+  };
+  const handleChangeSelect = (val: any, name: string, event: any) => {
+    // console.log(val);
+    // console.log(event.target);
+    setForm({
+      ...form,
+      [name]: val,
+    });
+  };
+
+  const handleSubmit = () => {
+    console.log(form);
+  };
   return (
     <>
       <div style={{ display: "flex", justifyContent: "center" }}>
         <h2>Profile Saya</h2>
       </div>
       <div style={{ display: "flex", justifyContent: "center" }}>
-        <Form {...layout} name="control-hooks" style={{ maxWidth: 600 }}>
+        <Form
+          onFinish={handleSubmit}
+          {...layout}
+          name="control-hooks"
+          style={{ maxWidth: 600 }}>
           <Form.Item
-            name="namaPuskesmas"
+            name="nama"
             label="Nama Puskemas/RS"
             rules={[{ required: true }]}>
-            <Input />
+            <Input onChange={handleChangeInput} value={form.nama} name="nama" />
           </Form.Item>
           <Form.Item
             name="noIzin"
             label="Nomor Izin"
             rules={[{ required: true }]}>
-            <Input />
+            <Input
+              onChange={handleChangeInput}
+              value={form.nama}
+              name="noizin"
+            />
           </Form.Item>
           <Form.Item
             name="kecamatan"
             label="Kecamatan"
+            initialValue={form.kecamatan}
             rules={[{ required: true }]}>
             <Select
+              value={form.kecamatan}
+              onChange={(v) => handleChangeSelect(v, "kecamatan", event)}
               placeholder="Select a option and change input text above"
               allowClear>
               <Option value="Kelapa Dua">Kelapa Dua</Option>
@@ -98,15 +136,13 @@ const FormProfile = () => {
             <Input />
           </Form.Item>
           <Form.Item name="email" label="Email" rules={[{ required: true }]}>
-            <Input />
+            <Input
+              onChange={handleChangeInput}
+              value={form.email}
+              name="email"
+            />
           </Form.Item>
-          <Form.Item label="Upload MOU">
-            <Upload {...props}>
-              <Button icon={<UploadOutlined />}>
-                Klik Untuk Upload MOU Transporter
-              </Button>
-            </Upload>
-          </Form.Item>
+
           <Form.Item label="Upload Izin IPAL">
             <Upload {...props}>
               <Button icon={<UploadOutlined />}>
