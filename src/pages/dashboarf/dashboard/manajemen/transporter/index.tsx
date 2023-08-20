@@ -1,4 +1,4 @@
-import MainLayout from "@/components/admin/MainLayout";
+import MainLayout from "@/components/dashboard/MainLayout";
 import { Button, Space } from "antd";
 import Link from "next/link";
 import React from "react";
@@ -13,23 +13,44 @@ import {
 
 interface DataType {
   status: any;
-  namaPuskesmas: any;
-  username: any;
+  namaTransporter: any;
+  tanggalPengajuan: any;
   key: React.Key;
+  name: string;
+  age: number;
+  address: string;
 }
 
 const columns: ColumnsType<DataType> = [
   {
-    title: "Nama Puskesmas / Rumah Sakit",
-    dataIndex: "namaPuskesmas",
+    title: "Nama Transporter",
+    dataIndex: "namaTransporter",
     defaultSortOrder: "descend",
-    sorter: (a, b) => a.namaPuskesmas - b.namaPuskesmas,
+    sorter: (a, b) => a.namaTransporter - b.namaTransporter,
   },
   {
-    title: "Username Puskesmas / Rumah Sakit",
-    dataIndex: "username",
+    title: "Tanggal Pengajuan",
+    dataIndex: "tanggalPengajuan",
     defaultSortOrder: "descend",
-    sorter: (a, b) => a.username - b.username,
+    sorter: (a, b) => a.tanggalPengajuan.localeCompare(b.tanggalPengajuan),
+  },
+  {
+    title: "Status Pengajuan",
+    dataIndex: "status",
+    filters: [
+      {
+        text: "Menunggu",
+        value: "Menunggu",
+      },
+      {
+        text: "Ditolak",
+        value: "Ditolak",
+      },
+    ],
+    // specify the condition of filtering result
+    // here is that finding the name started with `value`
+    onFilter: (value: string, record) => record.status.indexOf(value) === 0,
+    sorter: (a, b) => a.status - b.status,
   },
 
   {
@@ -38,7 +59,7 @@ const columns: ColumnsType<DataType> = [
     render: (_, record) => (
       <Space size="middle">
         <Button icon={<EditOutlined />} style={{ backgroundColor: "yellow" }}>
-          Edit Password
+          Edit
         </Button>
         <Button icon={<EyeOutlined />} type="primary">
           View
@@ -54,23 +75,27 @@ const columns: ColumnsType<DataType> = [
 const data = [
   {
     key: "1",
-    namaPuskesmas: "Jati Waringin",
-    username: "jatwar",
+    namaTransporter: "John Brown",
+    tanggalPengajuan: "17-08-2023",
+    status: "Menunggu",
   },
   {
     key: "2",
-    namaPuskesmas: "Gatot Subroto",
-    username: "gatsu",
+    namaTransporter: "Aohn Brown",
+    tanggalPengajuan: "19-08-2023",
+    status: "Menunggu",
   },
   {
     key: "3",
-    namaPuskesmas: "Majelis Repam",
-    username: "mapam",
+    namaTransporter: "Pohn Brown",
+    tanggalPengajuan: "27-08-2023",
+    status: "Ditolak",
   },
   {
     key: "4",
-    namaPuskesmas: "Waduuh",
-    username: "wdh",
+    namaTransporter: "Kohn Brown",
+    tanggalPengajuan: "17-09-2023",
+    status: "Ditolak",
   },
 ];
 
@@ -85,10 +110,10 @@ const onChange: TableProps<DataType>["onChange"] = (
 
 const index = () => {
   return (
-    <MainLayout title="Tabel Puskesmas / Rumah Sakit">
+    <MainLayout title="Tabel Transporter">
       <div>
         <Link
-          href="/admin/manajemenpuskesmas/TambahPuskesmas"
+          href="/admin/manajementransporter/PengajuanTransporter"
           passHref>
           <Button type="primary">Tambah Transporter</Button>
         </Link>

@@ -1,6 +1,6 @@
 import React from "react";
 import { useState, createContext, useContext, } from "react";
-import MainLayout from "@/components/admin/MainLayout";
+import MainLayout from "@/components/dashboard/MainLayout";
 import { Card, Col, Image, Row, Table, Space, Tag } from "antd";
 import type { ColumnsType } from 'antd/es/table';
 

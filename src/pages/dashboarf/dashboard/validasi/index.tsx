@@ -1,4 +1,4 @@
-import MainLayout from "@/components/admin/MainLayout";
+import MainLayout from "@/components/dashboard/MainLayout";
 import { Button, Space } from "antd";
 import Link from "next/link";
 import React from "react";
@@ -10,7 +10,7 @@ import {
   EyeOutlined,
   DeleteOutlined,
 } from "@ant-design/icons";
-import ModalValidasiTransporter from "@/components/admin/validasi/ModalValidasiTransporter";
+import ModalValidasiTransporter from "@/components/dashboard/validasi/ModalValidasiTransporter";
 
 interface DataType {
   status: any;

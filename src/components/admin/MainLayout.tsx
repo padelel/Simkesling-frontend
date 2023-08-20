@@ -5,7 +5,10 @@ import {
 } from "@ant-design/icons";
 import { Typography, Layout, Menu, theme } from "antd";
 import React, { ReactNode, useState } from "react";
+import { useRouter } from "next/router";
+// import Link from "next/link";
 import Image from "next/image";
+
 interface MainLayoutProps {
     children: ReactNode;
     title?: string;
@@ -15,40 +18,49 @@ const { Title, Paragraph, Text, Link } = Typography;
 
 const { Header, Content, Footer, Sider } = Layout;
 
-const items = [
-    {
-        icon: <HomeOutlined />,
-        label: "Dashboard",
-        href: "loginpage/LoginPage",
-    },
-    {
-        icon: <TableOutlined />,
-        label: "Manajemen Puskesmas / Rumah Sakit",
-    },
-    {
-        icon: <TableOutlined />,
-        label: "Manajemen Transporter",
-    },
-    {
-        icon: <SafetyCertificateOutlined />,
-        label: "Validasi Pengajuan Transporter",
-    },
-    {
-        icon: <TableOutlined />,
-        label: "Manajemen Laporan",
-    },
-].map((item, index) => ({
-    key: String(index + 1),
-    icon: item.icon,
-    label: item.label,
-}));
-
-
 const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
     const {
         token: { colorBgContainer },
     } = theme.useToken();
+    const router = useRouter();
     const [collapsed, setCollapsed] = useState(false);
+
+    const items = [
+        {
+            icon: <HomeOutlined />,
+            label: "Dashboard",
+            path: "/admin/dashboard",
+        },
+        {
+            icon: <TableOutlined />,
+            label: "Manajemen Puskesmas / Rumah Sakit",
+            path: "/admin/manajemenpuskesmas",
+        },
+        {
+            icon: <TableOutlined />,
+            label: "Manajemen Transporter",
+            path: "/admin/manajementransporter",
+        },
+        {
+            icon: <SafetyCertificateOutlined />,
+            label: "Validasi Pengajuan Transporter",
+            path: "/admin/validasitransporter",
+        },
+        {
+            icon: <TableOutlined />,
+            label: "Manajemen Laporan",
+            path: "/admin/manajemenlaporan",
+        },
+    ].map((item, index) => ({
+        key: item.path,
+        ...item,
+      }));
+
+    
+    const onClickMenu = (item: any) => {
+        const clicked = items.find((_item) => _item.key === item.key);
+        router.push(clicked!.path);
+      };
 
     return (
         <Layout style={{ minHeight: "100vh" }}>
@@ -106,8 +118,10 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
                 </h4>
                 <Menu
                     mode="inline"
-                    defaultSelectedKeys={["1"]}
+                    defaultSelectedKeys={[router.pathname]}
+                    selectedKeys={[router.pathname]}
                     items={items}
+                    onClick={onClickMenu}
                 />
             </Sider>
             <Layout>

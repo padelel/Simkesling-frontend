@@ -1,9 +1,10 @@
 import React from "react";
-import MainLayout from "@/components/admin/MainLayout";
+import MainLayout from "@/components/dashboard/MainLayout";
 import { Button, Space, Modal } from "antd";
 import Link from "next/link";
 import { Table } from "antd";
 import type { ColumnsType, TableProps } from "antd/es/table";
+import { Excel } from "antd-table-saveas-excel";
 import {
   LoginOutlined,
   EditOutlined,
@@ -11,6 +12,8 @@ import {
   DeleteOutlined,
   ExclamationCircleFilled,
 } from "@ant-design/icons";
+import ShowFile from "@/components/dashboard/laporan/ShowFile";
+import ModalView from "@/components/dashboard/laporan/ModalView";
 
 interface DataType {
   metodePemusnahan: any;
@@ -64,23 +67,39 @@ const columns: ColumnsType<DataType> = [
     key: "action",
     render: (_, record) => (
       <Space size="middle">
-        <Button icon={<EditOutlined />} style={{ backgroundColor: "yellow" }}>
-          Edit
-        </Button>
-        <Button icon={<EyeOutlined />} type="primary">
-          View
-        </Button>
-        <Button
-          onClick={showDeleteConfirm}
-          icon={<DeleteOutlined />}
-          type="primary"
-          danger>
-          Delete
-        </Button>
+          <ModalView />
       </Space>
     ),
   },
 ];
+
+const kolom = [
+  {
+    title: "Nomor Laporan",
+    dataIndex: "nomorLaporan",
+    defaultSortOrder: "descend",
+  },
+  {
+    title: "Tanggal Pengangkutan",
+    dataIndex: "tanggalPengangkutan",
+    defaultSortOrder: "descend",
+  },
+  {
+    title: "Nama Transporter",
+    dataIndex: "namaTransporter",
+    defaultSortOrder: "descend",
+  },
+  {
+    title: "Berat Limbah",
+    dataIndex: "beratLimbah",
+    defaultSortOrder: "descend",
+  },
+  {
+    title: "Metode Pemusnahan",
+    dataIndex: "metodePemusnahan",
+    defaultSortOrder: "descend",
+  },
+]
 
 const data = [
   {
@@ -126,36 +145,26 @@ const onChange: TableProps<DataType>["onChange"] = (
   console.log("params", pagination, filters, sorter, extra);
 };
 
-const { confirm } = Modal;
-
-const showDeleteConfirm = () => {
-  confirm({
-    title: "Are you sure delete this task?",
-    icon: <ExclamationCircleFilled />,
-    content: "Some descriptions",
-    okText: "Yes",
-    okType: "danger",
-    cancelText: "No",
-    onOk() {
-      console.log("OK");
-    },
-    onCancel() {
-      console.log("Cancel");
-    },
-  });
+const handlePrint = () => {
+  const excel = new Excel();
+  excel
+    .addSheet("sheet 1")
+    .addColumns(kolom)
+    .addDataSource(data, {
+      str2Percent: true
+    })
+    .saveAs("Excel.xlsx");
 };
 
 const index = () => {
   return (
     <MainLayout title="Tabel Laporan">
       <div>
-        <Link href="/dashboardpuskesmas/limbah/PageTambahLimbah" passHref>
-          <Button type="primary">Tambah Laporan Limbah</Button>
-        </Link>
+        <Button type="primary" onClick={handlePrint}>Export Excel</Button>
       </div>
 
       <div style={{ marginTop: "20px" }}>
-        <Table columns={columns} dataSource={data} onChange={onChange} />;
+        <Table columns={columns} dataSource={data} onChange={onChange} />
       </div>
     </MainLayout>
   );

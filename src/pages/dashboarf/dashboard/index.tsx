@@ -1,9 +1,11 @@
 import React from "react";
 import Chart from "react-apexcharts";
-import MainLayout from "@/components/admin/MainLayout";
-import Diagram from "@/components/admin/dashboard/Diagram";
+import MainLayout from "@/components/dashboard/MainLayout";
+import Diagram from "@/components/dashboard/dashboard/Diagram";
 import { Col, Row } from "antd";
-import TabelNotifikasi from "@/components/admin/dashboard/TabelNotifikasi";
+import TabelNotifikasi from "@/components/dashboard/dashboard/TabelNotifikasi";
+import CardTahunan from "@/components/dashboard/dashboard/CardTahunan";
+import CardBulanan from "@/components/dashboard/dashboard/Cardbulanan";
 
 const DashboardPage: React.FC = () => {
 
@@ -27,22 +29,22 @@ const DashboardPage: React.FC = () => {
       <h2>Grafik</h2>
       <Row>
         <Col>
-        <Chart options={options} type="bar" series={series} />
+        {(typeof window !== undefined) && <Chart options={options} type="bar" series={series} />}
         </Col>
         <Col>
-        <Chart options={options} type="line" series={series} />
+        {(typeof window !== undefined) && <Chart options={options} type="line" series={series} />}
         </Col>
         <Col>
-        <Chart options={options} type="bar" series={series} />
+        {(typeof window !== undefined) && <Chart options={options} type="bar" series={series} />}
         </Col>
       </Row>
       <h2>Total Laporan Sepanjang Tahun</h2>
       <Row>
-
+        <CardTahunan />
       </Row>
       <h2>Total Laporan Per Bulan</h2>
       <Row>
-
+        <CardBulanan />
       </Row>
       <h2>History Navigasi</h2>
       <Row>

@@ -1,5 +1,5 @@
 import MainLayout from "@/components/MainLayout";
-import FormPengajuanTransporter from "@/components/admin/transporter/FormTambahTransporter";
+import FormPengajuanTransporter from "@/components/dashboard/transporter/FormTambahTransporter";
 import React from "react";
 
 const PengajuanTransporter = () => {
