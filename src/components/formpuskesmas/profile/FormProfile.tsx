@@ -38,16 +38,17 @@ const FormProfile = () => {
     kecamatan: "",
     kelurahan: "",
     alamat: "",
+    telp: "",
     email: "",
-    ipal: "",
-    tps: "",
   });
 
   const beforeUploadFileDynamic = (file: RcFile) => {
     return false;
   };
 
-  const handleChangeInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChangeInput = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     console.log(event);
     setForm({
       ...form,
@@ -121,7 +122,10 @@ const FormProfile = () => {
             </Select>
           </Form.Item>
 
-          <Form.Item name="alamat" label="Alamat" rules={[{ required: true }]}>
+          <Form.Item
+            name="form_alamat"
+            label="Alamat"
+            rules={[{ required: true }]}>
             <TextArea
               name="alamat"
               showCount
@@ -131,12 +135,15 @@ const FormProfile = () => {
             />
           </Form.Item>
           <Form.Item
-            name="noTelp"
+            name="form_notelp"
             label="Nomor Telepon"
             rules={[{ required: true }]}>
-            <Input />
+            <Input onChange={handleChangeInput} value={form.telp} name="telp" />
           </Form.Item>
-          <Form.Item name="email" label="Email" rules={[{ required: true }]}>
+          <Form.Item
+            name="form_email"
+            label="Email"
+            rules={[{ required: true }]}>
             <Input
               onChange={handleChangeInput}
               value={form.email}
@@ -157,8 +164,8 @@ const FormProfile = () => {
               <Upload
                 beforeUpload={(file) => beforeUploadFileDynamic(file)}
                 fileList={fileTps}
-                onChange={(file) => setFileTps(file.fileList)}
-                multiple>
+                maxCount={1}
+                onChange={(file) => setFileTps(file.fileList)}>
                 <Button icon={<UploadOutlined />}>Klik Untuk Upload TPS</Button>
               </Upload>
             </div>
@@ -177,29 +184,14 @@ const FormProfile = () => {
               <Upload
                 beforeUpload={(file) => beforeUploadFileDynamic(file)}
                 fileList={fileIpal}
-                onChange={(file) => setFileIpal(file.fileList)}
-                multiple>
+                maxCount={1}
+                onChange={(file) => setFileIpal(file.fileList)}>
                 <Button icon={<UploadOutlined />}>
                   Klik Untuk Upload IPAL
                 </Button>
               </Upload>
             </div>
           </Form.Item>
-
-          {/* <Form.Item label="Upload Izin IPAL">
-            <Upload name="ipal" beforeUpload={(file) => false}>
-              <Button icon={<UploadOutlined />}>
-                Klik Untuk Upload IPAL Transporter
-              </Button>
-            </Upload>
-          </Form.Item>
-          <Form.Item label="Upload Izin TPS">
-            <Upload name="tps" beforeUpload={(file) => false}>
-              <Button icon={<UploadOutlined />}>
-                Klik Untuk Upload TPS Transporter
-              </Button>
-            </Upload>
-          </Form.Item> */}
 
           <Form.Item {...tailLayout}>
             <Button type="primary" htmlType="submit">

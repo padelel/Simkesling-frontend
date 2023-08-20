@@ -9,6 +9,7 @@ import {
   Radio,
   Select,
   Upload,
+  UploadFile,
   UploadProps,
   message,
 } from "antd";
@@ -24,6 +25,7 @@ import { DatePicker, Space } from "antd";
 import type { DatePickerProps, RangePickerProps } from "antd/es/date-picker";
 
 import { Card } from "antd";
+import { RcFile } from "antd/es/upload";
 
 const { RangePicker } = DatePicker;
 
@@ -85,30 +87,130 @@ const FormPengajuanLimbah = () => {
   const [isCheckboxChecked, setIsCheckboxChecked] = useState(false);
   const [isCheckboxChecked1, setIsCheckboxChecked1] = useState(false);
 
+  const [activeTabKey2, setActiveTabKey2] = useState<string>("limbahPadat");
+
+  const [fileManifest, setFileManifest] = useState<UploadFile[]>([]);
+  const [fileLogbook, setFileLogbook] = useState<UploadFile[]>([]);
+  const [limbahPadatList, setLimbahPadatList] = useState<any[]>([]);
+
+  const [uploading, setUploading] = useState(false);
+  const [form, setForm] = useState({
+    namatransporter: "",
+    namapemusnah: "",
+    metodepemusnah: "",
+    statustps: 0,
+    ukurantps: "",
+    statuspemusnah: 0,
+    ukuranpemusnah: "",
+    totallimbahpadat: 0,
+    totallimbahnoncovid: 0,
+    totallimbahcovid: 0,
+    kategoridetaillimbah: "",
+    catatandetaillimbah: "",
+    beratdetaillimbah: "",
+  });
+
+  const beforeUploadFileDynamic = (file: RcFile) => {
+    return false;
+  };
+
+  const handleChangeInput = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    console.log(event);
+    setForm({
+      ...form,
+      [event.target.name]: event.target.value,
+    });
+  };
+
+  // const handleChangeNumber = (
+  //   event: Number>
+  // ) => {
+  //   console.log(event);
+  //   setForm({
+  //     ...form,
+  //     [event.target.name]: event.target.value,
+  //   });
+  // };
+
+  const handleChangeSelect = (val: any, name: string, event: any) => {
+    setForm({
+      ...form,
+      [name]: val,
+    });
+  };
+
+  const handleSubmit = () => {
+    console.log(form);
+    console.log(fileLogbook);
+    console.log(fileManifest);
+  };
+
   const handleCheckboxChange = (e: any) => {
+    const newStatus = e.target.checked ? 1 : 0; // Jika checkbox dicentang, set nilai 1. Jika tidak, set nilai 0.
+    setForm({
+      ...form,
+      statustps: newStatus,
+    });
     setIsCheckboxChecked(e.target.checked);
   };
 
   const handleCheckboxChange1 = (e: any) => {
+    const newStatus1 = e.target.checked ? 1 : 0; // Jika checkbox dicentang, set nilai 1. Jika tidak, set nilai 0.
+    setForm({
+      ...form,
+      statuspemusnah: newStatus1,
+    });
     setIsCheckboxChecked1(e.target.checked);
   };
 
-  // const pemusnahValidationRules = isCheckboxChecked
-  //   ? [
-  //       {
-  //         required: true,
-  //         message: "Masukan Ukuran Pemusnah Mandiri",
-  //       },
-  //     ]
-  //   : [{ required: false }];
+  const handleAddRowDynamic = (
+    add: Function,
+    key: number = -1,
+    name: number = -1
+  ) => {
+    limbahPadatList.push({
+      kategori: "",
+      catatan: "",
+      berat: "",
+    });
+    add();
+  };
+  const handleRemoveRowDynamic = (
+    remove: Function,
+    key: number = -1,
+    name: number = -1
+  ) => {
+    remove(name);
 
-  // const pemusnahValidationRules1 = isCheckboxChecked1
-  //   ? [{ required: true, message: "Masukan Ukuran Pemusnah Mandiri" }]
-  //   : [{ required: false, message: "" }];
+    let tmpLimbahPadatList = [...limbahPadatList];
+    tmpLimbahPadatList.splice(name, 1);
+    setLimbahPadatList(tmpLimbahPadatList);
+  };
+  const handleChangeLimbahPadatInput = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    key: number = -1,
+    name: number = -1,
+    isfrom: string
+  ) => {
+    console.log("---");
+    console.log(event);
+    console.log(key);
+    console.log(name);
+    let tmpLimbahPadatList = [...limbahPadatList];
+    tmpLimbahPadatList[name][isfrom] = event.target.value;
+    setLimbahPadatList(tmpLimbahPadatList);
+    console.log("---[END]");
+  };
 
   const handleNextButton = () => {
+    console.log(limbahPadatList);
     // Update the activeTabKey2 state
-    setActiveTabKey2("limbahCair");
+    // setActiveTabKey2("limbahCair");
+    // console.log(form);
+    // console.log(fileLogbook);
+    // console.log(fileManifest);
   };
 
   const handlePreviousButton = () => {
@@ -127,10 +229,13 @@ const FormPengajuanLimbah = () => {
           Pencatatan Limbah Padat
         </h2>
         <Form.Item
-          name="transporter"
+          name="form_transporter"
           label="Pilih Transporter"
+          initialValue={form.namatransporter}
           rules={[{ required: true }]}>
           <Select
+            value={form.namatransporter}
+            onChange={(v) => handleChangeSelect(v, "namatransporter", event)}
             placeholder="Select a option and change input text above"
             allowClear>
             <Option value="Mudrock">Mudrock</Option>
@@ -138,57 +243,97 @@ const FormPengajuanLimbah = () => {
           </Select>
         </Form.Item>
         <Form.Item
-          name="namaPemusnah"
+          name="form_namaPemusnah"
           label="Nama Pemusnah"
           rules={[{ required: true }]}>
-          <Input />
+          <Input
+            onChange={handleChangeInput}
+            value={form.namapemusnah}
+            name="namapemusnah"
+          />
         </Form.Item>
         <Form.Item
-          name="metodePemusnahan"
+          name="form_metodePemusnahan"
           label="Metode Pemusnahan"
           rules={[{ required: true }]}>
-          <Input />
+          <Input
+            onChange={handleChangeInput}
+            value={form.metodepemusnah}
+            name="metodepemusnah"
+          />
         </Form.Item>
         <Divider />
-        <Form.Item name="ukuranTPS" label="Memiliki TPS?">
+        <Form.Item name="form_ukuranTPS" label="Memiliki TPS?">
           {/* rules={pemusnahValidationRules} */}
-          <Checkbox style={{ marginLeft: 10 }} onChange={handleCheckboxChange}>
+          <Checkbox
+            style={{ marginLeft: 10 }}
+            value={form.statustps}
+            onChange={handleCheckboxChange}>
             Iya
           </Checkbox>
-          <InputNumber
+          <Input
+            style={{ width: 100 }}
+            onChange={handleChangeInput}
             disabled={!isCheckboxChecked}
-            value={isCheckboxChecked ? 0 : undefined}
-            defaultValue={isCheckboxChecked ? 1 : undefined}
+            value={form.ukurantps}
+            name="ukurantps"
           />{" "}
-          /Ukuran (m2)
+          Ukuran
         </Form.Item>
-        <Form.Item name="ukuranPemusnah" label="Memiliki Pemusnah Mandiri?">
+        <Form.Item
+          name="form_ukuranPemusnah"
+          label="Memiliki Pemusnah Mandiri?">
           {/* rules={pemusnahValidationRules1} */}
-          <Checkbox style={{ marginLeft: 10 }} onChange={handleCheckboxChange1}>
+          <Checkbox
+            style={{ marginLeft: 10 }}
+            value={form.statuspemusnah}
+            onChange={handleCheckboxChange1}>
             Iya
           </Checkbox>
-          <InputNumber
+          <Input
+            style={{ width: 100 }}
+            onChange={handleChangeInput}
             disabled={!isCheckboxChecked1}
-            value={isCheckboxChecked1 ? 0 : undefined}
-            defaultValue={isCheckboxChecked1 ? 1 : undefined}
+            value={form.ukuranpemusnah}
+            name="ukuranpemusnah"
           />{" "}
-          /Ukuran (m2)
+          Ukuran
         </Form.Item>
         <Divider />
-        <Form.Item name="beratLimbah" label="Total Limbah Padat(Kg)" rules={[]}>
-          <InputNumber min={0} defaultValue={0} />
+        <Form.Item
+          name="form_beratLimbah"
+          label="Total Limbah Padat(Kg)"
+          rules={[]}>
+          <InputNumber
+            onChange={(v) => handleChangeSelect(v, "totallimbahpadat", event)}
+            value={form.totallimbahpadat}
+            min={0}
+            defaultValue={0}
+          />
         </Form.Item>
         <Form.Item
           name="beratLimbahNonCovid"
           label="Total Limbah NonCovid(Kg)"
           rules={[]}>
-          <InputNumber min={0} defaultValue={0} />
+          <InputNumber
+            onChange={(v) =>
+              handleChangeSelect(v, "totallimbahnoncovid", event)
+            }
+            value={form.totallimbahnoncovid}
+            min={0}
+            defaultValue={0}
+          />
         </Form.Item>
         <Form.Item
           name="totalBeratLimbah"
           label="Total Limbah Covid(Kg)"
           rules={[]}>
-          <InputNumber min={0} defaultValue={0} />
+          <InputNumber
+            onChange={(v) => handleChangeSelect(v, "totallimbahcovid", event)}
+            value={form.totallimbahcovid}
+            min={0}
+            defaultValue={0}
+          />
         </Form.Item>
         <Divider />
 
@@ -202,33 +347,68 @@ const FormPengajuanLimbah = () => {
                   align="baseline">
                   <Form.Item
                     {...restField}
-                    name={[name, "kategoriLimbahPadat"]}
+                    name={[name, "form_kategoriLimbahPadat"]}
+                    key={"form_kategoriLimbahPadat" + key}
                     rules={[
                       { required: true, message: "Masukan Kategori Limbah" },
-                    ]}>
-                    <Input style={{ width: 150 }} placeholder="Kategori" />
+                    ]}
+                    initialValue={limbahPadatList[name].kategori}>
+                    <Input
+                      onChange={(v) =>
+                        handleChangeLimbahPadatInput(v, key, name, "kategori")
+                      }
+                      value={limbahPadatList[name].kategori}
+                      name={"kategoridetaillimbah" + key}
+                      key={"kategoridetaillimbahKey" + key}
+                      style={{ width: 150 }}
+                      placeholder="Kategori"
+                    />
                   </Form.Item>
                   <Form.Item
                     {...restField}
-                    name={[name, "catatanLimbahPadat"]}
-                    rules={[{}]}>
-                    <Input style={{ width: 150 }} placeholder="Catatan" />
+                    name={[name, "form_catatanLimbahPadat"]}
+                    key={"form_catatanLimbahPadat" + key}
+                    rules={[{}]}
+                    initialValue={limbahPadatList[name].catatan}>
+                    <Input
+                      onChange={(v) =>
+                        handleChangeLimbahPadatInput(v, key, name, "catatan")
+                      }
+                      value={limbahPadatList[name].catatan}
+                      name={"catatandetaillimbah" + key}
+                      key={"catatandetaillimbahKey" + key}
+                      style={{ width: 150 }}
+                      placeholder="Catatan"
+                    />
                   </Form.Item>
                   <Form.Item
                     {...restField}
-                    name={[name, "beratLimbahPadat"]}
+                    name={[name, "form_beratLimbahPadat"]}
+                    key={"form_beratLimbahPadat" + key}
                     rules={[
                       { required: true, message: "Masukan Berat Limbah" },
-                    ]}>
-                    <Input style={{ width: 150 }} placeholder="Berat" />
+                    ]}
+                    initialValue={limbahPadatList[name].berat}>
+                    <Input
+                      onChange={(v) =>
+                        handleChangeLimbahPadatInput(v, key, name, "berat")
+                      }
+                      style={{ width: 150 }}
+                      value={limbahPadatList[name].berat}
+                      name="beratdetaillimbah"
+                      key={"beratdetaillimbahKey" + key}
+                      placeholder="Berat"
+                    />
                   </Form.Item>
-                  <MinusCircleOutlined onClick={() => remove(name)} />
+                  <MinusCircleOutlined
+                    onClick={(v) => handleRemoveRowDynamic(remove, key, name)}
+                  />
                 </Space>
               ))}
               <Form.Item>
                 <Button
                   type="dashed"
-                  onClick={() => add()}
+                  onClick={() => handleAddRowDynamic(add)}
                   block
                   icon={<PlusOutlined />}>
                   Tambahkan List Detail Limbah Padat
@@ -252,7 +432,7 @@ const FormPengajuanLimbah = () => {
           </Upload>
         </Form.Item>
         <Form.Item {...tailLayout}>
-          <Button type="primary" htmlType="submit">
+          <Button type="primary" htmlType="submit" onClick={handleNextButton}>
             Next
           </Button>
         </Form.Item>
@@ -298,11 +478,6 @@ const FormPengajuanLimbah = () => {
       </Form>
     ),
   };
-
-  const [activeTabKey2, setActiveTabKey2] = useState<string>("limbahPadat");
-  // const onTab2Change = (key: string) => {
-  //   setActiveTabKey2(key);
-  // };
 
   return (
     <>

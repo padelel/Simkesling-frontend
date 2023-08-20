@@ -137,7 +137,7 @@ const index = () => {
     <MainLayout title="Pengajuan Transporter">
       <div>
         <Link
-          href="/dashboardpuskesmas/pengajuantransporter/PagePengajuanTransporter"
+          href="/dashboard/user/pengajuantransporter/PagePengajuanTransporter"
           passHref>
           <Button type="primary">Tambah Transporter</Button>
         </Link>

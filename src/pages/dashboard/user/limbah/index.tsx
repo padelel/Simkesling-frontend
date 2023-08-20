@@ -149,7 +149,7 @@ const index = () => {
   return (
     <MainLayout title="Daftar Limbah">
       <div>
-        <Link href="/dashboardpuskesmas/limbah/PageTambahLimbah" passHref>
+        <Link href="/dashboard/user/limbah/PageTambahLimbah" passHref>
           <Button type="primary">Tambah Laporan Limbah</Button>
         </Link>
       </div>

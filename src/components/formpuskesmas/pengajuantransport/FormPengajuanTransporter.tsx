@@ -58,6 +58,16 @@ const FormPengajuanTransporter = () => {
   const [fileListList, setFileListList] = useState<UploadFile[][]>([]);
   const [dateRangeList, setDateRangeList] = useState<any[]>([]);
 
+  const [form, setForm] = useState({
+    namatransporter: "",
+    npwp: "",
+    kecamatan: "",
+    kelurahan: "",
+    alamat: "",
+    telp: "",
+    email: "",
+  });
+
   const [uploading, setUploading] = useState(false);
   const [rowCount, setRowCount] = useState(1);
 
@@ -182,30 +192,57 @@ const FormPengajuanTransporter = () => {
     setDateRangeList(tmpDateRangeList);
   };
 
-  // -- onSubmit
-  const handleOnSubmit = (event: any) => {
+  const handleChangeInput = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     console.log(event);
+    setForm({
+      ...form,
+      [event.target.name]: event.target.value,
+    });
+  };
+  const handleChangeSelect = (val: any, name: string, event: any) => {
+    setForm({
+      ...form,
+      [name]: val,
+    });
+  };
+
+  // -- onSubmit
+  const handleSubmit = () => {
+    console.log(form);
     console.log(fileListList);
     console.log(dateRangeList);
   };
   return (
     <>
-      <Form {...layout} name="control-hooks" style={{ maxWidth: 600 }}>
+      <Form
+        {...layout}
+        onFinish={handleSubmit}
+        name="control-hooks"
+        style={{ maxWidth: 600 }}>
         <Form.Item
-          name="namaTransporter"
+          name="form_namatransporter"
           label="Nama Transporter"
           rules={[{ required: true }]}>
-          <Input />
+          <Input
+            onChange={handleChangeInput}
+            value={form.namatransporter}
+            name="namatransporter"
+          />
         </Form.Item>
-        <Form.Item name="npwp" label="NPWP" rules={[{ required: true }]}>
-          <Input />
+        <Form.Item name="form_npwp" label="NPWP" rules={[{ required: true }]}>
+          <Input onChange={handleChangeInput} value={form.npwp} name="npwp" />
         </Form.Item>
         <Form.Item
-          name="kecamatan"
+          name="form_kecamatan"
           label="Kecamatan"
+          initialValue={form.kecamatan}
           rules={[{ required: true }]}>
           <Select
-            placeholder="Select a option and change input text above"
+            value={form.kecamatan}
+            onChange={(v) => handleChangeSelect(v, "kecamatan", event)}
+            placeholder="Silahkan Pilih Kecamatan"
             allowClear>
             <Option value="Kelapa Dua">Kelapa Dua</Option>
             <Option value="Citayam">Citayam</Option>
@@ -213,28 +250,40 @@ const FormPengajuanTransporter = () => {
           </Select>
         </Form.Item>
         <Form.Item
-          name="kelurahan"
+          name="form_kelurahan"
           label="Kelurahan"
+          initialValue={form.kelurahan}
           rules={[{ required: true }]}>
           <Select
-            placeholder="Select a option and change input text above"
+            value={form.kelurahan}
+            onChange={(v) => handleChangeSelect(v, "kelurahan", event)}
+            placeholder="Silahkan Pilih Kelurahan"
             allowClear>
             <Option value="Pasir Gunung Selatan">Pasir Gunung Selatan</Option>
             <Option value="Tugu">Tugu</Option>
             <Option value="Kukusan">Kukusan</Option>
           </Select>
         </Form.Item>
-        <Form.Item name="alamat" label="Alamat" rules={[{ required: true }]}>
-          <TextArea showCount maxLength={300} />
+        <Form.Item
+          name="form_alamat"
+          label="Alamat"
+          rules={[{ required: true }]}>
+          <TextArea
+            showCount
+            name="alamat"
+            maxLength={300}
+            onChange={handleChangeInput}
+            value={form.alamat}
+          />
         </Form.Item>
         <Form.Item
-          name="nohp"
+          name="form_nohp"
           label="Nomor Handphone"
           rules={[{ required: true }]}>
-          <Input />
+          <Input onChange={handleChangeInput} value={form.telp} name="telp" />
         </Form.Item>
-        <Form.Item name="email" label="Email" rules={[{ required: true }]}>
-          <Input />
+        <Form.Item name="form_email" label="Email" rules={[{ required: true }]}>
+          <Input onChange={handleChangeInput} value={form.email} name="email" />
         </Form.Item>
 
         <Divider />
@@ -322,10 +371,7 @@ const FormPengajuanTransporter = () => {
         </Form.List>
 
         <Form.Item {...tailLayoutUpload}>
-          <Button
-            type="primary"
-            htmlType="submit"
-            onClick={(event) => handleOnSubmit(event)}>
+          <Button type="primary" htmlType="submit">
             Submit
           </Button>
         </Form.Item>
