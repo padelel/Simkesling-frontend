@@ -5,6 +5,7 @@ import {
   Input,
   Select,
   Upload,
+  UploadFile,
   UploadProps,
   message,
 } from "antd";
@@ -13,45 +14,38 @@ import { LoginOutlined, UploadOutlined } from "@ant-design/icons";
 
 import { DatePicker, Space } from "antd";
 import type { DatePickerProps, RangePickerProps } from "antd/es/date-picker";
+import { RcFile, UploadChangeParam } from "antd/es/upload";
 
 const { Option } = Select;
 const { TextArea } = Input;
 
 const layout = {
   labelCol: { span: 10 },
-  wrapperCol: { span: 25 },
+  wrapperCol: { span: 6 },
 };
 
 const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
-};
-
-const props: UploadProps = {
-  name: "file",
-  action: "https://www.mocky.io/v2/5cc8019d300000980a055e76",
-  headers: {
-    authorization: "authorization-text",
-  },
-  onChange(info) {
-    if (info.file.status !== "uploading") {
-      console.log(info.file, info.fileList);
-    }
-    if (info.file.status === "done") {
-      message.success(`${info.file.name} file uploaded successfully`);
-    } else if (info.file.status === "error") {
-      message.error(`${info.file.name} file upload failed.`);
-    }
-  },
+  wrapperCol: { offset: 12, span: 16 },
 };
 
 const FormProfile = () => {
+  const [fileTps, setFileTps] = useState<UploadFile[]>([]);
+  const [fileIpal, setFileIpal] = useState<UploadFile[]>([]);
+  const [uploading, setUploading] = useState(false);
   const [form, setForm] = useState({
     nama: "",
     noizin: "",
     kecamatan: "",
-    email: "",
+    kelurahan: "",
     alamat: "",
+    email: "",
+    ipal: "",
+    tps: "",
   });
+
+  const beforeUploadFileDynamic = (file: RcFile) => {
+    return false;
+  };
 
   const handleChangeInput = (event: React.ChangeEvent<HTMLInputElement>) => {
     console.log(event);
@@ -71,43 +65,41 @@ const FormProfile = () => {
 
   const handleSubmit = () => {
     console.log(form);
+    console.log(fileTps);
+    console.log(fileIpal);
   };
   return (
     <>
       <div style={{ display: "flex", justifyContent: "center" }}>
         <h2>Profile Saya</h2>
       </div>
-      <div style={{ display: "flex", justifyContent: "center" }}>
-        <Form
-          onFinish={handleSubmit}
-          {...layout}
-          name="control-hooks"
-          style={{ maxWidth: 600 }}>
+      <div style={{ justifyContent: "center" }}>
+        <Form onFinish={handleSubmit} {...layout} name="control-hooks">
           <Form.Item
-            name="nama"
+            name="form_nama"
             label="Nama Puskemas/RS"
             rules={[{ required: true }]}>
             <Input onChange={handleChangeInput} value={form.nama} name="nama" />
           </Form.Item>
           <Form.Item
-            name="noIzin"
+            name="form_noIzin"
             label="Nomor Izin"
             rules={[{ required: true }]}>
             <Input
               onChange={handleChangeInput}
-              value={form.nama}
+              value={form.noizin}
               name="noizin"
             />
           </Form.Item>
           <Form.Item
-            name="kecamatan"
+            name="form_kecamatan"
             label="Kecamatan"
             initialValue={form.kecamatan}
             rules={[{ required: true }]}>
             <Select
               value={form.kecamatan}
               onChange={(v) => handleChangeSelect(v, "kecamatan", event)}
-              placeholder="Select a option and change input text above"
+              placeholder="Silahkan Pilih Kecamatan"
               allowClear>
               <Option value="Kelapa Dua">Kelapa Dua</Option>
               <Option value="Citayam">Citayam</Option>
@@ -115,19 +107,28 @@ const FormProfile = () => {
             </Select>
           </Form.Item>
           <Form.Item
-            name="kelurahan"
+            name="form_kelurahan"
             label="Kelurahan"
+            initialValue={form.kelurahan}
             rules={[{ required: true }]}>
             <Select
-              placeholder="Select a option and change input text above"
+              value={form.kelurahan}
+              onChange={(v) => handleChangeSelect(v, "kelurahan", event)}
+              placeholder="Silahkan Pilih Kecamatan"
               allowClear>
               <Option value="Pasir Gunung Selatan">Pasir Gunung Selatan</Option>
-              <Option value="Tugu">Tugu</Option>
-              <Option value="Kukusan">Kukusan</Option>
+              <Option value="Pasir Gunung Utara">Pasir Gunung Utara</Option>
             </Select>
           </Form.Item>
+
           <Form.Item name="alamat" label="Alamat" rules={[{ required: true }]}>
-            <TextArea showCount maxLength={300} />
+            <TextArea
+              name="alamat"
+              showCount
+              maxLength={300}
+              onChange={handleChangeInput}
+              value={form.alamat}
+            />
           </Form.Item>
           <Form.Item
             name="noTelp"
@@ -143,20 +144,62 @@ const FormProfile = () => {
             />
           </Form.Item>
 
-          <Form.Item label="Upload Izin IPAL">
-            <Upload {...props}>
+          <Form.Item
+            name="listFileTps"
+            rules={[
+              {
+                required: true,
+                message: "Upload File TPS",
+              },
+            ]}
+            label="Upload TPS">
+            <div>
+              <Upload
+                beforeUpload={(file) => beforeUploadFileDynamic(file)}
+                fileList={fileTps}
+                onChange={(file) => setFileTps(file.fileList)}
+                multiple>
+                <Button icon={<UploadOutlined />}>Klik Untuk Upload TPS</Button>
+              </Upload>
+            </div>
+          </Form.Item>
+
+          <Form.Item
+            name="listFileIpal"
+            rules={[
+              {
+                required: true,
+                message: "Upload File IPAL",
+              },
+            ]}
+            label="Upload IPAL">
+            <div>
+              <Upload
+                beforeUpload={(file) => beforeUploadFileDynamic(file)}
+                fileList={fileIpal}
+                onChange={(file) => setFileIpal(file.fileList)}
+                multiple>
+                <Button icon={<UploadOutlined />}>
+                  Klik Untuk Upload IPAL
+                </Button>
+              </Upload>
+            </div>
+          </Form.Item>
+
+          {/* <Form.Item label="Upload Izin IPAL">
+            <Upload name="ipal" beforeUpload={(file) => false}>
               <Button icon={<UploadOutlined />}>
                 Klik Untuk Upload IPAL Transporter
               </Button>
             </Upload>
           </Form.Item>
           <Form.Item label="Upload Izin TPS">
-            <Upload {...props}>
+            <Upload name="tps" beforeUpload={(file) => false}>
               <Button icon={<UploadOutlined />}>
                 Klik Untuk Upload TPS Transporter
               </Button>
             </Upload>
-          </Form.Item>
+          </Form.Item> */}
 
           <Form.Item {...tailLayout}>
             <Button type="primary" htmlType="submit">

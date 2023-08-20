@@ -63,33 +63,33 @@ const FormPengajuanTransporter = () => {
 
   const [showMOUFields, setShowMOUFields] = useState(false);
 
-  const toggleMOUFields = () => {
-    setShowMOUFields(!showMOUFields);
-  };
+  // const toggleMOUFields = () => {
+  //   setShowMOUFields(!showMOUFields);
+  // };
 
-  const handleUpload = () => {
-    const formData = new FormData();
-    fileList.forEach((file) => {
-      formData.append("files[]", file as RcFile);
-    });
-    setUploading(true);
-    // You can use any AJAX library you like
-    fetch("https://www.mocky.io/v2/5cc8019d300000980a055e76", {
-      method: "POST",
-      body: formData,
-    })
-      .then((res) => res.json())
-      .then(() => {
-        setFileList([]);
-        message.success("upload successfully.");
-      })
-      .catch(() => {
-        message.error("upload failed.");
-      })
-      .finally(() => {
-        setUploading(false);
-      });
-  };
+  // const handleUpload = () => {
+  //   const formData = new FormData();
+  //   fileList.forEach((file) => {
+  //     formData.append("files[]", file as RcFile);
+  //   });
+  //   setUploading(true);
+  //   // You can use any AJAX library you like
+  //   fetch("https://www.mocky.io/v2/5cc8019d300000980a055e76", {
+  //     method: "POST",
+  //     body: formData,
+  //   })
+  //     .then((res) => res.json())
+  //     .then(() => {
+  //       setFileList([]);
+  //       message.success("upload successfully.");
+  //     })
+  //     .catch(() => {
+  //       message.error("upload failed.");
+  //     })
+  //     .finally(() => {
+  //       setUploading(false);
+  //     });
+  // };
 
   const props: UploadProps = {
     onRemove: (file) => {
@@ -140,6 +140,7 @@ const FormPengajuanTransporter = () => {
   const beforeUploadFileDynamic = (file: RcFile, key: number) => {
     return false;
   };
+
   const onChangeFileDynamic = (
     file: UploadChangeParam<UploadFile<any>>,
     key: number,
@@ -149,6 +150,7 @@ const FormPengajuanTransporter = () => {
     tmpFileListList[name] = [file.file];
     setFileListList(tmpFileListList);
   };
+
   const onRemoveFileDynamic = (
     file: UploadFile<any>,
     key: number,
@@ -156,8 +158,6 @@ const FormPengajuanTransporter = () => {
   ) => {
     let tmpFileListList = [...fileListList];
     const index = tmpFileListList[name].indexOf(file);
-    // const newFileList = tmpFileListList[name].slice();
-    // newFileList.splice(index, 1);
     tmpFileListList[name].splice(index, 1);
     setFileListList(tmpFileListList);
   };
@@ -166,8 +166,6 @@ const FormPengajuanTransporter = () => {
   const onChangeRangeDateDynamic = (
     value: null | (Dayjs | null)[],
     dateStrings: string[],
-    // value: DatePickerProps["value"] | RangePickerProps["value"],
-    // dateString: [string, string] | string,
     key: number,
     name: number
   ) => {
@@ -267,7 +265,6 @@ const FormPengajuanTransporter = () => {
                     name={"fileMOU" + key}
                     key={"fileMOUKey" + key}>
                     <div>
-                      <br />
                       <Upload
                         beforeUpload={(file) =>
                           beforeUploadFileDynamic(file, key)
