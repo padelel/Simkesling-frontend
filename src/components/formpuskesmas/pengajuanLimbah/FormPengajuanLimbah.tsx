@@ -87,10 +87,11 @@ const FormPengajuanLimbah = () => {
   const [isCheckboxChecked, setIsCheckboxChecked] = useState(false);
   const [isCheckboxChecked1, setIsCheckboxChecked1] = useState(false);
 
-  const [activeTabKey2, setActiveTabKey2] = useState<string>("limbahPadat");
+  const [activeTabKey2, setActiveTabKey2] = useState<string>("limbahCair");
 
   const [fileManifest, setFileManifest] = useState<UploadFile[]>([]);
   const [fileLogbook, setFileLogbook] = useState<UploadFile[]>([]);
+
   const [limbahPadatList, setLimbahPadatList] = useState<any[]>([]);
 
   const [uploading, setUploading] = useState(false);
@@ -105,9 +106,10 @@ const FormPengajuanLimbah = () => {
     totallimbahpadat: 0,
     totallimbahnoncovid: 0,
     totallimbahcovid: 0,
-    kategoridetaillimbah: "",
-    catatandetaillimbah: "",
-    beratdetaillimbah: "",
+    debitlimbahcair: "",
+    kapasitasinpal: "",
+    stastuslimbahcair: 0,
+    catatanlimbahcair: "",
   });
 
   const beforeUploadFileDynamic = (file: RcFile) => {
@@ -165,6 +167,15 @@ const FormPengajuanLimbah = () => {
     setIsCheckboxChecked1(e.target.checked);
   };
 
+  const handleCheckboxChange2 = (e: any) => {
+    const newStatus2 = e.target.checked ? 1 : 0; // Jika checkbox dicentang, set nilai 1. Jika tidak, set nilai 0.
+    setForm({
+      ...form,
+      stastuslimbahcair: newStatus2,
+    });
+    setIsCheckboxChecked1(e.target.checked);
+  };
+
   const handleAddRowDynamic = (
     add: Function,
     key: number = -1,
@@ -208,9 +219,13 @@ const FormPengajuanLimbah = () => {
     console.log(limbahPadatList);
     // Update the activeTabKey2 state
     // setActiveTabKey2("limbahCair");
-    // console.log(form);
-    // console.log(fileLogbook);
-    // console.log(fileManifest);
+    console.log(form);
+    console.log(fileLogbook);
+    console.log(fileManifest);
+  };
+
+  const handleSubmitButton = () => {
+    console.log(form);
   };
 
   const handlePreviousButton = () => {
@@ -420,48 +435,74 @@ const FormPengajuanLimbah = () => {
         <Divider />
         <h3>Upload Catatan</h3>
         <Form.Item label="Upload Manifest">
-          <Upload {...props}>
+          <Upload
+            multiple
+            beforeUpload={(file) => beforeUploadFileDynamic(file)}
+            fileList={fileManifest}
+            onChange={(file) => setFileManifest(file.fileList)}>
             <Button icon={<UploadOutlined />}>
               Klik Untuk Upload MOU Transporter
             </Button>
           </Upload>
         </Form.Item>
         <Form.Item label="Upload Logbook">
-          <Upload {...props}>
+          <Upload
+            multiple
+            beforeUpload={(file) => beforeUploadFileDynamic(file)}
+            fileList={fileLogbook}
+            onChange={(file) => setFileLogbook(file.fileList)}>
             <Button icon={<UploadOutlined />}>Klik Untuk Upload Logbook</Button>
           </Upload>
         </Form.Item>
         <Form.Item {...tailLayout}>
-          <Button type="primary" htmlType="submit" onClick={handleNextButton}>
+          <Button type="primary" htmlType="submit">
             Next
           </Button>
         </Form.Item>
       </Form>
     ),
     limbahCair: (
-      <Form {...layout} name="control-hooks" style={{ maxWidth: 600 }}>
+      <Form
+        onFinish={handleSubmitButton}
+        {...layout}
+        name="control-hooks"
+        style={{ maxWidth: 600 }}>
         <h2 style={{ display: "flex", justifyContent: "center" }}>
           Pencatatan Limbah Cair
         </h2>
-        <Form.Item name="debitLimbah" label="Debit Limbah Cair">
-          <Input />
+        <Form.Item name="form_debitLimbah" label="Debit Limbah Cair">
+          <Input
+            onChange={handleChangeInput}
+            name="debitlimbahcair"
+            value={form.debitlimbahcair}
+          />
         </Form.Item>
-        <Form.Item name="kapasitasInpal" label="Kapasitas Inpal">
-          <Input />
+        <Form.Item name="form_kapasitasInpal" label="Kapasitas Inpal">
+          <Input
+            onChange={handleChangeInput}
+            name="kapasitasinpal"
+            value={form.kapasitasinpal}
+          />
         </Form.Item>
 
         <Divider />
 
-        <Form.Item name="ukuranTPS" label="Apakah Memenuhi Syarat?">
-          <Checkbox style={{ marginLeft: 10 }} onChange={handleCheckboxChange}>
+        <Form.Item name="form_ukuranTPS" label="Apakah Memenuhi Syarat?">
+          <Checkbox
+            style={{ marginLeft: 10 }}
+            value={form.statuspemusnah}
+            onChange={handleCheckboxChange2}>
             Iya
           </Checkbox>
         </Form.Item>
 
-        <Form.Item name="catatan" label="Catatan">
+        <Form.Item name="form_catatan" label="Catatan">
           <TextArea
             style={{ width: 500, height: 75 }}
             placeholder="Masukan Catatan"
+            onChange={handleChangeInput}
+            name="catatanlimbahcair"
+            value={form.catatanlimbahcair}
           />
         </Form.Item>
 
