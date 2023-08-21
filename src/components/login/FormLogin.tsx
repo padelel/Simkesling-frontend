@@ -57,7 +57,7 @@ const FormLogin = () => {
           </Form.Item>
 
           <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-            <Link href="/dashboardpuskesmas" passHref>
+            <Link href="/dashboard/user" passHref>
               <Button icon={<LoginOutlined />} type="primary" htmlType="submit">
                 Login
               </Button>

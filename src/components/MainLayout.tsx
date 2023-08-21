@@ -19,6 +19,7 @@ interface MainLayoutProps {
   children: ReactNode;
   title?: string;
 }
+
 const { Header, Content, Footer, Sider } = Layout;
 
 const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
@@ -32,27 +33,27 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
     {
       icon: <DashboardOutlined />,
       label: "Dashboard",
-      path: "/dashboardpuskesmas",
+      path: "/dashboard/user",
     },
     {
       icon: <CarOutlined />,
       label: "Pengajuan Transporter",
-      path: "/dashboardpuskesmas/pengajuantransporter",
+      path: "/dashboard/user/pengajuantransporter",
     },
     {
       icon: <OrderedListOutlined />,
       label: "Daftar Transporter",
-      path: "/dashboardpuskesmas/transporter",
+      path: "/dashboard/user/transporter",
     },
     {
       icon: <BarChartOutlined />,
       label: "Laporan Limbah",
-      path: "/dashboardpuskesmas/limbah",
+      path: "/dashboard/user/limbah",
     },
     {
       icon: <ProfileOutlined />,
       label: "Profil Saya",
-      path: "/dashboardpuskesmas/profilepuskesmas",
+      path: "/dashboard/user/profile",
     },
     {
       icon: <LogoutOutlined />,
@@ -144,10 +145,10 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
           </div> */}
           <Title level={5}>{title}</Title>
         </Header>
-        <Content style={{ margin: "24px 16px 0" }}>
+        <Content style={{ margin: "10px 8px 0" }}>
           <div
             style={{
-              padding: 12,
+              padding: 8,
               background: colorBgContainer,
             }}
           >
