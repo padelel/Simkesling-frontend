@@ -15,10 +15,14 @@
     "@types/react-dom": "18.2.7",
     "antd": "^5.8.3",
     "axios": "^1.4.0",
+    "antd-img-crop": "^4.12.2",
+    "antd-table-saveas-excel": "^2.2.1",
+    "apexcharts": "^3.41.1",
     "eslint": "8.47.0",
     "eslint-config-next": "13.4.13",
     "next": "13.4.13",
     "react": "18.2.0",
+    "react-apexcharts": "^1.4.1",
     "react-dom": "18.2.0",
     "typescript": "5.1.6"
   }
