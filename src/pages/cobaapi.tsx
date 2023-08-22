@@ -20,8 +20,8 @@ const CobaApiPage: React.FC = () => {
   };
 
   const cobaLogin = async () => {
-    let dari_form_username = "admin";
-    let dari_form_password = "adminsimkesling1";
+    let dari_form_username = "puskesmas001";
+    let dari_form_password = "123";
 
     let dataForm = new FormData();
     dataForm.append("username", dari_form_username);

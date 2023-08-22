@@ -3,44 +3,85 @@ import api from "./utils/HttpRequest";
 import { Select } from "antd";
 
 const Cobadapi: React.FC = () => {
-  const [datanya, setDatanya] = useState("");
-  const [options, setOptions] = useState<{ value: string; label: string }[]>(
-    []
+  const [kecamatanOptions, setKecamatanOptions] = useState<
+    { value: string; label: string; id_kecamatan: number }[]
+  >([]);
+  const [selectedKecamatan, setSelectedKecamatan] = useState<number | null>(
+    null
   );
-  const [selectedValue, setSelectedValue] = useState<string>("");
+
+  const [kelurahanOptions, setKelurahanOptions] = useState<
+    { value: string; label: string; id_kelurahan: number }[]
+  >([]);
+  const [selectedKelurahan, setSelectedKelurahan] = useState<number | null>(
+    null
+  );
 
   const clearData = () => {
-    setDatanya("");
-    setSelectedValue("");
-    setOptions([]);
+    setSelectedKecamatan(null);
+    setSelectedKelurahan(null);
+    setKecamatanOptions([]);
+    setKelurahanOptions([]);
   };
 
-  const getData = async () => {
+  const getKecamatanData = async () => {
     try {
       const response = await api.post("/user/kecamatan/data");
       const responseData = response.data.data.values;
 
-      setOptions(
-        responseData.map((item: { nama_kecamatan: any }) => ({
-          value: item.nama_kecamatan,
-          label: item.nama_kecamatan,
-        }))
+      setKecamatanOptions(
+        responseData.map(
+          (item: { nama_kecamatan: string; id_kecamatan: number }) => ({
+            value: item.id_kecamatan.toString(),
+            label: item.nama_kecamatan,
+            id_kecamatan: item.id_kecamatan,
+          })
+        )
       );
-
-      setDatanya(JSON.stringify(responseData, null, 4));
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error("Error fetching kecamatan data:", error);
     }
   };
 
+  const getKelurahanData = async (id_kecamatan: number) => {
+    try {
+      const response = await api.post(
+        `/user/kelurahan/data?id_kecamatan=${id_kecamatan}`
+      );
+      const responseData = response.data.data.values;
+
+      setKelurahanOptions(
+        responseData.map(
+          (item: { nama_kelurahan: string; id_kelurahan: number }) => ({
+            value: item.id_kelurahan.toString(),
+            label: item.nama_kelurahan,
+            id_kelurahan: item.id_kelurahan,
+          })
+        )
+      );
+    } catch (error) {
+      console.error("Error fetching kelurahan data:", error);
+    }
+  };
+
+  const handleKecamatanSelectChange = (value: string) => {
+    const id_kecamatan = parseInt(value);
+    setSelectedKecamatan(id_kecamatan);
+    setSelectedKelurahan(null);
+    getKelurahanData(id_kecamatan);
+  };
+
+  const handleKelurahanSelectChange = (value: string) => {
+    setSelectedKelurahan(parseInt(value));
+  };
+
   useEffect(() => {
-    getData();
+    getKecamatanData();
   }, []);
 
   return (
     <>
-      {/* <pre>{datanya}</pre> */}
-      <button onClick={() => getData()}>Get Data</button>
+      <button onClick={() => getKecamatanData()}>Get Kecamatan Data</button>
       <button onClick={() => clearData()}>Clear Data</button>
 
       <br />
@@ -54,9 +95,25 @@ const Cobadapi: React.FC = () => {
         filterOption={(input, option) =>
           (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
         }
-        value={selectedValue}
-        onChange={(value) => setSelectedValue(value)}
-        options={options}
+        value={selectedKecamatan?.toString() || undefined}
+        onChange={handleKecamatanSelectChange}
+        options={kecamatanOptions}
+      />
+
+      <br />
+      <br />
+
+      <Select
+        style={{ width: 500 }}
+        showSearch
+        placeholder="Select kelurahan"
+        optionFilterProp="children"
+        filterOption={(input, option) =>
+          (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
+        }
+        value={selectedKelurahan?.toString() || undefined}
+        onChange={handleKelurahanSelectChange}
+        options={kelurahanOptions}
       />
     </>
   );
