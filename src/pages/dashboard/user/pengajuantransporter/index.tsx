@@ -12,6 +12,9 @@ import {
   DeleteOutlined,
   ExclamationCircleFilled,
 } from "@ant-design/icons";
+import { MPengajuanTransporter } from "../../../../models/MPengajuanTransporter";
+import { usePengajuanTransporterStore } from "@/stores/pengajuanTransporterStore";
+import { useRouter } from "next/router";
 
 interface DataType {
   status: any;
@@ -22,68 +25,6 @@ interface DataType {
   age: number;
   address: string;
 }
-
-const columns: ColumnsType<DataType> = [
-  {
-    title: "Nama Transporter",
-    dataIndex: "namaTransporter",
-    defaultSortOrder: "descend",
-    sorter: (a, b) => a.namaTransporter - b.namaTransporter,
-  },
-  {
-    title: "Tanggal Pengajuan",
-    dataIndex: "tanggalPengajuan",
-    defaultSortOrder: "descend",
-    sorter: (a, b) => a.tanggalPengajuan.localeCompare(b.tanggalPengajuan),
-  },
-  {
-    title: "Status Pengajuan",
-    dataIndex: "status",
-    filters: [
-      {
-        text: "Menunggu",
-        value: "1",
-      },
-      {
-        text: "Ditolak",
-        value: "o",
-      },
-    ],
-    // specify the condition of filtering result
-    // here is that finding the name started with `value`
-    render: (status: string) => {
-      if (status === "1") {
-        return "Menunggu";
-      } else if (status === "0") {
-        return "Ditolak";
-      }
-      return "Unknown"; // Handle other cases if needed
-    },
-    sorter: (a, b) => a.status.localeCompare(b.status),
-  },
-
-  {
-    title: "Action",
-    key: "action",
-    render: (_, record) => (
-      <Space size="middle">
-        <Button icon={<EditOutlined />} style={{ backgroundColor: "yellow" }}>
-          Edit
-        </Button>
-        <Button icon={<EyeOutlined />} type="primary">
-          View
-        </Button>
-        <Button
-          onClick={showDeleteConfirm}
-          icon={<DeleteOutlined />}
-          type="primary"
-          danger>
-          Delete
-        </Button>
-      </Space>
-    ),
-  },
-];
 
 // const data = [
 //   {
@@ -127,8 +68,87 @@ const showDeleteConfirm = () => {
   });
 };
 
-const index: React.FC = () => {
+const Index: React.FC = () => {
   const [data, setData] = useState<DataType[]>([]);
+  const pengajuanTransporterStore = usePengajuanTransporterStore();
+  const router = useRouter();
+
+  const columns: ColumnsType<DataType> = [
+    {
+      title: "Nama Transporter",
+      dataIndex: "namaTransporter",
+      defaultSortOrder: "descend",
+      sorter: (a, b) => a.namaTransporter - b.namaTransporter,
+    },
+    {
+      title: "Tanggal Pengajuan",
+      dataIndex: "tanggalPengajuan",
+      defaultSortOrder: "descend",
+      sorter: (a, b) => a.tanggalPengajuan.localeCompare(b.tanggalPengajuan),
+    },
+    {
+      title: "Status Pengajuan",
+      dataIndex: "status",
+      filters: [
+        {
+          text: "Menunggu",
+          value: "1",
+        },
+        {
+          text: "Ditolak",
+          value: "o",
+        },
+      ],
+      // specify the condition of filtering result
+      // here is that finding the name started with `value`
+      render: (status: string) => {
+        if (status === "1") {
+          return "Menunggu";
+        } else if (status === "0") {
+          return "Ditolak";
+        }
+        return "Unknown"; // Handle other cases if needed
+      },
+      sorter: (a, b) => a.status.localeCompare(b.status),
+    },
+
+    {
+      title: "Action",
+      key: "action",
+      render: (_, record: MPengajuanTransporter) => {
+        // console.log(record);
+
+        const toFormPage = (param: MPengajuanTransporter) => {
+          if (pengajuanTransporterStore.simpenSementara) {
+            pengajuanTransporterStore.simpenSementara(param);
+            router.push("/about/dariform");
+          }
+        };
+        return (
+          <Space size="middle">
+            <Button
+              onClick={() => toFormPage(record)}
+              icon={<EditOutlined />}
+              style={{ backgroundColor: "yellow" }}
+            >
+              Edit
+            </Button>
+            <Button icon={<EyeOutlined />} type="primary">
+              View
+            </Button>
+            <Button
+              onClick={showDeleteConfirm}
+              icon={<DeleteOutlined />}
+              type="primary"
+              danger
+            >
+              Delete
+            </Button>
+          </Space>
+        );
+      },
+    },
+  ];
 
   const getData = async () => {
     try {
@@ -136,6 +156,7 @@ const index: React.FC = () => {
       const responseData = response.data.data.values;
 
       const transformedData = responseData.map((item: any) => ({
+        ...item,
         namaTransporter: item.nama_transporter,
         tanggalPengajuan: item.created_at,
         status: item.statusactive_transporter_tmp,
@@ -157,7 +178,8 @@ const index: React.FC = () => {
       <div>
         <Link
           href="/dashboard/user/pengajuantransporter/PagePengajuanTransporter"
-          passHref>
+          passHref
+        >
           <Button type="primary">Tambah Transporter</Button>
         </Link>
       </div>
@@ -169,4 +191,4 @@ const index: React.FC = () => {
   );
 };
 
-export default index;
+export default Index;
