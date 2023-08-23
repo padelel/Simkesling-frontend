@@ -42,17 +42,24 @@ const columns: ColumnsType<DataType> = [
     filters: [
       {
         text: "Menunggu",
-        value: "Menunggu",
+        value: "1",
       },
       {
         text: "Ditolak",
-        value: "Ditolak",
+        value: "o",
       },
     ],
     // specify the condition of filtering result
     // here is that finding the name started with `value`
-    onFilter: (value: string, record) => record.status.indexOf(value) === 0,
-    sorter: (a, b) => a.status - b.status,
+    render: (status: string) => {
+      if (status === "1") {
+        return "Menunggu";
+      } else if (status === "0") {
+        return "Ditolak";
+      }
+      return "Unknown"; // Handle other cases if needed
+    },
+    sorter: (a, b) => a.status.localeCompare(b.status),
   },
 
   {
@@ -78,32 +85,19 @@ const columns: ColumnsType<DataType> = [
   },
 ];
 
-const data = [
-  {
-    key: "1",
-    namaTransporter: "John Brown",
-    tanggalPengajuan: "17-08-2023",
-    status: "Menunggu",
-  },
-  {
-    key: "2",
-    namaTransporter: "Aohn Brown",
-    tanggalPengajuan: "19-08-2023",
-    status: "Menunggu",
-  },
-  {
-    key: "3",
-    namaTransporter: "Pohn Brown",
-    tanggalPengajuan: "27-08-2023",
-    status: "Ditolak",
-  },
-  {
-    key: "4",
-    namaTransporter: "Kohn Brown",
-    tanggalPengajuan: "17-09-2023",
-    status: "Ditolak",
-  },
-];
+// const data = [
+//   {
+//     namaTransporter: {{nama_transporter}},
+//     tanggalPengajuan: {{created_at}},
+//     status: {{statusactive_transporter_tmp}},
+//   },
+//   {
+//     namaTransporter: {{nama_transporter}},
+//     tanggalPengajuan: {{created_at}},
+//     status: {{statusactive_transporter_tmp}},
+//   },
+
+// ];
 
 const onChange: TableProps<DataType>["onChange"] = (
   pagination,
@@ -134,13 +128,24 @@ const showDeleteConfirm = () => {
 };
 
 const index: React.FC = () => {
-  const [datanya, setDatanya] = useState("");
+  const [data, setData] = useState<DataType[]>([]);
 
   const getData = async () => {
-    let responsenya = await api.post("/user/pengajuan-transporter/data");
-    console.log(responsenya);
-    console.log(setDatanya);
-    setDatanya(JSON.stringify(responsenya.data, null, 4));
+    try {
+      const response = await api.post("/user/pengajuan-transporter/data");
+      const responseData = response.data.data.values;
+
+      const transformedData = responseData.map((item: any) => ({
+        namaTransporter: item.nama_transporter,
+        tanggalPengajuan: item.created_at,
+        status: item.statusactive_transporter_tmp,
+        key: item.id_transporter_tmp.toString(),
+      }));
+
+      setData(transformedData);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
   };
 
   useEffect(() => {
@@ -160,7 +165,6 @@ const index: React.FC = () => {
       <div style={{ marginTop: "20px" }}>
         <Table columns={columns} dataSource={data} onChange={onChange} />;
       </div>
-      <pre>{datanya}</pre>
     </MainLayout>
   );
 };
