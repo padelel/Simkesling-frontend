@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   Divider,
@@ -23,20 +23,9 @@ import type { Dayjs } from "dayjs";
 import { DatePicker, Space } from "antd";
 import type { DatePickerProps, RangePickerProps } from "antd/es/date-picker";
 import { RcFile, UploadChangeParam } from "antd/es/upload";
+import api from "@/pages/utils/HttpRequest";
 
 const { RangePicker } = DatePicker;
-
-// const onChange = (
-//   value: DatePickerProps["value"] | RangePickerProps["value"],
-//   dateString: [string, string] | string
-// ) => {
-//   console.log("Selected Time: ", value);
-//   console.log("Formatted Selected Time: ", dateString);
-// };
-
-// const onOk = (value: DatePickerProps["value"] | RangePickerProps["value"]) => {
-//   console.log("onOk: ", value);
-// };
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -53,7 +42,65 @@ const tailLayoutUpload = {
   wrapperCol: { offset: 8, span: 16 },
 };
 
-const FormPengajuanTransporter = () => {
+const FormPengajuanTransporter: React.FC = () => {
+  const [kecamatanOptions, setKecamatanOptions] = useState<
+    { value: string; label: string; id_kecamatan: number }[]
+  >([]);
+  const [selectedKecamatan, setSelectedKecamatan] = useState<number | null>(
+    null
+  );
+
+  const [kelurahanOptions, setKelurahanOptions] = useState<
+    { value: string; label: string; id_kelurahan: number }[]
+  >([]);
+  const [selectedKelurahan, setSelectedKelurahan] = useState<number | null>(
+    null
+  );
+
+  const getKecamatanData = async () => {
+    try {
+      const response = await api.post("/user/kecamatan/data");
+      const responseData = response.data.data.values;
+
+      setKecamatanOptions(
+        responseData.map(
+          (item: { nama_kecamatan: string; id_kecamatan: number }) => ({
+            value: item.id_kecamatan.toString(),
+            label: item.nama_kecamatan,
+            id_kecamatan: item.id_kecamatan,
+          })
+        )
+      );
+    } catch (error) {
+      console.error("Error fetching kecamatan data:", error);
+    }
+  };
+
+  const getKelurahanData = async (id_kecamatan: number) => {
+    try {
+      const response = await api.post(
+        `/user/kelurahan/data?id_kecamatan=${id_kecamatan}`
+      );
+      const responseData = response.data.data.values;
+
+      setKelurahanOptions(
+        responseData.map(
+          (item: { nama_kelurahan: string; id_kelurahan: number }) => ({
+            value: item.id_kelurahan.toString(),
+            label: item.nama_kelurahan,
+            id_kelurahan: item.id_kelurahan,
+          })
+        )
+      );
+    } catch (error) {
+      console.error("Error fetching kelurahan data:", error);
+    }
+  };
+
+  useEffect(() => {
+    getKecamatanData();
+  }, []);
+
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [fileListList, setFileListList] = useState<UploadFile[][]>([]);
   const [dateRangeList, setDateRangeList] = useState<any[]>([]);
@@ -61,8 +108,8 @@ const FormPengajuanTransporter = () => {
   const [form, setForm] = useState({
     namatransporter: "",
     npwp: "",
-    kecamatan: "",
-    kelurahan: "",
+    id_kecamatan: "",
+    id_kelurahan: "",
     alamat: "",
     telp: "",
     email: "",
@@ -72,34 +119,6 @@ const FormPengajuanTransporter = () => {
   const [rowCount, setRowCount] = useState(1);
 
   const [showMOUFields, setShowMOUFields] = useState(false);
-
-  // const toggleMOUFields = () => {
-  //   setShowMOUFields(!showMOUFields);
-  // };
-
-  // const handleUpload = () => {
-  //   const formData = new FormData();
-  //   fileList.forEach((file) => {
-  //     formData.append("files[]", file as RcFile);
-  //   });
-  //   setUploading(true);
-  //   // You can use any AJAX library you like
-  //   fetch("https://www.mocky.io/v2/5cc8019d300000980a055e76", {
-  //     method: "POST",
-  //     body: formData,
-  //   })
-  //     .then((res) => res.json())
-  //     .then(() => {
-  //       setFileList([]);
-  //       message.success("upload successfully.");
-  //     })
-  //     .catch(() => {
-  //       message.error("upload failed.");
-  //     })
-  //     .finally(() => {
-  //       setUploading(false);
-  //     });
-  // };
 
   const props: UploadProps = {
     onRemove: (file) => {
@@ -201,16 +220,69 @@ const FormPengajuanTransporter = () => {
       [event.target.name]: event.target.value,
     });
   };
-  const handleChangeSelect = (val: any, name: string, event: any) => {
+
+  const handleKecamatanSelectChange = (value: any, name: any, event: any) => {
+    const id_kecamatan = parseInt(value);
+    setSelectedKecamatan(id_kecamatan);
+    setSelectedKelurahan(null);
+    getKelurahanData(id_kecamatan);
     setForm({
       ...form,
-      [name]: val,
+      [name]: value,
     });
   };
 
+  const handleKelurahanSelectChange = (
+    value: string,
+    name: any,
+    event: any
+  ) => {
+    setSelectedKelurahan(parseInt(value));
+    setForm({
+      ...form,
+      [name]: value,
+    });
+  };
+
+  const handleChangeSelect = (val: any, name: any, event: any) => {};
+
   // -- onSubmit
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     console.log(form);
+
+    let dataForm = new FormData();
+    dataForm.append("username", "puskesmasasade");
+    dataForm.append("password", "123");
+    dataForm.append("nama_user", form.email);
+    dataForm.append("level", "3");
+    dataForm.append("nama_transporter", form.namatransporter);
+    dataForm.append("npwp_transporter", form.npwp);
+    dataForm.append("id_kecamatan", form.id_kecamatan);
+    dataForm.append("id_kelurahan", form.id_kelurahan);
+    dataForm.append("alamat_transporter", form.alamat);
+    dataForm.append("notlp", form.telp);
+    dataForm.append("email", form.email);
+    // dataForm.append("file_mou", fileListList);
+
+    // Append tgl_mulai and tgl_akhir based on dateRangeList
+    dateRangeList.forEach((rangeDates, index) => {
+      if (rangeDates.length === 2) {
+        // Format the dates to the required format
+        const tglMulai = rangeDates[0].format("YYYY-MM-DD");
+        const tglAkhir = rangeDates[1].format("YYYY-MM-DD");
+
+        dataForm.append(`tgl_mulai`, tglMulai);
+        dataForm.append(`tgl_akhir`, tglAkhir);
+        // dataForm.append(`tgl_mulai[${index}]`, tglMulai);
+        // dataForm.append(`tgl_akhir[${index}]`, tglAkhir);
+      }
+    });
+
+    let responsenya = await api.post(
+      "/user/puskesmas-rumahsakit/create",
+      dataForm
+    );
+
     console.log(fileListList);
     console.log(dateRangeList);
   };
@@ -237,32 +309,36 @@ const FormPengajuanTransporter = () => {
         <Form.Item
           name="form_kecamatan"
           label="Kecamatan"
-          initialValue={form.kecamatan}
+          initialValue={form.id_kecamatan}
           rules={[{ required: true }]}>
           <Select
-            value={form.kecamatan}
-            onChange={(v) => handleChangeSelect(v, "kecamatan", event)}
+            style={{ width: 250 }}
+            showSearch
+            value={form.id_kecamatan}
+            onChange={(v) =>
+              handleKecamatanSelectChange(v, "id_kecamatan", event)
+            }
             placeholder="Silahkan Pilih Kecamatan"
-            allowClear>
-            <Option value="Kelapa Dua">Kelapa Dua</Option>
-            <Option value="Citayam">Citayam</Option>
-            <Option value="Srengseng Sawah">Srengseng Sawah</Option>
-          </Select>
+            allowClear
+            options={kecamatanOptions}
+          />
         </Form.Item>
         <Form.Item
           name="form_kelurahan"
           label="Kelurahan"
-          initialValue={form.kelurahan}
+          initialValue={form.id_kelurahan}
           rules={[{ required: true }]}>
           <Select
-            value={form.kelurahan}
-            onChange={(v) => handleChangeSelect(v, "kelurahan", event)}
+            style={{ width: 250 }}
+            showSearch
+            value={form.id_kelurahan}
+            onChange={(v) =>
+              handleKelurahanSelectChange(v, "id_kelurahan", event)
+            }
             placeholder="Silahkan Pilih Kelurahan"
-            allowClear>
-            <Option value="Pasir Gunung Selatan">Pasir Gunung Selatan</Option>
-            <Option value="Tugu">Tugu</Option>
-            <Option value="Kukusan">Kukusan</Option>
-          </Select>
+            allowClear
+            options={kelurahanOptions}
+          />
         </Form.Item>
         <Form.Item
           name="form_alamat"

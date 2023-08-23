@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useState, createContext, useContext } from "react";
 import api from "./utils/HttpRequest";
 const CobaApiPage: React.FC = () => {
@@ -14,7 +14,7 @@ const CobaApiPage: React.FC = () => {
   };
 
   const getData = async () => {
-    let responsenya = await api.post("/user/kecamatan/data");
+    let responsenya = await api.post("/user/pengajuan-transporter/data");
     console.log(responsenya);
     setDatanya(JSON.stringify(responsenya.data, null, 4));
   };
@@ -65,6 +65,10 @@ const CobaApiPage: React.FC = () => {
       console.error("API error:", error);
     }
   };
+
+  useEffect(() => {
+    getData();
+  }, []);
 
   const onChangeFile = async (event: any) => {
     console.log(event.target.files);

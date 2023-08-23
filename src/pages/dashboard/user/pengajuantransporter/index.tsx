@@ -1,9 +1,10 @@
 import MainLayout from "@/components/MainLayout";
 import { Button, Space, Modal } from "antd";
 import Link from "next/link";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Table } from "antd";
 import type { ColumnsType, TableProps } from "antd/es/table";
+import api from "../../../utils/HttpRequest";
 import {
   LoginOutlined,
   EditOutlined,
@@ -132,7 +133,20 @@ const showDeleteConfirm = () => {
   });
 };
 
-const index = () => {
+const index: React.FC = () => {
+  const [datanya, setDatanya] = useState("");
+
+  const getData = async () => {
+    let responsenya = await api.post("/user/pengajuan-transporter/data");
+    console.log(responsenya);
+    console.log(setDatanya);
+    setDatanya(JSON.stringify(responsenya.data, null, 4));
+  };
+
+  useEffect(() => {
+    getData();
+  }, []);
+
   return (
     <MainLayout title="Pengajuan Transporter">
       <div>
@@ -146,6 +160,7 @@ const index = () => {
       <div style={{ marginTop: "20px" }}>
         <Table columns={columns} dataSource={data} onChange={onChange} />;
       </div>
+      <pre>{datanya}</pre>
     </MainLayout>
   );
 };
