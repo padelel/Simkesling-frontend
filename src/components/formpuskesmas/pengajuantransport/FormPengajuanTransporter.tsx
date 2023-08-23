@@ -106,6 +106,7 @@ const FormPengajuanTransporter: React.FC = () => {
   const [dateRangeList, setDateRangeList] = useState<any[]>([]);
 
   const [form, setForm] = useState({
+    oldid: "",
     namatransporter: "",
     npwp: "",
     id_kecamatan: "",
@@ -250,19 +251,23 @@ const FormPengajuanTransporter: React.FC = () => {
   const handleSubmit = async () => {
     console.log(form);
 
-    let dataForm = new FormData();
-    dataForm.append("username", "puskesmasasade");
-    dataForm.append("password", "123");
-    dataForm.append("nama_user", form.email);
-    dataForm.append("level", "3");
+    let dataForm: any = new FormData();
+    dataForm.append("oldid", form.oldid);
     dataForm.append("nama_transporter", form.namatransporter);
     dataForm.append("npwp_transporter", form.npwp);
     dataForm.append("id_kecamatan", form.id_kecamatan);
     dataForm.append("id_kelurahan", form.id_kelurahan);
     dataForm.append("alamat_transporter", form.alamat);
     dataForm.append("notlp", form.telp);
+    dataForm.append("nohp", "-");
     dataForm.append("email", form.email);
-    // dataForm.append("file_mou", fileListList);
+
+    // Append tgl_mulai and tgl_akhir based on dateRangeList
+    fileListList.forEach((file, index) => {
+      dataForm.append("file_mou[]", file[0], file[0].fileName);
+      console.log(file);
+      // return;
+    });
 
     // Append tgl_mulai and tgl_akhir based on dateRangeList
     dateRangeList.forEach((rangeDates, index) => {
@@ -271,15 +276,15 @@ const FormPengajuanTransporter: React.FC = () => {
         const tglMulai = rangeDates[0].format("YYYY-MM-DD");
         const tglAkhir = rangeDates[1].format("YYYY-MM-DD");
 
-        dataForm.append(`tgl_mulai`, tglMulai);
-        dataForm.append(`tgl_akhir`, tglAkhir);
-        // dataForm.append(`tgl_mulai[${index}]`, tglMulai);
-        // dataForm.append(`tgl_akhir[${index}]`, tglAkhir);
+        // dataForm.append(`tgl_mulai`, tglMulai);
+        // dataForm.append(`tgl_akhir`, tglAkhir);
+        dataForm.append(`tgl_mulai[]`, tglMulai);
+        dataForm.append(`tgl_akhir[]`, tglAkhir);
       }
     });
 
     let responsenya = await api.post(
-      "/user/puskesmas-rumahsakit/create",
+      "/user/pengajuan-transporter/create",
       dataForm
     );
 

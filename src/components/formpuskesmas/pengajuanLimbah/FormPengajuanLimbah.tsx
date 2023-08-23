@@ -87,7 +87,7 @@ const FormPengajuanLimbah = () => {
   const [isCheckboxChecked, setIsCheckboxChecked] = useState(false);
   const [isCheckboxChecked1, setIsCheckboxChecked1] = useState(false);
 
-  const [activeTabKey2, setActiveTabKey2] = useState<string>("limbahCair");
+  const [activeTabKey2, setActiveTabKey2] = useState<string>("limbahPadat");
 
   const [fileManifest, setFileManifest] = useState<UploadFile[]>([]);
   const [fileLogbook, setFileLogbook] = useState<UploadFile[]>([]);
