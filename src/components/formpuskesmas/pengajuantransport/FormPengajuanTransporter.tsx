@@ -24,6 +24,7 @@ import { DatePicker, Space } from "antd";
 import type { DatePickerProps, RangePickerProps } from "antd/es/date-picker";
 import { RcFile, UploadChangeParam } from "antd/es/upload";
 import api from "@/pages/utils/HttpRequest";
+import { usePengajuanTransporterStore } from "@/stores/pengajuanTransporterStore";
 
 const { RangePicker } = DatePicker;
 
@@ -31,8 +32,8 @@ const { Option } = Select;
 const { TextArea } = Input;
 
 const layout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 16 },
+  labelCol: { span: 10 },
+  wrapperCol: { span: 17 },
 };
 
 const tailLayout = {
@@ -43,6 +44,7 @@ const tailLayoutUpload = {
 };
 
 const FormPengajuanTransporter: React.FC = () => {
+  const pengajuanTransporterStore = usePengajuanTransporterStore();
   const [kecamatanOptions, setKecamatanOptions] = useState<
     { value: string; label: string; id_kecamatan: number }[]
   >([]);
@@ -97,8 +99,15 @@ const FormPengajuanTransporter: React.FC = () => {
     }
   };
 
+  const [formInstance] = Form.useForm();
+
   useEffect(() => {
+    console.log(Object.values(pengajuanTransporterStore));
     getKecamatanData();
+    formInstance.setFieldsValue({
+      form_namatransporter: pengajuanTransporterStore.nama_transporter,
+      form_npwp: pengajuanTransporterStore.npwp_transporter,
+    });
   }, []);
 
   const [fileList, setFileList] = useState<UploadFile[]>([]);
@@ -297,7 +306,8 @@ const FormPengajuanTransporter: React.FC = () => {
         {...layout}
         onFinish={handleSubmit}
         name="control-hooks"
-        style={{ maxWidth: 600 }}>
+        style={{ maxWidth: 600 }}
+        form={formInstance}>
         <Form.Item
           name="form_namatransporter"
           label="Nama Transporter"
@@ -350,6 +360,7 @@ const FormPengajuanTransporter: React.FC = () => {
           label="Alamat"
           rules={[{ required: true }]}>
           <TextArea
+            style={{ width: 250 }}
             showCount
             name="alamat"
             maxLength={300}

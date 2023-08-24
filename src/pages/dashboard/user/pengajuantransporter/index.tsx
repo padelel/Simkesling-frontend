@@ -121,7 +121,9 @@ const Index: React.FC = () => {
         const toFormPage = (param: MPengajuanTransporter) => {
           if (pengajuanTransporterStore.simpenSementara) {
             pengajuanTransporterStore.simpenSementara(param);
-            router.push("/about/dariform");
+            router.push(
+              "/dashboard/user/pengajuantransporter/PagePengajuanTransporter"
+            );
           }
         };
         return (
@@ -129,8 +131,7 @@ const Index: React.FC = () => {
             <Button
               onClick={() => toFormPage(record)}
               icon={<EditOutlined />}
-              style={{ backgroundColor: "yellow" }}
-            >
+              style={{ backgroundColor: "yellow" }}>
               Edit
             </Button>
             <Button icon={<EyeOutlined />} type="primary">
@@ -140,8 +141,7 @@ const Index: React.FC = () => {
               onClick={showDeleteConfirm}
               icon={<DeleteOutlined />}
               type="primary"
-              danger
-            >
+              danger>
               Delete
             </Button>
           </Space>
@@ -178,8 +178,7 @@ const Index: React.FC = () => {
       <div>
         <Link
           href="/dashboard/user/pengajuantransporter/PagePengajuanTransporter"
-          passHref
-        >
+          passHref>
           <Button type="primary">Tambah Transporter</Button>
         </Link>
       </div>
