@@ -277,13 +277,13 @@ const FormPengajuanLimbah: React.FC = () => {
     dataForm.append("limbah_padat_berat[]", 2023);
 
     fileLogbook.forEach((file, index) => {
-      dataForm.append("file_logbook[]", file.fileName);
+      dataForm.append("file_logbook[]", file.originFileObj);
       console.log(file);
       // return;
     });
 
     fileManifest.forEach((file, index) => {
-      dataForm.append("file_manifest[]", file.fileName);
+      dataForm.append("file_manifest[]", file.originFileObj);
       console.log(file);
       // return;
     });
