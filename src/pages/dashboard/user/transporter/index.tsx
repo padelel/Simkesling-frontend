@@ -1,10 +1,10 @@
 import MainLayout from "@/components/MainLayout";
-import { Table } from "antd";
-import React from "react";
-import { Button, Modal, Space } from "antd";
+import { Button, Space, Modal } from "antd";
 import Link from "next/link";
-
+import React, { useEffect, useState } from "react";
+import { Table } from "antd";
 import type { ColumnsType, TableProps } from "antd/es/table";
+import api from "../../../utils/HttpRequest";
 import {
   LoginOutlined,
   EditOutlined,
@@ -12,6 +12,9 @@ import {
   DeleteOutlined,
   ExclamationCircleFilled,
 } from "@ant-design/icons";
+import { MPengajuanTransporter } from "../../../../models/MPengajuanTransporter";
+import { usePengajuanTransporterStore } from "@/stores/pengajuanTransporterStore";
+import { useRouter } from "next/router";
 
 interface DataType {
   status: any;
@@ -24,75 +27,19 @@ interface DataType {
   address: string;
 }
 
-const columns: ColumnsType<DataType> = [
-  {
-    title: "Nama Transporter",
-    dataIndex: "namaTransporter",
-    defaultSortOrder: "descend",
-    sorter: (a, b) => a.namaTransporter - b.namaTransporter,
-  },
-  {
-    title: "Tanggal Pengajuan",
-    dataIndex: "tanggalPengajuan",
-    defaultSortOrder: "descend",
-    sorter: (a, b) => a.tanggalPengajuan.localeCompare(b.tanggalPengajuan),
-  },
-  {
-    title: "Tanggal Berakhir",
-    dataIndex: "tanggalBerakhir",
-    defaultSortOrder: "descend",
-    sorter: (a, b) => a.tanggalPengajuan.localeCompare(b.tanggalBerakhir),
-  },
+// const data = [
+//   {
+//     namaTransporter: {{nama_transporter}},
+//     tanggalPengajuan: {{created_at}},
+//     status: {{statusactive_transporter_tmp}},
+//   },
+//   {
+//     namaTransporter: {{nama_transporter}},
+//     tanggalPengajuan: {{created_at}},
+//     status: {{statusactive_transporter_tmp}},
+//   },
 
-  {
-    title: "Action",
-    key: "action",
-    render: (_, record) => (
-      <Space size="middle">
-        <Button icon={<EditOutlined />} style={{ backgroundColor: "yellow" }}>
-          Edit
-        </Button>
-        <Button icon={<EyeOutlined />} type="primary">
-          View
-        </Button>
-        <Button
-          onClick={showDeleteConfirm}
-          icon={<DeleteOutlined />}
-          type="primary"
-          danger>
-          Delete
-        </Button>
-      </Space>
-    ),
-  },
-];
-
-const data = [
-  {
-    key: "1",
-    namaTransporter: "John Brown",
-    tanggalPengajuan: "17-08-2023",
-    tanggalBerakhir: "17-08-2025",
-  },
-  {
-    key: "2",
-    namaTransporter: "Aohn Brown",
-    tanggalPengajuan: "19-08-2023",
-    tanggalBerakhir: "19-08-2025",
-  },
-  {
-    key: "3",
-    namaTransporter: "Pohn Brown",
-    tanggalPengajuan: "27-08-2023",
-    tanggalBerakhir: "27-08-2025",
-  },
-  {
-    key: "4",
-    namaTransporter: "Kohn Brown",
-    tanggalPengajuan: "17-09-2023",
-    tanggalBerakhir: "17-09-2025",
-  },
-];
+// ];
 
 const onChange: TableProps<DataType>["onChange"] = (
   pagination,
@@ -122,9 +69,103 @@ const showDeleteConfirm = () => {
   });
 };
 
-const index = () => {
+const Index: React.FC = () => {
+  const [data, setData] = useState<DataType[]>([]);
+  const pengajuanTransporterStore = usePengajuanTransporterStore();
+  const router = useRouter();
+
+  const columns: ColumnsType<DataType> = [
+    {
+      title: "Nama Transporter",
+      dataIndex: "namaTransporter",
+      defaultSortOrder: "descend",
+      sorter: (a, b) => a.namaTransporter - b.namaTransporter,
+    },
+    {
+      title: "Tanggal Pengajuan",
+      dataIndex: "tanggalPengajuan",
+      defaultSortOrder: "descend",
+      sorter: (a, b) => a.tanggalPengajuan.localeCompare(b.tanggalPengajuan),
+    },
+    {
+      title: "Tanggal Berakhir",
+      dataIndex: "tanggalBerakhir",
+      defaultSortOrder: "descend",
+      sorter: (a, b) => a.tanggalBerakhir.localeCompare(b.tanggalBerakhir),
+    },
+
+    {
+      title: "Action",
+      key: "action",
+      render: (_, record: MPengajuanTransporter) => {
+        // console.log(record);
+
+        const toFormPage = (param: MPengajuanTransporter) => {
+          if (pengajuanTransporterStore.simpenSementara) {
+            pengajuanTransporterStore.simpenSementara(param);
+            router.push(
+              "/dashboard/user/pengajuantransporter/PagePengajuanTransporter"
+            );
+          }
+        };
+        return (
+          <Space size="middle">
+            <Button
+              onClick={() => toFormPage(record)}
+              icon={<EditOutlined />}
+              style={{ backgroundColor: "yellow" }}>
+              Edit
+            </Button>
+            <Button icon={<EyeOutlined />} type="primary">
+              View
+            </Button>
+            <Button
+              onClick={showDeleteConfirm}
+              icon={<DeleteOutlined />}
+              type="primary"
+              danger>
+              Delete
+            </Button>
+          </Space>
+        );
+      },
+    },
+  ];
+
+  const getData = async () => {
+    try {
+      const response = await api.post("/user/transporter/data");
+      const responseData = response.data.data.values;
+
+      const transformedData = responseData.map((item: any) => ({
+        ...item,
+        namaTransporter: item.nama_transporter,
+        tanggalPengajuan: item.created_at,
+        tanggalBerakhir: item.tgl_akhir,
+
+        key: item.id_transporter_tmp.toString(),
+      }));
+
+      setData(transformedData);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  useEffect(() => {
+    getData();
+  }, []);
+
   return (
-    <MainLayout title="Daftar Transporter">
+    <MainLayout title="Pengajuan Transporter">
+      <div>
+        <Link
+          href="/dashboard/user/pengajuantransporter/PagePengajuanTransporter"
+          passHref>
+          <Button type="primary">Tambah Transporter</Button>
+        </Link>
+      </div>
+
       <div style={{ marginTop: "20px" }}>
         <Table columns={columns} dataSource={data} onChange={onChange} />;
       </div>
@@ -132,4 +173,4 @@ const index = () => {
   );
 };
 
-export default index;
+export default Index;

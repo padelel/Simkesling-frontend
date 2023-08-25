@@ -107,6 +107,11 @@ const FormPengajuanTransporter: React.FC = () => {
     formInstance.setFieldsValue({
       form_namatransporter: pengajuanTransporterStore.nama_transporter,
       form_npwp: pengajuanTransporterStore.npwp_transporter,
+      form_kecamatan: pengajuanTransporterStore.id_kecamatan,
+      form_kelurahan: pengajuanTransporterStore.id_kelurahan,
+      form_alamat: pengajuanTransporterStore.alamat_transporter,
+      form_nohp: pengajuanTransporterStore.notlp,
+      form_email: pengajuanTransporterStore.email,
     });
   }, []);
 

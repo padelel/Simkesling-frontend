@@ -106,6 +106,8 @@ const Index: React.FC = () => {
           return "Menunggu";
         } else if (status === "0") {
           return "Ditolak";
+        } else if (status === "2") {
+          return "Aktif";
         }
         return "Unknown"; // Handle other cases if needed
       },

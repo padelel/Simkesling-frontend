@@ -1,9 +1,10 @@
-import React from "react";
 import MainLayout from "@/components/MainLayout";
 import { Button, Space, Modal } from "antd";
 import Link from "next/link";
+import React, { useEffect, useState } from "react";
 import { Table } from "antd";
 import type { ColumnsType, TableProps } from "antd/es/table";
+import api from "../../../utils/HttpRequest";
 import {
   LoginOutlined,
   EditOutlined,
@@ -11,111 +12,31 @@ import {
   DeleteOutlined,
   ExclamationCircleFilled,
 } from "@ant-design/icons";
+import { MPengajuanTransporter } from "../../../../models/MPengajuanTransporter";
+import { usePengajuanTransporterStore } from "@/stores/pengajuanTransporterStore";
+import { useRouter } from "next/router";
 
 interface DataType {
-  metodePemusnahan: any;
-  beratLimbah: any;
-  tanggalPengangkutan: any;
-  nomorLaporan: any;
-  status: any;
   namaTransporter: any;
-  tanggalPengajuan: any;
+  tanggalPelaporan: any;
+  beratLimbahTotal: any;
+
   key: React.Key;
-  name: string;
-  age: number;
-  address: string;
 }
 
-const columns: ColumnsType<DataType> = [
-  {
-    title: "Nomor Laporan",
-    dataIndex: "nomorLaporan",
-    defaultSortOrder: "descend",
-    sorter: (a, b) => a.nomorLaporan - b.nomorLaporan,
-  },
-  {
-    title: "Tanggal Pengangkutan",
-    dataIndex: "tanggalPengangkutan",
-    defaultSortOrder: "descend",
-    sorter: (a, b) =>
-      a.tanggalPengangkutan.localeCompare(b.tanggalPengangkutan),
-  },
-  {
-    title: "Nama Transporter",
-    dataIndex: "namaTransporter",
-    defaultSortOrder: "descend",
-    sorter: (a, b) => a.namaTransporter.localeCompare(b.namaTransporter),
-  },
-  {
-    title: "Berat Limbah",
-    dataIndex: "beratLimbah",
-    defaultSortOrder: "descend",
-    sorter: (a, b) => a.beratLimbah - b.beratLimbah,
-  },
-  {
-    title: "Metode Pemusnahan",
-    dataIndex: "metodePemusnahan",
-    defaultSortOrder: "descend",
-    sorter: (a, b) => a.metodePemusnahan.localeCompare(b.metodePemusnahan),
-  },
+// const data = [
+//   {
+//     namaTransporter: {{nama_transporter}},
+//     tanggalPengajuan: {{created_at}},
+//     status: {{statusactive_transporter_tmp}},
+//   },
+//   {
+//     namaTransporter: {{nama_transporter}},
+//     tanggalPengajuan: {{created_at}},
+//     status: {{statusactive_transporter_tmp}},
+//   },
 
-  {
-    title: "Action",
-    key: "action",
-    render: (_, record) => (
-      <Space size="middle">
-        <Button icon={<EditOutlined />} style={{ backgroundColor: "yellow" }}>
-          Edit
-        </Button>
-        <Button icon={<EyeOutlined />} type="primary">
-          View
-        </Button>
-        <Button
-          onClick={showDeleteConfirm}
-          icon={<DeleteOutlined />}
-          type="primary"
-          danger>
-          Delete
-        </Button>
-      </Space>
-    ),
-  },
-];
-
-const data = [
-  {
-    key: "1",
-    nomorLaporan: "128673123",
-    tanggalPengangkutan: "17-08-2023",
-    namaTransporter: "John Brown",
-    beratLimbah: 30,
-    metodePemusnahan: "Pembakaran",
-  },
-  {
-    key: "2",
-    nomorLaporan: "128673129",
-    tanggalPengangkutan: "17-09-2023",
-    namaTransporter: "John Brown",
-    beratLimbah: 35,
-    metodePemusnahan: "Pembakaran",
-  },
-  {
-    key: "3",
-    nomorLaporan: "128673129",
-    tanggalPengangkutan: "17-08-2023",
-    namaTransporter: "Denis Brown",
-    beratLimbah: 40,
-    metodePemusnahan: "Pembakaran",
-  },
-  {
-    key: "4",
-    nomorLaporan: "128673123",
-    tanggalPengangkutan: "17-10-2023",
-    namaTransporter: "John Brown",
-    beratLimbah: 50,
-    metodePemusnahan: "Pembakaran",
-  },
-];
+// ];
 
 const onChange: TableProps<DataType>["onChange"] = (
   pagination,
@@ -145,12 +66,97 @@ const showDeleteConfirm = () => {
   });
 };
 
-const index = () => {
+const Index: React.FC = () => {
+  const [data, setData] = useState<DataType[]>([]);
+  const pengajuanTransporterStore = usePengajuanTransporterStore();
+  const router = useRouter();
+
+  const columns: ColumnsType<DataType> = [
+    {
+      title: "Tanggal Pelaporan",
+      dataIndex: "tanggalPelaporan",
+      defaultSortOrder: "descend",
+      sorter: (a, b) => a.tanggalPelaporan - b.namaTransporter,
+    },
+    {
+      title: "Nama Transporter",
+      dataIndex: "namaTransporter",
+      defaultSortOrder: "descend",
+      sorter: (a, b) => a.namaTransporter - b.namaTransporter,
+    },
+    {
+      title: "Berat Limbah Total",
+      dataIndex: "beratLimbahTotal",
+      defaultSortOrder: "descend",
+      sorter: (a, b) => a.beratLimbahTotal.localeCompare(b.beratLimbahTotal),
+    },
+
+    {
+      title: "Action",
+      key: "action",
+      render: (_, record: MPengajuanTransporter) => {
+        // console.log(record);
+
+        const toFormPage = (param: MPengajuanTransporter) => {
+          if (pengajuanTransporterStore.simpenSementara) {
+            pengajuanTransporterStore.simpenSementara(param);
+            router.push(
+              "/dashboard/user/pengajuantransporter/PagePengajuanTransporter"
+            );
+          }
+        };
+        return (
+          <Space size="middle">
+            <Button
+              onClick={() => toFormPage(record)}
+              icon={<EditOutlined />}
+              style={{ backgroundColor: "yellow" }}>
+              Edit
+            </Button>
+            <Button icon={<EyeOutlined />} type="primary">
+              View
+            </Button>
+            <Button
+              onClick={showDeleteConfirm}
+              icon={<DeleteOutlined />}
+              type="primary"
+              danger>
+              Delete
+            </Button>
+          </Space>
+        );
+      },
+    },
+  ];
+
+  const getData = async () => {
+    try {
+      const response = await api.post("/user/laporan-bulanan/data");
+      const responseData = response.data.data.values;
+
+      const transformedData = responseData.map((item: any) => ({
+        ...item,
+        tanggalPelaporan: item.created_at,
+        namaTransporter: item.nama_transporter,
+        beratLimbahTotal: item.berat_limbah_total,
+        key: item.id_laporan_bulanan.toString(),
+      }));
+
+      setData(transformedData);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  useEffect(() => {
+    getData();
+  }, []);
+
   return (
-    <MainLayout title="Daftar Limbah">
+    <MainLayout title="Laporan Limbah">
       <div>
         <Link href="/dashboard/user/limbah/PageTambahLimbah" passHref>
-          <Button type="primary">Tambah Laporan Limbah</Button>
+          <Button type="primary">Tambah Pelaporan Limbah</Button>
         </Link>
       </div>
 
@@ -161,4 +167,4 @@ const index = () => {
   );
 };
 
-export default index;
+export default Index;
