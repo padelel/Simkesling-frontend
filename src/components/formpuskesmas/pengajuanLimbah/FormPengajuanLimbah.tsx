@@ -118,6 +118,9 @@ const FormPengajuanLimbah: React.FC = () => {
 
   const [fileManifest, setFileManifest] = useState<UploadFile[]>([]);
   const [fileLogbook, setFileLogbook] = useState<UploadFile[]>([]);
+  const [limbah_padat_kategori, setlimbah_padat_kategori] = useState<any[]>([]);
+  const [limbah_padat_catatan, setlimbah_padat_catatan] = useState<any[]>([]);
+  const [limbah_padat_berat, setlimbah_padat_berat] = useState<any[]>([]);
 
   const [limbahPadatList, setLimbahPadatList] = useState<any[]>([]);
 
@@ -244,13 +247,48 @@ const FormPengajuanLimbah: React.FC = () => {
     console.log("---[END]");
   };
 
-  const handleNextButton = () => {
+  const handleNextButton = async () => {
     console.log(limbahPadatList);
     // Update the activeTabKey2 state
     // setActiveTabKey2("limbahCair");
     console.log(form);
     console.log(fileLogbook);
     console.log(fileManifest);
+
+    let dataForm: any = new FormData();
+    dataForm.append("id_transporter", form.namatransporter);
+    dataForm.append("nama_pemusnah", form.namapemusnah);
+    dataForm.append("metode_pemusnah", form.metodepemusnah);
+    dataForm.append("berat_limbah_total", form.totallimbahpadat);
+    dataForm.append("punya_penyimpanan_tps", form.statustps);
+    dataForm.append("ukuran_penyimpanan_tps", 1);
+    dataForm.append("punya_pemusnahan_sendiri", form.statuspemusnah);
+    dataForm.append("ukuran_pemusnahan_sendiri", form.ukuranpemusnah);
+    dataForm.append("limbah_b3_covid", form.totallimbahcovid);
+    dataForm.append("limbah_b3_noncovid", form.totallimbahnoncovid);
+    dataForm.append("debit_limbah_cair", 1);
+    dataForm.append("kapasitas_ipal", 1);
+    dataForm.append("memenuhi_syarat", form.stastuslimbahcair);
+    dataForm.append("catatan", "-");
+    dataForm.append("periode", 4);
+    dataForm.append("tahun", 2023);
+    dataForm.append("limbah_padat_kategori[]", 2023);
+    dataForm.append("limbah_padat_catatan[]", 2023);
+    dataForm.append("limbah_padat_berat[]", 2023);
+
+    fileLogbook.forEach((file, index) => {
+      dataForm.append("file_logbook[]", file.fileName);
+      console.log(file);
+      // return;
+    });
+
+    fileManifest.forEach((file, index) => {
+      dataForm.append("file_manifest[]", file.fileName);
+      console.log(file);
+      // return;
+    });
+
+    let responsenya = await api.post("/user/laporan-bulanan/create", dataForm);
   };
 
   const handleSubmitButton = () => {
