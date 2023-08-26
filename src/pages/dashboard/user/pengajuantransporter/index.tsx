@@ -124,7 +124,7 @@ const Index: React.FC = () => {
           if (pengajuanTransporterStore.simpenSementara) {
             pengajuanTransporterStore.simpenSementara(param);
             router.push(
-              "/dashboard/user/pengajuantransporter/PagePengajuanTransporter"
+              "/dashboard/user/pengajuantransporter/PagePengajuanTransporter?action=edit"
             );
           }
         };

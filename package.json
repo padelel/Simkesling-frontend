@@ -21,6 +21,7 @@
     "clone-deep": "^4.0.1",
     "eslint": "8.47.0",
     "eslint-config-next": "13.4.13",
+    "file-type": "^18.5.0",
     "next": "13.4.13",
     "react": "18.2.0",
     "react-apexcharts": "^1.4.1",
