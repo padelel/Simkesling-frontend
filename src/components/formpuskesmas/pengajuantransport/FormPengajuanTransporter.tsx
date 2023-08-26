@@ -265,7 +265,7 @@ const FormPengajuanTransporter: React.FC = () => {
     dataForm.append("id_kelurahan", form.id_kelurahan);
     dataForm.append("alamat_transporter", form.alamat);
     dataForm.append("notlp", form.telp);
-    dataForm.append("nohp", "-");
+    dataForm.append("nohp", form.telp);
     dataForm.append("email", form.email);
 
     console.log(fileListList);
@@ -329,14 +329,7 @@ const FormPengajuanTransporter: React.FC = () => {
 
       // Create a Blob URL
       const blobUrl = URL.createObjectURL(blob);
-      // fileListList.push([
-      //   {
-      //     uid: new Date().toISOString(),
-      //     name: filename,
-      //     status: "done",
-      //     url: blobUrl,
-      //   },
-      // ]);
+
       return {
         uid: new Date().toISOString(),
         name: filename,
@@ -373,6 +366,42 @@ const FormPengajuanTransporter: React.FC = () => {
     formInstance.setFieldsValue({
       listMouDynamic: arrfile,
     });
+
+    getDatesHere();
+  };
+  const getDatesHere = async () => {
+    let lengthdate = pengajuanTransporterStore.files?.length ?? 0;
+    let arrdate = [];
+    for (let index = 0; index < lengthdate; index++) {
+      // const element = array[index];
+      if (pengajuanTransporterStore.files) {
+        let val = pengajuanTransporterStore.files[index];
+        // let tmpfile = await getFile(val.file1);
+        // arrdate.push([tmpfile]);
+        // console.log(val);
+        let tmpdate = [dayjs(val.tgl_mulai), dayjs(val.tgl_akhir)];
+        // console.log(a);
+        arrdate.push(tmpdate);
+      }
+    }
+    console.log(arrdate);
+    setDateRangeList(arrdate);
+    console.log(dateRangeList);
+    const listMouDynamic = formInstance.getFieldValue("listMouDynamic");
+    console.log(listMouDynamic);
+    let kdate = Object.keys(listMouDynamic);
+    console.log(kdate);
+    for (let index = 0; index < kdate.length; index++) {
+      if (kdate.includes("masaBerlaku")) {
+        // let val =
+        // @ts-ignore
+        formInstance.setFieldValue[kdate[index]] = arrdate[index];
+        // formInstance[kdate[index]] = arrdate[index];
+      }
+    }
+    // formInstance.setFieldsValue({
+    //   list: arrdate,
+    // });
   };
 
   const [formInstance] = Form.useForm();
@@ -397,7 +426,7 @@ const FormPengajuanTransporter: React.FC = () => {
         id_kecamatan: pengajuanTransporterStore.id_kecamatan?.toString() ?? "",
         id_kelurahan: pengajuanTransporterStore.id_kelurahan?.toString() ?? "",
         alamat: pengajuanTransporterStore.alamat_transporter?.toString() ?? "",
-        telp: pengajuanTransporterStore.nohp?.toString() ?? "",
+        telp: pengajuanTransporterStore.notlp?.toString() ?? "",
         email: pengajuanTransporterStore.email?.toString() ?? "",
       });
 
@@ -496,11 +525,7 @@ const FormPengajuanTransporter: React.FC = () => {
 
         <Divider />
 
-        {fileListList.length}
-        <Form.List
-          name="listMouDynamic"
-          initialValue={fileListList}
-          key={formListKey}>
+        <Form.List name="listMouDynamic" key={formListKey}>
           {(fields, { add, remove }) => (
             <>
               {fields.map(({ key, name, ...restField }) => (
@@ -542,6 +567,7 @@ const FormPengajuanTransporter: React.FC = () => {
                       </Upload>
                     </div>
                   </Form.Item>
+                  {dateRangeList.length}
                   <Form.Item
                     rules={[
                       {
@@ -561,6 +587,7 @@ const FormPengajuanTransporter: React.FC = () => {
                         onChange={(v1, v2) =>
                           onChangeRangeDateDynamic(v1, v2, key, name)
                         }
+                        defaultValue={dateRangeList[name]}
                         name={"rangePicker" + key}
                         key={"rangePickerKey" + key}
                       />
@@ -585,9 +612,6 @@ const FormPengajuanTransporter: React.FC = () => {
         <Form.Item {...tailLayoutUpload}>
           <Button type="primary" htmlType="submit">
             Submit
-          </Button>
-          <Button type="primary" htmlType="submit">
-            Edit
           </Button>
         </Form.Item>
       </Form>
