@@ -126,6 +126,8 @@ const FormPengajuanLimbah: React.FC = () => {
 
   const [uploading, setUploading] = useState(false);
   const [form, setForm] = useState({
+    periode: "",
+    tahun: "",
     namatransporter: "",
     namapemusnah: "",
     metodepemusnah: "",
@@ -169,6 +171,15 @@ const FormPengajuanLimbah: React.FC = () => {
   const handleChangeSelect = (val: any, name: string, event: any) => {
     const id_transporter = parseInt(val);
     setSelectedTransporter(id_transporter);
+    setForm({
+      ...form,
+      [name]: val,
+    });
+  };
+
+  const handleChangePeriode = (val: any, name: string, event: any) => {
+    const id_periode = parseInt(val);
+    setSelectedTransporter(id_periode);
     setForm({
       ...form,
       [name]: val,
@@ -250,11 +261,14 @@ const FormPengajuanLimbah: React.FC = () => {
   const handleNextButton = async () => {
     console.log(limbahPadatList);
     // Update the activeTabKey2 state
-    // setActiveTabKey2("limbahCair");
+    setActiveTabKey2("limbahCair");
     console.log(form);
     console.log(fileLogbook);
     console.log(fileManifest);
+  };
 
+  const handleSubmitButton = async () => {
+    console.log(form);
     let dataForm: any = new FormData();
     dataForm.append("id_transporter", form.namatransporter);
     dataForm.append("nama_pemusnah", form.namapemusnah);
@@ -266,15 +280,12 @@ const FormPengajuanLimbah: React.FC = () => {
     dataForm.append("ukuran_pemusnahan_sendiri", form.ukuranpemusnah);
     dataForm.append("limbah_b3_covid", form.totallimbahcovid);
     dataForm.append("limbah_b3_noncovid", form.totallimbahnoncovid);
-    dataForm.append("debit_limbah_cair", 1);
-    dataForm.append("kapasitas_ipal", 1);
+    dataForm.append("debit_limbah_cair", form.debitlimbahcair);
+    dataForm.append("kapasitas_ipal", form.kapasitasinpal);
     dataForm.append("memenuhi_syarat", form.stastuslimbahcair);
-    dataForm.append("catatan", "-");
-    dataForm.append("periode", 4);
-    dataForm.append("tahun", 2023);
-    dataForm.append("limbah_padat_kategori[]", 2023);
-    dataForm.append("limbah_padat_catatan[]", 2023);
-    dataForm.append("limbah_padat_berat[]", 2023);
+    dataForm.append("catatan", form.catatanlimbahcair);
+    dataForm.append("periode", form.periode);
+    dataForm.append("tahun", form.tahun);
 
     fileLogbook.forEach((file, index) => {
       dataForm.append("file_logbook[]", file.originFileObj);
@@ -288,11 +299,18 @@ const FormPengajuanLimbah: React.FC = () => {
       // return;
     });
 
-    let responsenya = await api.post("/user/laporan-bulanan/create", dataForm);
-  };
+    limbahPadatList.forEach((val, index) => {
+      val.kategori;
+      val.catatan;
+      val.berat;
+      dataForm.append("limbah_padat_kategori[]", val.kategori);
+      dataForm.append("limbah_padat_catatan[]", val.catatan);
+      dataForm.append("limbah_padat_berat[]", val.berat);
+      console.log(val);
+      // return;
+    });
 
-  const handleSubmitButton = () => {
-    console.log(form);
+    let responsenya = await api.post("/user/laporan-bulanan/create", dataForm);
   };
 
   const handlePreviousButton = () => {
@@ -592,6 +610,50 @@ const FormPengajuanLimbah: React.FC = () => {
 
   return (
     <>
+      <Form>
+        <br />
+        <Space wrap>
+          <Form.Item
+            name="form_periode"
+            initialValue={form.periode}
+            rules={[{ required: true }]}
+            label="Periode">
+            <Select
+              value={form.periode}
+              placeholder="Pilih Bulan Periode"
+              onChange={(v) => handleChangePeriode(v, "periode", event)}
+              style={{ width: 200 }}
+              // onChange={handleChange}
+              options={[
+                { value: "1", label: "Januari" },
+                { value: "2", label: "Februari" },
+                { value: "3", label: "Maret" },
+                { value: "4", label: "April" },
+                { value: "5", label: "Mei" },
+                { value: "6", label: "Juni" },
+                { value: "7", label: "Juli" },
+                { value: "8", label: "Agustus" },
+                { value: "9", label: "September" },
+                { value: "10", label: "Oktober" },
+                { value: "11", label: "November" },
+                { value: "12", label: "Desember" },
+              ]}
+            />
+          </Form.Item>
+          <Form.Item
+            name="form_tahun"
+            label="Tahun"
+            rules={[{ required: true }]}>
+            <Input
+              placeholder="Masukan Tahun"
+              onChange={handleChangeInput}
+              value={form.tahun}
+              maxLength={4}
+              name="tahun"
+            />
+          </Form.Item>
+        </Space>
+      </Form>
       <Card
         style={{ width: "100%" }}
         tabList={tabListNoTitle}
