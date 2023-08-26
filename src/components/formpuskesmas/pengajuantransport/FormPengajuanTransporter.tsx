@@ -28,6 +28,8 @@ import { usePengajuanTransporterStore } from "@/stores/pengajuanTransporterStore
 import apifile from "@/pages/utils/HttpRequestFile";
 import axios from "axios";
 import { fileTypeFromStream } from "file-type";
+import router from "next/router";
+import cloneDeep from "clone-deep";
 
 const { RangePicker } = DatePicker;
 
@@ -102,40 +104,12 @@ const FormPengajuanTransporter: React.FC = () => {
       console.error("Error fetching kelurahan data:", error);
     }
   };
-  function getMimeTypeFromArrayBuffer(arrayBuffer: any) {
-    const uint8arr = new Uint8Array(arrayBuffer);
-
-    const len = 4;
-    if (uint8arr.length >= len) {
-      let signatureArr = new Array(len);
-      for (let i = 0; i < len; i++)
-        signatureArr[i] = new Uint8Array(arrayBuffer)[i].toString(16);
-      const signature = signatureArr.join("").toUpperCase();
-
-      switch (signature) {
-        case "89504E47":
-          return "image/png";
-        case "47494638":
-          return "image/gif";
-        case "25504446":
-          return "application/pdf";
-        case "FFD8FFDB":
-        case "FFD8FFE0":
-          return "image/jpeg";
-        case "504B0304":
-          return "application/zip";
-        default:
-          return null;
-      }
-    }
-    return null;
-  }
 
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [fileListList, setFileListList] = useState<UploadFile[][]>([]);
   const [dateRangeList, setDateRangeList] = useState<any[]>([]);
 
-  const [form, setForm] = useState({
+  let tmpForm = {
     oldid: "",
     namatransporter: "",
     npwp: "",
@@ -144,7 +118,9 @@ const FormPengajuanTransporter: React.FC = () => {
     alamat: "",
     telp: "",
     email: "",
-  });
+  };
+
+  const [form, setForm] = useState(cloneDeep(tmpForm));
 
   const [uploading, setUploading] = useState(false);
   const [rowCount, setRowCount] = useState(1);
@@ -292,9 +268,20 @@ const FormPengajuanTransporter: React.FC = () => {
     dataForm.append("nohp", "-");
     dataForm.append("email", form.email);
 
+    console.log(fileListList);
+
     // Append tgl_mulai and tgl_akhir based on dateRangeList
     fileListList.forEach((file, index) => {
-      dataForm.append("file_mou[]", file[0], file[0].fileName);
+      console.log(typeof file[0]);
+      console.log(file[0].hasOwnProperty("blob"));
+      //@ts-ignore
+      if (file[0].hasOwnProperty("blob")) {
+        // @ts-ignore
+        dataForm.append("file_mou[]", file[0].blob, file[0].name);
+      } else {
+        //@ts-ignore
+        dataForm.append("file_mou[]", file[0], file[0].fileName);
+      }
       console.log(file);
       // return;
     });
@@ -314,20 +301,26 @@ const FormPengajuanTransporter: React.FC = () => {
     });
 
     let url = "/user/pengajuan-transporter/create";
-    // if (dari param) {
-    //   url = "/user/pengajuan-transporter/update"
-    // }
+    if (router.query.action == "edit") {
+      url = "/user/pengajuan-transporter/update";
+    }
     let responsenya = await api.post(url, dataForm);
 
     console.log(fileListList);
     console.log(dateRangeList);
+    console.log(responsenya);
   };
 
   const getFile = async (file: any) => {
     try {
       let arrname = file.split("/");
       let filename = arrname[arrname.length - 1];
-      const resp = await apifile.get(file, { responseType: "arraybuffer" }); // Set responseType to 'arraybuffer'
+      const resp = await apifile.get(
+        `${file}?${Math.random().toString().replaceAll(".", "")}`,
+        {
+          responseType: "arraybuffer",
+        }
+      ); // Set responseType to 'arraybuffer'
       const filenya = resp.data;
       const typefile = resp.headers["content-type"];
 
@@ -349,6 +342,7 @@ const FormPengajuanTransporter: React.FC = () => {
         name: filename,
         status: "done",
         url: blobUrl,
+        blob: blob,
       };
 
       // Open the Blob URL in a new tab
@@ -379,41 +373,48 @@ const FormPengajuanTransporter: React.FC = () => {
     formInstance.setFieldsValue({
       listMouDynamic: arrfile,
     });
-    // let keynow = Math.random().toString();
-    // console.log("formListKey");
-    // console.log(formListKey);
-    // console.log(keynow);
-    // setFormListKey(keynow);
-    // let tmpfile = await pengajuanTransporterStore.files?.map(async (val) => {
-    //   let a = await getFile(val.file1);
-    //   console.log(a);
-    //   return a;
-    // });
-    // console.log(tmpfile);
-    // console.log(tmpfile);
-    // let tmpFileListList = [...(tmpfile ?? [])];
-    // setFileListList(tmpFileListList as any[]);
-    // console.log(tmpFileListList);
   };
 
   const [formInstance] = Form.useForm();
 
   useLayoutEffect(() => {
+    getKecamatanData();
+    console.log(router.query);
     console.log(Object.values(pengajuanTransporterStore));
     console.log(pengajuanTransporterStore);
-    formInstance.setFieldsValue({
-      form_namatransporter: pengajuanTransporterStore.nama_transporter,
-      form_npwp: pengajuanTransporterStore.npwp_transporter,
-      form_kecamatan: pengajuanTransporterStore.id_kecamatan,
-      form_kelurahan: pengajuanTransporterStore.id_kelurahan,
-      form_alamat: pengajuanTransporterStore.alamat_transporter,
-      form_nohp: pengajuanTransporterStore.notlp,
-      form_email: pengajuanTransporterStore.email,
-    });
-    getKecamatanData();
-    getKelurahanData(parseInt(pengajuanTransporterStore.id_kecamatan ?? "0"));
-    // getFile(pengajuanTransporterStore.files);
-    getFilesHere();
+
+    // jika create
+    formInstance.resetFields();
+    setForm(cloneDeep(tmpForm));
+
+    // jika edit set valuenya
+    if (router.query.action == "edit") {
+      setForm({
+        oldid: pengajuanTransporterStore.id_transporter_tmp?.toString() ?? "",
+        namatransporter:
+          pengajuanTransporterStore.nama_transporter?.toString() ?? "",
+        npwp: pengajuanTransporterStore.npwp_transporter?.toString() ?? "",
+        id_kecamatan: pengajuanTransporterStore.id_kecamatan?.toString() ?? "",
+        id_kelurahan: pengajuanTransporterStore.id_kelurahan?.toString() ?? "",
+        alamat: pengajuanTransporterStore.alamat_transporter?.toString() ?? "",
+        telp: pengajuanTransporterStore.nohp?.toString() ?? "",
+        email: pengajuanTransporterStore.email?.toString() ?? "",
+      });
+
+      formInstance.setFieldsValue({
+        form_namatransporter: pengajuanTransporterStore.nama_transporter,
+        form_npwp: pengajuanTransporterStore.npwp_transporter,
+        form_kecamatan: pengajuanTransporterStore.id_kecamatan,
+        form_kelurahan: pengajuanTransporterStore.id_kelurahan,
+        form_alamat: pengajuanTransporterStore.alamat_transporter,
+        form_nohp: pengajuanTransporterStore.notlp,
+        form_email: pengajuanTransporterStore.email,
+      });
+
+      getKelurahanData(parseInt(pengajuanTransporterStore.id_kecamatan ?? "0"));
+      // getFile(pengajuanTransporterStore.files);
+      getFilesHere();
+    }
   }, []);
   return (
     <>
