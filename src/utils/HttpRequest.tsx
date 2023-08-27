@@ -42,6 +42,7 @@ api.interceptors.response.use(
     return response;
   },
   (error: any) => {
+    console.error(error);
     Notif("warning", "Something Wrong.!", error.message.toString);
     // alert("Error coy, cek console..!");
     // Handle response errors

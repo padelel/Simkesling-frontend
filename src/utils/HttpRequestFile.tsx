@@ -1,4 +1,5 @@
 import axios from "axios";
+import Notif from "./Notif";
 // Create an instance of Axios with custom configurations
 const apifile = axios.create({
   // baseURL: 'http://localhost:8000/api',
@@ -41,7 +42,11 @@ apifile.interceptors.response.use(
     return response;
   },
   (error: any) => {
-    alert("Error APIFILE coy, cek console..!");
+    console.error("-- errorHttpReqFile --");
+    console.error(error);
+    console.error(error.message);
+    console.error("-- [END] errorHttpReqFile --");
+    Notif("warning", "Something Wrong.!", error.message.toString);
     // Handle response errors
     return Promise.reject(error);
   }

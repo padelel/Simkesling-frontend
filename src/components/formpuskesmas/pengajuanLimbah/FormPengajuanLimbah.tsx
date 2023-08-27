@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import {
   Button,
   Checkbox,
@@ -14,6 +14,8 @@ import {
   message,
 } from "antd";
 
+import cloneDeep from "clone-deep";
+
 import {
   LoginOutlined,
   UploadOutlined,
@@ -27,6 +29,10 @@ import type { DatePickerProps, RangePickerProps } from "antd/es/date-picker";
 import { Card } from "antd";
 import { RcFile } from "antd/es/upload";
 import api from "@/utils/HttpRequest";
+import { useLaporanBulananStore } from "@/stores/laporanBulananStore";
+import router from "next/router";
+import { useGlobalStore } from "@/stores/globalStore";
+import apifile from "@/utils/HttpRequestFile";
 
 const { RangePicker } = DatePicker;
 
@@ -85,6 +91,9 @@ const tabListNoTitle = [
 ];
 
 const FormPengajuanLimbah: React.FC = () => {
+  const globalStore = useGlobalStore();
+  const [formListKey, setFormListKey] = useState(new Date().toISOString());
+  const laporanBulananStore = useLaporanBulananStore();
   const [transporterOptions, setTransporterOptions] = useState<
     { value: string; label: string; id_transporter: number }[]
   >([]);
@@ -125,7 +134,9 @@ const FormPengajuanLimbah: React.FC = () => {
   const [limbahPadatList, setLimbahPadatList] = useState<any[]>([]);
 
   const [uploading, setUploading] = useState(false);
-  const [form, setForm] = useState({
+
+  let tmpForm = {
+    oldid: "",
     periode: "",
     tahun: "",
     namatransporter: "",
@@ -142,7 +153,9 @@ const FormPengajuanLimbah: React.FC = () => {
     kapasitasinpal: "",
     stastuslimbahcair: 0,
     catatanlimbahcair: "",
-  });
+  };
+
+  const [form, setForm] = useState(cloneDeep(tmpForm));
 
   const beforeUploadFileDynamic = (file: RcFile) => {
     return false;
@@ -157,16 +170,6 @@ const FormPengajuanLimbah: React.FC = () => {
       [event.target.name]: event.target.value,
     });
   };
-
-  // const handleChangeNumber = (
-  //   event: Number>
-  // ) => {
-  //   console.log(event);
-  //   setForm({
-  //     ...form,
-  //     [event.target.name]: event.target.value,
-  //   });
-  // };
 
   const handleChangeSelect = (val: any, name: string, event: any) => {
     const id_transporter = parseInt(val);
@@ -270,6 +273,7 @@ const FormPengajuanLimbah: React.FC = () => {
   const handleSubmitButton = async () => {
     console.log(form);
     let dataForm: any = new FormData();
+    dataForm.append("oldid", form.oldid);
     dataForm.append("id_transporter", form.namatransporter);
     dataForm.append("nama_pemusnah", form.namapemusnah);
     dataForm.append("metode_pemusnah", form.metodepemusnah);
@@ -288,21 +292,32 @@ const FormPengajuanLimbah: React.FC = () => {
     dataForm.append("tahun", form.tahun);
 
     fileLogbook.forEach((file, index) => {
-      dataForm.append("file_logbook[]", file.originFileObj);
       console.log(file);
       // return;
+      if (file.hasOwnProperty("blob")) {
+        // @ts-ignore
+        dataForm.append("file_logbook[]", file.blob);
+      } else {
+        dataForm.append("file_logbook[]", file.originFileObj);
+      }
+      // console.log(file);
     });
+    // console.log(dataForm);
+    // return;
 
     fileManifest.forEach((file, index) => {
-      dataForm.append("file_manifest[]", file.originFileObj);
       console.log(file);
+      // return;
+      if (file.hasOwnProperty("blob")) {
+        // @ts-ignore
+        dataForm.append("file_manifest[]", file.blob);
+      } else {
+        dataForm.append("file_manifest[]", file.originFileObj);
+      }
       // return;
     });
 
     limbahPadatList.forEach((val, index) => {
-      val.kategori;
-      val.catatan;
-      val.berat;
       dataForm.append("limbah_padat_kategori[]", val.kategori);
       dataForm.append("limbah_padat_catatan[]", val.catatan);
       dataForm.append("limbah_padat_berat[]", val.berat);
@@ -310,7 +325,23 @@ const FormPengajuanLimbah: React.FC = () => {
       // return;
     });
 
-    let responsenya = await api.post("/user/laporan-bulanan/create", dataForm);
+    // let responsenya = await api.post("/user/laporan-bulanan/create", dataForm);
+
+    let url = "/user/laporan-bulanan/create";
+    if (router.query.action == "edit") {
+      url = "/user/laporan-bulanan/update";
+    }
+
+    try {
+      if (globalStore.setLoading) globalStore.setLoading(true);
+      let responsenya = await api.post(url, dataForm);
+      console.log(limbahPadatList);
+      console.log(responsenya);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      if (globalStore.setLoading) globalStore.setLoading(false);
+    }
   };
 
   const handlePreviousButton = () => {
@@ -318,14 +349,223 @@ const FormPengajuanLimbah: React.FC = () => {
     setActiveTabKey2("limbahPadat");
   };
 
-  useEffect(() => {
+  const [formInstance] = Form.useForm();
+
+  const getListHere = async () => {
+    let lengthList = laporanBulananStore.b3padat?.length ?? 0;
+    let arrList = [];
+    for (let index = 0; index < lengthList; index++) {
+      // const element = array[index];
+      if (laporanBulananStore.b3padat) {
+        let val = laporanBulananStore.b3padat[index];
+        arrList.push({
+          kategori: val.kategori,
+          catatan: val.catatan,
+          berat: val.total,
+        });
+      }
+    }
+    console.log(arrList);
+    setLimbahPadatList(arrList);
+    formInstance.setFieldsValue({
+      detailLimbahDynamic: arrList,
+    });
+  };
+
+  const getFile = async (file: any) => {
+    try {
+      if (globalStore.setLoading) globalStore.setLoading(true);
+      let arrname = file.split("/");
+      let filename = arrname[arrname.length - 1];
+      const resp = await apifile.get(
+        `${file}?${Math.random().toString().replaceAll(".", "")}`,
+        {
+          responseType: "arraybuffer",
+        }
+      ); // Set responseType to 'arraybuffer'
+      const filenya = resp.data;
+      const typefile = resp.headers["content-type"];
+
+      // Create a Blob from the response data
+      const blob = new Blob([filenya], { type: typefile });
+
+      // Create a Blob URL
+      const blobUrl = URL.createObjectURL(blob);
+      return {
+        uid: new Date().toISOString(),
+        name: filename,
+        status: "done",
+        url: blobUrl,
+        blob: blob,
+      };
+    } catch (error) {
+      console.error("-- error in getfile --");
+      console.error("Error fetching or processing data:", error);
+    } finally {
+      if (globalStore.setLoading) globalStore.setLoading(false);
+    }
+  };
+
+  const getFilesManifest = async () => {
+    console.log(laporanBulananStore.file_manifest);
+    let lengthfile = laporanBulananStore.file_manifest?.length ?? 0;
+    let arrfile = [];
+    for (let index = 0; index < lengthfile; index++) {
+      if (laporanBulananStore.file_manifest) {
+        let val = laporanBulananStore.file_manifest[index];
+        let tmpfile = await getFile(val.file1);
+        arrfile.push(tmpfile);
+      }
+    }
+    console.log(arrfile);
+    setFileManifest(arrfile as any[]);
+    formInstance.setFieldsValue({
+      form_manifest: arrfile,
+    });
+  };
+  const getFilesLogbook = async () => {
+    console.log(laporanBulananStore.file_logbook);
+    let lengthfile = laporanBulananStore.file_logbook?.length ?? 0;
+    let arrfile = [];
+    for (let index = 0; index < lengthfile; index++) {
+      if (laporanBulananStore.file_logbook) {
+        let val = laporanBulananStore.file_logbook[index];
+        let tmpfile = await getFile(val.file1);
+        arrfile.push(tmpfile);
+      }
+    }
+    console.log(arrfile);
+    setFileLogbook(arrfile as any[]);
+    formInstance.setFieldsValue({
+      form_logbook: arrfile,
+    });
+  };
+
+  useLayoutEffect(() => {
     getTransporterData();
-    console.log(transporterOptions); // Add this line to log transporterOptions
+    console.log(transporterOptions);
+    console.log(Object.values(laporanBulananStore));
+    console.log(laporanBulananStore);
+
+    formInstance.resetFields();
+    setForm(cloneDeep(tmpForm));
+
+    if (router.query.action === "edit") {
+      // jika edit set valuenya
+      // setForm({
+      //   oldid: laporanBulananStore.id_laporan_bulanan?.toString() ?? "",
+      //   periode: laporanBulananStore.periode?.toString() ?? "",
+      //   tahun: laporanBulananStore.tahun?.toString() ?? "",
+      //   namatransporter: laporanBulananStore.id_transporter?.toString() ?? "",
+      //   namapemusnah: laporanBulananStore.nama_pemusnah?.toString() ?? "",
+      //   metodepemusnah: laporanBulananStore.metode_pemusnah?.toString() ?? "",
+      //   statustps:
+      //     laporanBulananStore.punya_penyimpanan_tps &&
+      //     [1, "1"].includes(laporanBulananStore.punya_penyimpanan_tps)
+      //       ? 1
+      //       : 0,
+      //   ukurantps: laporanBulananStore.ukuran_penyimpanan_tps?.toString() ?? "",
+      //   catatanlimbahcair: laporanBulananStore.catatan?.toString() ?? "",
+      // });
+      setForm({
+        ...form,
+        oldid: laporanBulananStore.id_laporan_bulanan?.toString() ?? "",
+        periode: laporanBulananStore.periode?.toString() ?? "",
+        tahun: laporanBulananStore.tahun?.toString() ?? "",
+        namatransporter: laporanBulananStore.id_transporter?.toString() ?? "",
+        namapemusnah: laporanBulananStore.nama_pemusnah?.toString() ?? "",
+        metodepemusnah: laporanBulananStore.metode_pemusnah?.toString() ?? "",
+        catatanlimbahcair: laporanBulananStore.catatan?.toString() ?? "",
+        totallimbahpadat: parseInt(
+          laporanBulananStore.berat_limbah_total?.toString() ?? ""
+        ),
+        totallimbahcovid: parseInt(
+          laporanBulananStore.limbah_b3_covid?.toString() ?? ""
+        ),
+        totallimbahnoncovid: parseInt(
+          laporanBulananStore.limbah_b3_noncovid?.toString() ?? ""
+        ),
+        debitlimbahcair:
+          laporanBulananStore.debit_limbah_cair?.toString() ?? "",
+        kapasitasinpal: laporanBulananStore.kapasitas_ipal?.toString() ?? "",
+
+        statustps:
+          laporanBulananStore.punya_penyimpanan_tps &&
+          [1, "1"].includes(laporanBulananStore.punya_penyimpanan_tps)
+            ? 1
+            : 0,
+        ukurantps: laporanBulananStore.ukuran_penyimpanan_tps?.toString() || "",
+        statuspemusnah:
+          laporanBulananStore.punya_pemusnahan_sendiri &&
+          [1, "1"].includes(laporanBulananStore.punya_pemusnahan_sendiri)
+            ? 1
+            : 0,
+        ukuranpemusnah:
+          laporanBulananStore.ukuran_pemusnahan_sendiri?.toString() || "",
+        stastuslimbahcair:
+          laporanBulananStore.memenuhi_syarat &&
+          [1, "1"].includes(laporanBulananStore.memenuhi_syarat)
+            ? 1
+            : 0,
+      });
+
+      setIsCheckboxChecked(
+        laporanBulananStore.punya_penyimpanan_tps &&
+          [1, "1"].includes(laporanBulananStore.punya_penyimpanan_tps)
+          ? true
+          : false
+      );
+      setIsCheckboxChecked1(
+        laporanBulananStore.punya_pemusnahan_sendiri &&
+          [1, "1"].includes(laporanBulananStore.punya_pemusnahan_sendiri)
+          ? true
+          : false
+      );
+
+      formInstance.setFieldsValue({
+        form_periode: laporanBulananStore.periode,
+        form_tahun: laporanBulananStore.tahun,
+        form_transporter: laporanBulananStore.id_transporter,
+        form_namaPemusnah: laporanBulananStore.nama_pemusnah,
+        form_metodePemusnahan: laporanBulananStore.metode_pemusnah,
+        form_statusTps:
+          laporanBulananStore.punya_penyimpanan_tps &&
+          [1, "1"].includes(laporanBulananStore.punya_penyimpanan_tps)
+            ? true
+            : false,
+        form_ukuranTps: laporanBulananStore.ukuran_penyimpanan_tps,
+        form_statusPemusnah:
+          laporanBulananStore.punya_pemusnahan_sendiri &&
+          [1, "1"].includes(laporanBulananStore.punya_pemusnahan_sendiri)
+            ? true
+            : false,
+        form_ukuranPemusnah: laporanBulananStore.ukuran_pemusnahan_sendiri,
+        form_beratLimbah: laporanBulananStore.berat_limbah_total,
+        form_beratLimbahNonCovid: laporanBulananStore.limbah_b3_noncovid,
+        form_beratLimbahCovid: laporanBulananStore.limbah_b3_covid,
+        form_debitLimbah: laporanBulananStore.debit_limbah_cair,
+        form_kapasitasInpal: laporanBulananStore.kapasitas_ipal,
+        form_statussyaratipal:
+          laporanBulananStore.memenuhi_syarat &&
+          [1, "1"].includes(laporanBulananStore.memenuhi_syarat)
+            ? true
+            : false,
+        form_catatan: laporanBulananStore.catatan,
+      });
+
+      // getFile(pengajuanTransporterStore.files);
+      getFilesManifest();
+      getFilesLogbook();
+      // fileManifest;
+      // fileLogbook;
+      getListHere();
+    }
   }, []);
 
   const contentListNoTitle: Record<string, React.ReactNode> = {
     limbahPadat: (
       <Form
+        form={formInstance}
         onFinish={handleNextButton}
         {...layout}
         name="control-hooks"
@@ -366,11 +606,11 @@ const FormPengajuanLimbah: React.FC = () => {
           />
         </Form.Item>
         <Divider />
-        <Form.Item name="form_ukuranTPS" label="Memiliki TPS?">
-          {/* rules={pemusnahValidationRules} */}
+        {/* <Form.Item name="form_TPS" label="Memiliki TPS?">
           <Checkbox
             style={{ marginLeft: 10 }}
-            value={form.statustps}
+            checked={[1, "1"].includes(form.statustps)}
+            name="form_statusTps"
             onChange={handleCheckboxChange}>
             Iya
           </Checkbox>
@@ -379,17 +619,16 @@ const FormPengajuanLimbah: React.FC = () => {
             onChange={handleChangeInput}
             disabled={!isCheckboxChecked}
             value={form.ukurantps}
-            name="ukurantps"
+            name="form_ukuranTps"
           />{" "}
           Ukuran
         </Form.Item>
-        <Form.Item
-          name="form_ukuranPemusnah"
-          label="Memiliki Pemusnah Mandiri?">
-          {/* rules={pemusnahValidationRules1} */}
+        <Form.Item name="form_pemusnah" label="Memiliki Pemusnah Mandiri?">
           <Checkbox
+            checked={[1, "1"].includes(form.statuspemusnah)}
             style={{ marginLeft: 10 }}
             value={form.statuspemusnah}
+            name="form_statusPemusnah"
             onChange={handleCheckboxChange1}>
             Iya
           </Checkbox>
@@ -398,10 +637,10 @@ const FormPengajuanLimbah: React.FC = () => {
             onChange={handleChangeInput}
             disabled={!isCheckboxChecked1}
             value={form.ukuranpemusnah}
-            name="ukuranpemusnah"
+            name="form_ukuranPemusnah"
           />{" "}
           Ukuran
-        </Form.Item>
+        </Form.Item> */}
         <Divider />
         <Form.Item
           name="form_beratLimbah"
@@ -415,7 +654,7 @@ const FormPengajuanLimbah: React.FC = () => {
           />
         </Form.Item>
         <Form.Item
-          name="beratLimbahNonCovid"
+          name="form_beratLimbahNonCovid"
           label="Total Limbah NonCovid(Kg)"
           rules={[]}>
           <InputNumber
@@ -428,7 +667,7 @@ const FormPengajuanLimbah: React.FC = () => {
           />
         </Form.Item>
         <Form.Item
-          name="totalBeratLimbah"
+          name="form_beratLimbahCovid"
           label="Total Limbah Covid(Kg)"
           rules={[]}>
           <InputNumber
@@ -440,7 +679,10 @@ const FormPengajuanLimbah: React.FC = () => {
         </Form.Item>
         <Divider />
 
-        <Form.List name="detailLimbahDynamic">
+        <Form.List
+          name="detailLimbahDynamic"
+          key={formListKey}
+          initialValue={limbahPadatList}>
           {(fields, { add, remove }) => (
             <>
               {fields.map(({ key, name, ...restField }) => (
@@ -522,8 +764,12 @@ const FormPengajuanLimbah: React.FC = () => {
         </Form.List>
         <Divider />
         <h3>Upload Catatan</h3>
-        <Form.Item label="Upload Manifest">
+        <Form.Item
+          initialValue={fileManifest}
+          name="form_manifest"
+          label="Upload Manifest">
           <Upload
+            name="manifest"
             multiple
             beforeUpload={(file) => beforeUploadFileDynamic(file)}
             fileList={fileManifest}
@@ -533,8 +779,12 @@ const FormPengajuanLimbah: React.FC = () => {
             </Button>
           </Upload>
         </Form.Item>
-        <Form.Item label="Upload Logbook">
+        <Form.Item
+          initialValue={fileLogbook}
+          name="form_logbook"
+          label="Upload Logbook">
           <Upload
+            name="logbook"
             multiple
             beforeUpload={(file) => beforeUploadFileDynamic(file)}
             fileList={fileLogbook}
@@ -551,6 +801,7 @@ const FormPengajuanLimbah: React.FC = () => {
     ),
     limbahCair: (
       <Form
+        form={formInstance}
         onFinish={handleSubmitButton}
         {...layout}
         name="control-hooks"
@@ -577,9 +828,11 @@ const FormPengajuanLimbah: React.FC = () => {
 
         <Form.Item name="form_ukuranTPS" label="Apakah Memenuhi Syarat?">
           <Checkbox
+            checked={[1, "1"].includes(form.statuspemusnah)}
             style={{ marginLeft: 10 }}
             value={form.statuspemusnah}
-            onChange={handleCheckboxChange2}>
+            onChange={handleCheckboxChange2}
+            name="form_statussyaratipal">
             Iya
           </Checkbox>
         </Form.Item>
@@ -610,7 +863,7 @@ const FormPengajuanLimbah: React.FC = () => {
 
   return (
     <>
-      <Form>
+      <Form form={formInstance}>
         <br />
         <Space wrap>
           <Form.Item

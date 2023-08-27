@@ -1,20 +1,18 @@
 import React, { useEffect, useState } from "react";
-import {
-  Button,
-  Form,
-  Input,
-  Select,
-} from "antd";
+import { Button, Form, Input, Select } from "antd";
 
 import dayjs from "dayjs";
 import type { Dayjs } from "dayjs";
-import api from "@/pages/utils/HttpRequest";
+import api from "@/utils/HttpRequest";
+import router from "next/router";
 import { useTambahAkunStore } from "@/stores/pengajuanAkunStore";
+import { useGlobalStore } from "@/stores/globalStore";
+import cloneDeep from "clone-deep";
 
 const { TextArea } = Input;
 
 const layout = {
-  labelCol: { span: 10 },
+  labelCol: { span: 14 },
   wrapperCol: { span: 17 },
 };
 
@@ -23,6 +21,7 @@ const tailLayoutUpload = {
 };
 
 const FormTambahAkun: React.FC = () => {
+  const globalStore = useGlobalStore();
   const tambahAkunStore = useTambahAkunStore();
   const [kecamatanOptions, setKecamatanOptions] = useState<
     { value: string; label: string; id_kecamatan: number }[]
@@ -37,6 +36,22 @@ const FormTambahAkun: React.FC = () => {
   const [selectedKelurahan, setSelectedKelurahan] = useState<number | null>(
     null
   );
+
+  let tmpForm = {
+    oldid: "",
+    nama_user: "",
+    noreg_tempat: "",
+    level: "",
+    id_kecamatan: "",
+    id_kelurahan: "",
+    alamat_tempat: "",
+    notelp: "",
+    email: "",
+    username: "",
+    password: "",
+  };
+
+  const [form, setForm] = useState(cloneDeep(tmpForm));
 
   const getKecamatanData = async () => {
     try {
@@ -80,34 +95,73 @@ const FormTambahAkun: React.FC = () => {
 
   const [formInstance] = Form.useForm();
 
-  useEffect(() => {
-    console.log(Object.values(tambahAkunStore));
-    getKecamatanData();
+  // useEffect(() => {
+  //   console.log(Object.values(tambahAkunStore));
+  //   getKecamatanData();
+  //   formInstance.setFieldsValue({
+  //     form_namauser: tambahAkunStore.nama_user,
+  //     form_username: tambahAkunStore.username,
+  //     form_noreg: tambahAkunStore.noreg_tempat,
+  //     level: tambahAkunStore.level,
+  //     form_kecamatan: tambahAkunStore.id_kecamatan,
+  //     form_kelurahan: tambahAkunStore.id_kelurahan,
+  //     form_alamat: tambahAkunStore.alamat_tempat,
+  //     form_nohp: tambahAkunStore.notlp,
+  //     form_email: tambahAkunStore.email,
+  //   });
+  // }, []);
+
+  // jika create
+  formInstance.resetFields();
+  setForm(cloneDeep(tmpForm));
+
+  if (router.query.action === "edit") {
+    // jika edit set valuenya
+    // setForm({
+    //   oldid: tambahAkunStore.id_user?.toString() ?? "",
+    //   nama_user: tambahAkunStore.nama_user?.toString() ?? "",
+    //   username: tambahAkunStore.username?.toString() ?? "",
+    //   noreg_tempat: tambahAkunStore.noreg_tempat?.toString() ?? "",
+    //   level: tambahAkunStore.level?.toString() ?? "",
+    //   id_kecamatan: tambahAkunStore.id_kecamatan?.toString() ?? "",
+    //   id_kelurahan: tambahAkunStore.id_kelurahan?.toString() ?? "",
+    //   alamat_tempat: tambahAkunStore.alamat_tempat?.toString() ?? "",
+    //   notelp: tambahAkunStore.nohp?.toString() ?? "",
+    //   email: tambahAkunStore.email?.toString() ?? "",
+    // });
+
     formInstance.setFieldsValue({
       form_namauser: tambahAkunStore.nama_user,
-      form_namatempat: tambahAkunStore.nama_tempat,
-      form_tipe: tambahAkunStore.tipe_tempat,
+      form_username: tambahAkunStore.username,
+      form_noreg: tambahAkunStore.noreg_tempat,
+      level: tambahAkunStore.level,
       form_kecamatan: tambahAkunStore.id_kecamatan,
       form_kelurahan: tambahAkunStore.id_kelurahan,
       form_alamat: tambahAkunStore.alamat_tempat,
       form_nohp: tambahAkunStore.notlp,
       form_email: tambahAkunStore.email,
     });
-  }, []);
+
+    // getKelurahanData(parseInt(tambahAkunStore.id_kecamatan ?? "0"));
+    // getFile(pengajuanTransporterStore.files);
+    // getFilesHere();
+  }
 
   const [dateRangeList, setDateRangeList] = useState<any[]>([]);
 
-  const [form, setForm] = useState({
-    id_user: "",
-    nama_user: "",
-    nama_tempat: "",
-    tipe_tempat: "",
-    id_kecamatan: "",
-    id_kelurahan: "",
-    alamat_tempat: "",
-    notelp: "",
-    email: "",
-  });
+  // const [form, setForm] = useState({
+  //   id_user: "",
+  //   nama_user: "",
+  //   noreg_tempat: "",
+  //   level: "",
+  //   id_kecamatan: "",
+  //   id_kelurahan: "",
+  //   alamat_tempat: "",
+  //   notelp: "",
+  //   email: "",
+  //   username: "",
+  //   password: "",
+  // });
 
   const handleChangeInput = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -116,6 +170,15 @@ const FormTambahAkun: React.FC = () => {
     setForm({
       ...form,
       [event.target.name]: event.target.value,
+    });
+  };
+
+  const handleChangeSelect = (val: any, name: string, event: any) => {
+    // console.log(val);
+    // console.log(event.target);
+    setForm({
+      ...form,
+      [name]: val,
     });
   };
 
@@ -147,21 +210,33 @@ const FormTambahAkun: React.FC = () => {
     console.log(form);
 
     let dataForm: any = new FormData();
-    dataForm.append("oldid", form.id_user);
+    dataForm.append("oldid", form.oldid);
     dataForm.append("nama_user", form.nama_user);
-    dataForm.append("nama_tempat", form.nama_tempat);
-    dataForm.append("tipe_tempat", form.tipe_tempat);
+    dataForm.append("username", form.username);
+    dataForm.append("password", form.password);
+    dataForm.append("noreg_tempat", form.noreg_tempat);
+    dataForm.append("level", form.level);
     dataForm.append("id_kecamatan", form.id_kecamatan);
     dataForm.append("id_kelurahan", form.id_kelurahan);
     dataForm.append("alamat_tempat", form.alamat_tempat);
     dataForm.append("notlp", form.notelp);
     dataForm.append("email", form.email);
 
-    let responsenya = await api.post(
-      "/user/puskesmas-rumahsakit/create",
-      dataForm
-    );
-    console.log(dateRangeList);
+    let url = "/user/puskesmas-rumahsakit/create";
+    if (router.query.action == "edit") {
+      url = "/user/puskesmas-rumahsakit/update";
+    }
+
+    try {
+      if (globalStore.setLoading) globalStore.setLoading(true);
+      let responsenya = await api.post(url, dataForm);
+      console.log(dateRangeList);
+      console.log(responsenya);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      if (globalStore.setLoading) globalStore.setLoading(false);
+    }
   };
   return (
     <>
@@ -173,7 +248,7 @@ const FormTambahAkun: React.FC = () => {
         form={formInstance}>
         <Form.Item
           name="form_namauser"
-          label="Nama User"
+          label="Nama Instansi"
           rules={[{ required: true }]}>
           <Input
             onChange={handleChangeInput}
@@ -182,17 +257,51 @@ const FormTambahAkun: React.FC = () => {
           />
         </Form.Item>
         <Form.Item
-          name="form_namatempat"
-          label="Nama Tempat"
+          name="form_username"
+          label="Username"
           rules={[{ required: true }]}>
           <Input
             onChange={handleChangeInput}
-            value={form.nama_tempat}
-            name="nama_tempat"
+            value={form.username}
+            name="username"
           />
         </Form.Item>
-        <Form.Item name="form_tipe" label="Tipe Instansi" rules={[{ required: true }]}>
-          <Input onChange={handleChangeInput} value={form.tipe_tempat} name="tipe_tempat" />
+        <Form.Item
+          name="password"
+          label="Password"
+          rules={[{ required: true }]}>
+          <Input.Password
+            onChange={handleChangeInput}
+            value={form.password}
+            name="password"
+          />
+        </Form.Item>
+        <Form.Item
+          name="form_noreg"
+          label="Nomor registrasi / Nomor izin RS"
+          rules={[{ required: true }]}>
+          <Input
+            onChange={handleChangeInput}
+            value={form.noreg_tempat}
+            name="noreg_tempat"
+          />
+        </Form.Item>
+        <Form.Item
+          name="level"
+          label="Jenis Instansi"
+          initialValue={form.level}
+          rules={[{ required: true }]}>
+          <Select
+            style={{ width: 250 }}
+            showSearch
+            onChange={(v) => handleChangeSelect(v, "level", event)}
+            placeholder="Silahkan Pilih Tipe Instansi"
+            allowClear
+            options={[
+              { value: "3", label: "Puskesmas" },
+              { value: "2", label: "Rumah Sakit" },
+            ]}
+          />
         </Form.Item>
         <Form.Item
           name="form_kecamatan"
@@ -245,7 +354,11 @@ const FormTambahAkun: React.FC = () => {
           name="form_nohp"
           label="Nomor Handphone"
           rules={[{ required: true }]}>
-          <Input onChange={handleChangeInput} value={form.notelp} name="notelp" />
+          <Input
+            onChange={handleChangeInput}
+            value={form.notelp}
+            name="notelp"
+          />
         </Form.Item>
         <Form.Item name="form_email" label="Email" rules={[{ required: true }]}>
           <Input onChange={handleChangeInput} value={form.email} name="email" />

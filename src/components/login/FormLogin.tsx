@@ -66,6 +66,9 @@ const FormLogin = () => {
       if (usernya == null) return;
 
       console.log(usernya);
+      // let token = Cookies.get("token") ?? "";
+      // let user = jwt_decode(token) ?? undefined;
+      userLogin.user = usernya;
       let url = "/dashboard/user";
       if (usernya) {
         if (usernya.level == "1") {

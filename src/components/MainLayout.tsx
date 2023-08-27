@@ -63,16 +63,6 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
       path: "/dashboard/user/profile",
     },
     {
-      icon: <ProfileOutlined />,
-      label: "Dashboard User",
-      path: "/admin/dashboard",
-    },
-    {
-      icon: <ProfileOutlined />,
-      label: "Manajemen Laporan",
-      path: "manajemenlaporan",
-    },
-    {
       icon: <HomeOutlined />,
       label: "Dashboard",
       path: "/dashboard/admin",

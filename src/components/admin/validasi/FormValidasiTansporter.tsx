@@ -49,7 +49,7 @@ const tailLayoutUpload = {
   wrapperCol: { offset: 8, span: 16 },
 };
 
-const FormPengajuanTransporter: React.FC = () => {
+const FormValidasiTransporter: React.FC = () => {
   const globalStore = useGlobalStore();
   const [apimessage, contextHolder] = notification.useNotification();
 
@@ -140,6 +140,9 @@ const FormPengajuanTransporter: React.FC = () => {
   const [showMOUFields, setShowMOUFields] = useState(false);
 
   const props: UploadProps = {
+    showUploadList: {
+      showRemoveIcon: false,
+    },
     onRemove: (file) => {
       const index = fileList.indexOf(file);
       const newFileList = fileList.slice();
@@ -233,7 +236,9 @@ const FormPengajuanTransporter: React.FC = () => {
   const handleChangeInput = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    console.log(event);
+    // console.log(event);
+    console.log(event.target.name, event.target.value);
+    // console.log();
     setForm({
       ...form,
       [event.target.name]: event.target.value,
@@ -327,17 +332,128 @@ const FormPengajuanTransporter: React.FC = () => {
       console.log(fileListList);
       console.log(dateRangeList);
       console.log(responsenya);
+
+      apimessage.open({
+        message: "Validasi Transporter",
+        description: "Pengajuan Transporter berhasil diterima.",
+
+        duration: 2,
+        type: "success",
+      });
+
+      router.push("/dashboard/admin/validasi");
     } catch (e) {
       console.error(e);
     } finally {
       if (globalStore.setLoading) globalStore.setLoading(false);
     }
   };
+  // const [formInstance] = Form.useForm();
+  const [formModal] = Form.useForm();
+  const handleTolak = () => {
+    Modal.info({
+      title: "Berikan Catatan!",
+      centered: true,
+      closable: true,
+      content: (
+        <Form form={formModal} name="form_modal">
+          <Form.Item
+            name="form_catatan"
+            label="Catatan"
+            rules={[{ required: true }]}>
+            <Input
+              onChange={handleChangeInput}
+              value={form.catatan}
+              name="catatan"
+            />
+          </Form.Item>
+        </Form>
+      ),
+      async onOk() {
+        await ifTolak();
+      },
+    });
+  };
 
   // -- onSubmit
-  // const ifTolak = async () => {
+  const ifTolak = async () => {
+    console.log(form);
 
-  // };
+    let dataForm: any = new FormData();
+    dataForm.append("oldid", form.oldid);
+    dataForm.append("nama_transporter", form.namatransporter);
+    dataForm.append("npwp_transporter", form.npwp);
+    dataForm.append("id_kecamatan", form.id_kecamatan);
+    dataForm.append("id_kelurahan", form.id_kelurahan);
+    dataForm.append("alamat_transporter", form.alamat);
+    dataForm.append("notlp", form.telp);
+    dataForm.append("nohp", "-");
+    dataForm.append("email", form.email);
+
+    console.log(fileListList);
+
+    // Append tgl_mulai and tgl_akhir based on dateRangeList
+    fileListList.forEach((file, index) => {
+      console.log(typeof file[0]);
+      console.log(file[0].hasOwnProperty("blob"));
+      //@ts-ignore
+      if (file[0].hasOwnProperty("blob")) {
+        // @ts-ignore
+        dataForm.append("file_mou[]", file[0].blob, file[0].name);
+      } else {
+        //@ts-ignore
+        dataForm.append("file_mou[]", file[0], file[0].fileName);
+      }
+      console.log(file);
+      // return;
+    });
+
+    // Append tgl_mulai and tgl_akhir based on dateRangeList
+    dateRangeList.forEach((rangeDates, index) => {
+      if (rangeDates.length === 2) {
+        // Format the dates to the required format
+        const tglMulai = rangeDates[0].format("YYYY-MM-DD");
+        const tglAkhir = rangeDates[1].format("YYYY-MM-DD");
+
+        // dataForm.append(`tgl_mulai`, tglMulai);
+        // dataForm.append(`tgl_akhir`, tglAkhir);
+        dataForm.append(`tgl_mulai[]`, tglMulai);
+        dataForm.append(`tgl_akhir[]`, tglAkhir);
+      }
+    });
+
+    let url = "/user/pengajuan-transporter/create";
+    if (router.query.action == "edit") {
+      url = "/user/pengajuan-transporter/update";
+    }
+
+    if (router.query.action == "validasi") {
+      dataForm.append("status_transporter", "0");
+      dataForm.append("catatan", formModal.getFieldValue("form_catatan"));
+      url = "/user/pengajuan-transporter/validasi";
+    }
+    try {
+      // @ts-ignore
+      if (globalStore.setLoading) globalStore.setLoading(true);
+      let responsenya = await api.post(url, dataForm);
+      console.log(fileListList);
+      console.log(dateRangeList);
+      console.log(responsenya);
+
+      apimessage.open({
+        message: "Validasi Transporter",
+        description: "Pengajuan Transporter ditolak.",
+        duration: 2,
+        type: "error",
+      });
+      router.push("/dashboard/admin/validasi");
+    } catch (e) {
+      console.error(e);
+    } finally {
+      // @ts-ignore
+      if (globalStore.setLoading) globalStore.setLoading(false);
+    }
+  };
 
   const getFile = async (file: any) => {
     try {
@@ -456,7 +572,15 @@ const FormPengajuanTransporter: React.FC = () => {
     formInstance.resetFields();
     setForm(cloneDeep(tmpForm));
 
-    if (router.query.action === "edit") {
+    // jika idnya kosong (dia melakukan refresh) balikin ke table
+    if (
+      pengajuanTransporterStore.id_transporter_tmp == null ||
+      pengajuanTransporterStore.id_transporter_tmp == 0
+    ) {
+      router.push("/dashboard/admin/validasi");
+      return;
+    }
+    if (router.query.action === "edit" || router.query.action === "validasi") {
       // jika edit set valuenya
       setForm({
         status_transporter:
@@ -502,13 +626,19 @@ const FormPengajuanTransporter: React.FC = () => {
           label="Nama Transporter"
           rules={[{ required: true }]}>
           <Input
+            disabled={true}
             onChange={handleChangeInput}
             value={form.namatransporter}
             name="namatransporter"
           />
         </Form.Item>
         <Form.Item name="form_npwp" label="NPWP" rules={[{ required: true }]}>
-          <Input onChange={handleChangeInput} value={form.npwp} name="npwp" />
+          <Input
+            onChange={handleChangeInput}
+            value={form.npwp}
+            name="npwp"
+            disabled={true}
+          />
         </Form.Item>
         <Form.Item
           name="form_kecamatan"
@@ -516,6 +646,7 @@ const FormPengajuanTransporter: React.FC = () => {
           initialValue={form.id_kecamatan}
           rules={[{ required: true }]}>
           <Select
+            disabled={true}
             style={{ width: 250 }}
             showSearch
             value={form.id_kecamatan}
@@ -533,6 +664,7 @@ const FormPengajuanTransporter: React.FC = () => {
           initialValue={form.id_kelurahan}
           rules={[{ required: true }]}>
           <Select
+            disabled={true}
             style={{ width: 250 }}
             showSearch
             value={form.id_kelurahan}
@@ -549,6 +681,7 @@ const FormPengajuanTransporter: React.FC = () => {
           label="Alamat"
           rules={[{ required: true }]}>
           <TextArea
+            disabled={true}
             style={{ width: 250 }}
             showCount
             name="alamat"
@@ -561,10 +694,20 @@ const FormPengajuanTransporter: React.FC = () => {
           name="form_nohp"
           label="Nomor Handphone"
           rules={[{ required: true }]}>
-          <Input onChange={handleChangeInput} value={form.telp} name="telp" />
+          <Input
+            onChange={handleChangeInput}
+            value={form.telp}
+            name="telp"
+            disabled={true}
+          />
         </Form.Item>
         <Form.Item name="form_email" label="Email" rules={[{ required: true }]}>
-          <Input onChange={handleChangeInput} value={form.email} name="email" />
+          <Input
+            onChange={handleChangeInput}
+            value={form.email}
+            name="email"
+            disabled={true}
+          />
         </Form.Item>
 
         <Divider />
@@ -581,10 +724,6 @@ const FormPengajuanTransporter: React.FC = () => {
                   size="middle"
                   key={"spaceKey" + key}
                   style={{ display: "flex", justifyContent: "center" }}>
-                  <MinusCircleOutlined
-                    onClick={() => handleRemoveRowDynamic(remove, name, key)}
-                  />
-
                   <Form.Item
                     rules={[
                       {
@@ -599,19 +738,14 @@ const FormPengajuanTransporter: React.FC = () => {
                     key={"fileMOUKey" + key}>
                     <div>
                       <Upload
+                        {...props}
                         beforeUpload={(file) =>
                           beforeUploadFileDynamic(file, key)
                         }
-                        onChange={(v) => onChangeFileDynamic(v, key, name)}
-                        onRemove={(v) => onRemoveFileDynamic(v, key, name)}
                         fileList={fileListList[name]}
                         maxCount={1}
                         name={"upload" + key}
-                        key={"uploadKey" + key}>
-                        <Button icon={<UploadOutlined />}>
-                          Klik Untuk Upload MOU Transporter
-                        </Button>
-                      </Upload>
+                        key={"uploadKey" + key}></Upload>
                     </div>
                   </Form.Item>
                   <Form.Item
@@ -629,6 +763,7 @@ const FormPengajuanTransporter: React.FC = () => {
                     key={"masaBerlakuKey" + key}>
                     <div>
                       <RangePicker
+                        disabled={true}
                         format="YYYY-MM-DD"
                         onChange={(v1, v2) =>
                           onChangeRangeDateDynamic(v1, v2, key, name)
@@ -642,25 +777,24 @@ const FormPengajuanTransporter: React.FC = () => {
                   <Divider />
                 </Space>
               ))}
-              <Form.Item {...tailLayout}>
-                <Button
-                  type="dashed"
-                  onClick={() => handleAddRowDynamic(add)}
-                  block
-                  icon={<PlusOutlined />}>
-                  Tambahkan MOU Transporter
-                </Button>
-              </Form.Item>
             </>
           )}
         </Form.List>
 
         <Form.Item {...tailLayoutUpload}>
-          <Button onClick={() => handleSubmit()}>Simpan</Button>
+          <Popconfirm
+            title="Validasi Transporter"
+            description="Apakah anda ingin melakukan validasi pada transporter ini?"
+            onConfirm={handleSubmit}
+            onCancel={handleTolak}
+            okText="Validasi"
+            cancelText="Tolak">
+            <Button>Validasi</Button>
+          </Popconfirm>
         </Form.Item>
       </Form>
     </>
   );
 };
 
-export default FormPengajuanTransporter;
+export default FormValidasiTransporter;

@@ -19,7 +19,7 @@ import { MUser } from "@/models/MTambahAkun";
 
 interface DataType {
   namaUser: any;
-  namaTempat: any;
+  noregTempat: any;
   tipeTempat: any;
   alamat: any;
   kecamatan: any;
@@ -75,16 +75,16 @@ const Index: React.FC = () => {
 
   const columns: ColumnsType<DataType> = [
     {
-      title: "Nama Pengguna",
+      title: "Nama Puskesmas / Rumah Sakit",
       dataIndex: "namaUser",
       defaultSortOrder: "descend",
       sorter: (a, b) => a.namaUser - b.namaUser,
     },
     {
-      title: "Nama Puskesmas / Rumah Sakit",
-      dataIndex: "namaTempat",
+      title: "Nomor Registrasi / Nomor Izin RS",
+      dataIndex: "noregTempat",
       defaultSortOrder: "descend",
-      sorter: (a, b) => a.namaTempat - b.namaTempat,
+      sorter: (a, b) => a.noregTempat - b.noregTempat,
     },
     {
       title: "Tipe Instansi",
@@ -117,10 +117,12 @@ const Index: React.FC = () => {
       render: (_, record: MPengajuanTransporter) => {
         // console.log(record);
 
-        const toFormPage = (param: MUser) => {
+        const toFormPage = (param: MPengajuanTransporter) => {
           if (tambahAkunStore.simpenBentaran) {
             tambahAkunStore.simpenBentaran(param);
-            router.push("/dashboard/admin/manajemen/profil/TambahAkun");
+            router.push(
+              "/dashboard/admin/manajemen/profil/TambahAkun?action=edit"
+            );
           }
         };
         return (
@@ -155,7 +157,7 @@ const Index: React.FC = () => {
       const transformedData = responseData.map((item: any) => ({
         ...item,
         namaUser: item.nama_user,
-        namaTempat: item.nama_tempat,
+        noregTempat: item.noreg_tempat,
         tipeTempat: item.tipe_tempat,
         alamat: item.alamat_tempat,
         kecamatan: item.kecamatan,

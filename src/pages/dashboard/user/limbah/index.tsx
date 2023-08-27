@@ -15,6 +15,10 @@ import {
 import { MPengajuanTransporter } from "../../../../models/MPengajuanTransporter";
 import { usePengajuanTransporterStore } from "@/stores/pengajuanTransporterStore";
 import { useRouter } from "next/router";
+import { MLaporanBulanan } from "@/models/MLaporanBulanan";
+import { useLaporanBulananStore } from "@/stores/laporanBulananStore";
+import { useGlobalStore } from "@/stores/globalStore";
+import cloneDeep from "clone-deep";
 
 interface DataType {
   namaTransporter: any;
@@ -68,7 +72,9 @@ const showDeleteConfirm = () => {
 
 const Index: React.FC = () => {
   const [data, setData] = useState<DataType[]>([]);
-  const pengajuanTransporterStore = usePengajuanTransporterStore();
+  const [dataSearch, setDataSearch] = useState<DataType[]>([]);
+  const laporanBulananStore = useLaporanBulananStore();
+  const globalStore = useGlobalStore();
   const router = useRouter();
 
   const columns: ColumnsType<DataType> = [
@@ -94,15 +100,13 @@ const Index: React.FC = () => {
     {
       title: "Action",
       key: "action",
-      render: (_, record: MPengajuanTransporter) => {
+      render: (_, record: MLaporanBulanan) => {
         // console.log(record);
 
-        const toFormPage = (param: MPengajuanTransporter) => {
-          if (pengajuanTransporterStore.simpenSementara) {
-            pengajuanTransporterStore.simpenSementara(param);
-            router.push(
-              "/dashboard/user/pengajuantransporter/PagePengajuanTransporter"
-            );
+        const toFormPage = (param: MLaporanBulanan) => {
+          if (laporanBulananStore.simpenSementara) {
+            laporanBulananStore.simpenSementara(param);
+            router.push("/dashboard/user/limbah/PageTambahLimbah?action=edit");
           }
         };
         return (
@@ -143,9 +147,19 @@ const Index: React.FC = () => {
       }));
 
       setData(transformedData);
+      setDataSearch(transformedData);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
+  };
+  const doSearch = async (e: any) => {
+    // console.log(e.target.value);
+    let tmpdata = dataSearch.filter((val) => {
+      // console.log(val);
+      return val.beratLimbahTotal.toString().includes(e.target.value);
+    });
+    console.log(tmpdata);
+    setData(cloneDeep(tmpdata));
   };
 
   useEffect(() => {
@@ -155,12 +169,15 @@ const Index: React.FC = () => {
   return (
     <MainLayout title="Laporan Limbah">
       <div>
-        <Link href="/dashboard/user/limbah/PageTambahLimbah" passHref>
+        <Link
+          href="/dashboard/user/limbah/PageTambahLimbah?action=create"
+          passHref>
           <Button type="primary">Tambah Pelaporan Limbah</Button>
         </Link>
       </div>
 
       <div style={{ marginTop: "20px" }}>
+        <input type="text" onChange={(e) => doSearch(e)} />
         <Table columns={columns} dataSource={data} onChange={onChange} />;
       </div>
     </MainLayout>
