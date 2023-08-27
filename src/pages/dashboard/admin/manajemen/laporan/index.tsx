@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import MainLayout from "@/components/admin/MainLayout";
+import MainLayout from "@/components/MainLayout";
 import { Button, Space, Modal } from "antd";
 import { Table } from "antd";
 import type { ColumnsType, TableProps } from "antd/es/table";
 import { Excel } from "antd-table-saveas-excel";
-import api from "../../../../utils/HttpRequest";
+import api from "@/utils/HttpRequest";
 import ModalView from "@/components/admin/laporan/ModalView";
 import { useRouter } from "next/router";
 
@@ -71,7 +71,6 @@ const onChange: TableProps<DataType>["onChange"] = (
   console.log("params", pagination, filters, sorter, extra);
 };
 
-
 const index: React.FC = () => {
   const [data, setData] = useState<DataType[]>([]);
   const router = useRouter();
@@ -82,7 +81,7 @@ const index: React.FC = () => {
       .addSheet("sheet 1")
       .addColumns(kolom)
       .addDataSource(data, {
-        str2Percent: true
+        str2Percent: true,
       })
       .saveAs("Excel.xlsx");
   };
@@ -217,7 +216,7 @@ const index: React.FC = () => {
       dataIndex: "tanggalPengajuan",
       defaultSortOrder: "descend",
     },
-  ]
+  ];
 
   const getData = async () => {
     try {
@@ -258,7 +257,9 @@ const index: React.FC = () => {
   return (
     <MainLayout title="Tabel Laporan">
       <div>
-        <Button type="primary" onClick={handlePrint}>Export Excel</Button>
+        <Button type="primary" onClick={handlePrint}>
+          Export Excel
+        </Button>
       </div>
 
       <div style={{ marginTop: "20px" }}>

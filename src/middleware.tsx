@@ -3,14 +3,8 @@ import type { NextRequest } from "next/server";
 import jwt_decode from "jwt-decode";
 
 export function middleware(request: NextRequest) {
-  //   if (request.nextUrl.pathname.startsWith("/about")) {
-  //     return NextResponse.rewrite(new URL("/about-2", request.url));
-  //   }
+  return NextResponse.next();
 
-  //   if (request.nextUrl.pathname.startsWith("/dashboard")) {
-  //     return NextResponse.rewrite(new URL("/dashboard/user", request.url));
-  //   }
-  // console.log(request.cookies);
   // jika tidak include dashboard abaikan
   if (!request.nextUrl.pathname.toLowerCase().includes("dashboard"))
     return NextResponse.next();

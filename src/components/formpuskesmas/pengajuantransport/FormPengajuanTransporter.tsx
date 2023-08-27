@@ -30,6 +30,7 @@ import axios from "axios";
 import { fileTypeFromStream } from "file-type";
 import router from "next/router";
 import cloneDeep from "clone-deep";
+import { useGlobalStore } from "@/stores/globalStore";
 
 const { RangePicker } = DatePicker;
 
@@ -49,6 +50,7 @@ const tailLayoutUpload = {
 };
 
 const FormPengajuanTransporter: React.FC = () => {
+  const globalStore = useGlobalStore();
   const [apimessage, contextHolder] = notification.useNotification();
 
   const [formListKey, setFormListKey] = useState(new Date().toISOString());
@@ -69,6 +71,7 @@ const FormPengajuanTransporter: React.FC = () => {
 
   const getKecamatanData = async () => {
     try {
+      if (globalStore.setLoading) globalStore.setLoading(true);
       const response = await api.post("/user/kecamatan/data");
       const responseData = response.data.data.values;
 
@@ -83,11 +86,14 @@ const FormPengajuanTransporter: React.FC = () => {
       );
     } catch (error) {
       console.error("Error fetching kecamatan data:", error);
+    } finally {
+      if (globalStore.setLoading) globalStore.setLoading(false);
     }
   };
 
   const getKelurahanData = async (id_kecamatan: number) => {
     try {
+      if (globalStore.setLoading) globalStore.setLoading(true);
       const response = await api.post(
         `/user/kelurahan/data?id_kecamatan=${id_kecamatan}`
       );
@@ -104,6 +110,8 @@ const FormPengajuanTransporter: React.FC = () => {
       );
     } catch (error) {
       console.error("Error fetching kelurahan data:", error);
+    } finally {
+      if (globalStore.setLoading) globalStore.setLoading(false);
     }
   };
 
@@ -321,17 +329,24 @@ const FormPengajuanTransporter: React.FC = () => {
       dataForm.append("status_transporter", "2");
       url = "/user/pengajuan-transporter/validasi";
     }
-    let responsenya = await api.post(url, dataForm);
-
-    console.log(fileListList);
-    console.log(dateRangeList);
-    console.log(responsenya);
+    try {
+      if (globalStore.setLoading) globalStore.setLoading(true);
+      let responsenya = await api.post(url, dataForm);
+      console.log(fileListList);
+      console.log(dateRangeList);
+      console.log(responsenya);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      if (globalStore.setLoading) globalStore.setLoading(false);
+    }
   };
 
   const handleTolak = () => {
     Modal.info({
       title: "Berikan Catatan!",
       centered: true,
+      closable: true,
       content: (
         <Form>
           <Form.Item
@@ -409,11 +424,17 @@ const FormPengajuanTransporter: React.FC = () => {
           dataForm.append("catatan", form.catatan);
           url = "/user/pengajuan-transporter/validasi";
         }
-        let responsenya = await api.post(url, dataForm);
-
-        console.log(fileListList);
-        console.log(dateRangeList);
-        console.log(responsenya);
+        try {
+          if (globalStore.setLoading) globalStore.setLoading(true);
+          let responsenya = await api.post(url, dataForm);
+          console.log(fileListList);
+          console.log(dateRangeList);
+          console.log(responsenya);
+        } catch (e) {
+          console.error(e);
+        } finally {
+          if (globalStore.setLoading) globalStore.setLoading(false);
+        }
       },
     });
   };
@@ -425,6 +446,7 @@ const FormPengajuanTransporter: React.FC = () => {
 
   const getFile = async (file: any) => {
     try {
+      if (globalStore.setLoading) globalStore.setLoading(true);
       let arrname = file.split("/");
       let filename = arrname[arrname.length - 1];
       const resp = await apifile.get(
@@ -463,7 +485,10 @@ const FormPengajuanTransporter: React.FC = () => {
       // Release the Blob URL when done to avoid memory leaks
       // URL.revokeObjectURL(blobUrl);
     } catch (error) {
+      console.error("-- error in getfile --");
       console.error("Error fetching or processing data:", error);
+    } finally {
+      if (globalStore.setLoading) globalStore.setLoading(false);
     }
   };
   const getFilesHere = async () => {
@@ -536,8 +561,16 @@ const FormPengajuanTransporter: React.FC = () => {
     formInstance.resetFields();
     setForm(cloneDeep(tmpForm));
 
-    // jika edit set valuenya
+    // jika idnya kosong (dia melakukan refresh) balikin ke table
+    if (
+      pengajuanTransporterStore.id_transporter_tmp == null ||
+      pengajuanTransporterStore.id_transporter_tmp == 0
+    ) {
+      router.push("/dashboard/admin/validasi");
+      return;
+    }
     if (router.query.action === "edit" || router.query.action === "validasi") {
+      // jika edit set valuenya
       setForm({
         status_transporter:
           pengajuanTransporterStore.status_transporter_tmp?.toString() ?? "",
@@ -694,7 +727,6 @@ const FormPengajuanTransporter: React.FC = () => {
                       </Upload>
                     </div>
                   </Form.Item>
-                  {dateRangeList.length}
                   <Form.Item
                     rules={[
                       {

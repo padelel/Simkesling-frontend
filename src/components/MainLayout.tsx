@@ -8,6 +8,9 @@ import {
   BarChartOutlined,
   ProfileOutlined,
   LogoutOutlined,
+  HomeOutlined,
+  SafetyCertificateOutlined,
+  TableOutlined,
 } from "@ant-design/icons";
 import { Layout, Menu, Spin, theme, Typography } from "antd";
 import React, { ReactNode, useEffect, useState } from "react";
@@ -68,6 +71,31 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
       icon: <ProfileOutlined />,
       label: "Manajemen Laporan",
       path: "manajemenlaporan",
+    },
+    {
+      icon: <HomeOutlined />,
+      label: "Dashboard",
+      path: "/dashboard/admin",
+    },
+    {
+      icon: <TableOutlined />,
+      label: "Manajemen Puskesmas / Rumah Sakit",
+      path: "/dashboard/admin/manajemen/profil",
+    },
+    {
+      icon: <TableOutlined />,
+      label: "Manajemen Transporter",
+      path: "/dashboard/admin/manajemen/transporter",
+    },
+    {
+      icon: <SafetyCertificateOutlined />,
+      label: "Validasi Pengajuan Transporter",
+      path: "/dashboard/admin/validasi",
+    },
+    {
+      icon: <TableOutlined />,
+      label: "Manajemen Laporan",
+      path: "/dashboard/admin/manajemen/laporan",
     },
     {
       icon: <LogoutOutlined />,

@@ -1,10 +1,10 @@
-import MainLayout from "@/components/admin/MainLayout";
+import MainLayout from "@/components/MainLayout";
 import { Button, Space, Modal } from "antd";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { Table } from "antd";
 import type { ColumnsType, TableProps } from "antd/es/table";
-import api from "../../../utils/HttpRequest";
+import api from "@/utils/HttpRequest";
 import {
   LoginOutlined,
   EditOutlined,
@@ -191,7 +191,6 @@ const Index: React.FC = () => {
 
   return (
     <MainLayout title="Pengajuan Transporter">
-
       <div style={{ marginTop: "20px" }}>
         <Table columns={columns} dataSource={data} onChange={onChange} />
       </div>

@@ -1,10 +1,10 @@
-import MainLayout from "@/components/admin/MainLayout";
+import MainLayout from "@/components/MainLayout";
 import { Button, Space, Modal } from "antd";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { Table } from "antd";
 import type { ColumnsType, TableProps } from "antd/es/table";
-import api from "../../../../utils/HttpRequest";
+import api from "@/utils/HttpRequest";
 import {
   LoginOutlined,
   EditOutlined,
@@ -120,9 +120,7 @@ const Index: React.FC = () => {
         const toFormPage = (param: MUser) => {
           if (tambahAkunStore.simpenBentaran) {
             tambahAkunStore.simpenBentaran(param);
-            router.push(
-              "/dashboard/admin/manajemen/profil/TambahAkun"
-            );
+            router.push("/dashboard/admin/manajemen/profil/TambahAkun");
           }
         };
         return (
@@ -178,9 +176,7 @@ const Index: React.FC = () => {
   return (
     <MainLayout title="Manajemen Akun Puskesmas / Rumah Sakit">
       <div>
-        <Link
-          href="/dashboard/admin/manajemen/profil/TambahAkun"
-          passHref>
+        <Link href="/dashboard/admin/manajemen/profil/TambahAkun" passHref>
           <Button type="primary">Tambah Akun Puskesmas / Rumah Sakit</Button>
         </Link>
       </div>

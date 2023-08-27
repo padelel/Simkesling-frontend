@@ -1,4 +1,4 @@
-import MainLayout from "@/components/admin/MainLayout";
+import MainLayout from "@/components/MainLayout";
 import FormPengajuanTransporter from "@/components/formpuskesmas/pengajuantransport/FormPengajuanTransporter";
 import React from "react";
 
