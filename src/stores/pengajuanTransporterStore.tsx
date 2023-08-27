@@ -25,6 +25,7 @@ const tmpPengajuanTransporter = {
   updated_at: undefined,
   files: [],
 };
+
 export const usePengajuanTransporterStore = create<MPengajuanTransporter>(
   (set) => ({
     ...tmpPengajuanTransporter,

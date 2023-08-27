@@ -26,7 +26,7 @@ import type { DatePickerProps, RangePickerProps } from "antd/es/date-picker";
 
 import { Card } from "antd";
 import { RcFile } from "antd/es/upload";
-import api from "@/pages/utils/HttpRequest";
+import api from "@/utils/HttpRequest";
 
 const { RangePicker } = DatePicker;
 

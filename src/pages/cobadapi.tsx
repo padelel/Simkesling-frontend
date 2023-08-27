@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import api from "./utils/HttpRequest";
+import api from "../utils/HttpRequest";
 import { Select } from "antd";
 
 const Cobadapi: React.FC = () => {

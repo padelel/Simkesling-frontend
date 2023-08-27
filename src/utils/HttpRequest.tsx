@@ -1,4 +1,7 @@
+import { useGlobalStore } from "@/stores/globalStore";
 import axios from "axios";
+import Notif from "./Notif";
+
 // Create an instance of Axios with custom configurations
 const api = axios.create({
   // baseURL: 'http://localhost:8000/api',
@@ -23,6 +26,7 @@ api.interceptors.request.use(
       config.headers.Authorization = `${token}`;
     }
     // console.log(config)
+
     return config;
   },
   (error: any) => {
@@ -38,7 +42,8 @@ api.interceptors.response.use(
     return response;
   },
   (error: any) => {
-    alert("Error coy, cek console..!");
+    Notif("warning", "Something Wrong.!", error.message.toString);
+    // alert("Error coy, cek console..!");
     // Handle response errors
     return Promise.reject(error);
   }

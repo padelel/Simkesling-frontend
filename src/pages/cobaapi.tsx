@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useState, createContext, useContext } from "react";
-import api from "./utils/HttpRequest";
+import api from "../utils/HttpRequest";
 const CobaApiPage: React.FC = () => {
   const [datanya, setDatanya] = useState("");
   const [datalogin, setDatalogin] = useState("");

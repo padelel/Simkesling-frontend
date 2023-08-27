@@ -9,10 +9,12 @@ import {
   ProfileOutlined,
   LogoutOutlined,
 } from "@ant-design/icons";
-import { Layout, Menu, theme, Typography } from "antd";
+import { Layout, Menu, Spin, theme, Typography } from "antd";
 import React, { ReactNode, useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/router";
+import { useUserLoginStore } from "@/stores/userLoginStore";
+import { useGlobalStore } from "@/stores/globalStore";
 
 const { Title } = Typography;
 interface MainLayoutProps {
@@ -28,6 +30,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
   } = theme.useToken();
   const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
+  const userLoginStore = useUserLoginStore();
+  const globalStore = useGlobalStore();
 
   const items = [
     {
@@ -75,9 +79,16 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
     ...item,
   }));
 
-  const onClickMenu = (item: any) => {
+  const onClickMenu = async (item: any) => {
     const clicked = items.find((_item) => _item.key === item.key);
-    router.push(clicked!.path);
+    if (clicked?.label.toLowerCase() == "logout") {
+      if (userLoginStore.prosesLogout) {
+        let a = await userLoginStore.prosesLogout();
+        router.push(clicked!.path);
+      }
+    } else {
+      router.push(clicked!.path);
+    }
   };
 
   return (
@@ -89,6 +100,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
           padding: 0;
         }
       `}</style>
+
       <Sider
         breakpoint="lg"
         collapsedWidth="0"
@@ -99,8 +111,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
         collapsible
         collapsed={collapsed}
         onCollapse={(value) => setCollapsed(value)}
-        style={{ background: colorBgContainer }}
-      >
+        style={{ background: colorBgContainer }}>
         {/* <Sider
         breakpoint="lg"
         collapsedWidth="0"
@@ -119,8 +130,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
             justifyContent: "center",
             display: "flex",
             marginTop: "30px",
-          }}
-        >
+          }}>
           <Image
             src="/icon-navbar/kotadepok.png"
             alt="Vercel Logo"
@@ -155,17 +165,18 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
           </div> */}
           <Title level={5}>{title}</Title>
         </Header>
-        <Content style={{ margin: "10px 8px 0" }}>
-          <div
-            style={{
-              padding: 8,
-              background: colorBgContainer,
-            }}
-          >
-            {/* Lorem ipsum dolor sit amet consectetur adipisicing elit. Officia */}
-            {children}
-          </div>
-        </Content>
+        <Spin spinning={globalStore.isloading}>
+          <Content style={{ margin: "10px 8px 0" }}>
+            <div
+              style={{
+                padding: 8,
+                background: colorBgContainer,
+              }}>
+              {/* Lorem ipsum dolor sit amet consectetur adipisicing elit. Officia */}
+              {children}
+            </div>
+          </Content>
+        </Spin>
         <Footer style={{ textAlign: "center" }}>
           SIMKESLING ©2023 Created by Keluarga Berencana
         </Footer>

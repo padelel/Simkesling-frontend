@@ -4,7 +4,7 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { Table } from "antd";
 import type { ColumnsType, TableProps } from "antd/es/table";
-import api from "../../../utils/HttpRequest";
+import api from "../../../../utils/HttpRequest";
 import {
   LoginOutlined,
   EditOutlined,
@@ -15,6 +15,7 @@ import {
 import { MPengajuanTransporter } from "../../../../models/MPengajuanTransporter";
 import { usePengajuanTransporterStore } from "@/stores/pengajuanTransporterStore";
 import { useRouter } from "next/router";
+import { useGlobalStore } from "@/stores/globalStore";
 
 interface DataType {
   status: any;
@@ -71,6 +72,8 @@ const showDeleteConfirm = () => {
 const Index: React.FC = () => {
   const [data, setData] = useState<DataType[]>([]);
   const pengajuanTransporterStore = usePengajuanTransporterStore();
+  const globalStore = useGlobalStore();
+
   const router = useRouter();
 
   const columns: ColumnsType<DataType> = [
@@ -153,6 +156,7 @@ const Index: React.FC = () => {
   ];
 
   const getData = async () => {
+    if (globalStore.setLoading) globalStore.setLoading(true);
     try {
       const response = await api.post("/user/pengajuan-transporter/data");
       const responseData = response.data.data.values;
@@ -168,6 +172,8 @@ const Index: React.FC = () => {
       setData(transformedData);
     } catch (error) {
       console.error("Error fetching data:", error);
+    } finally {
+      if (globalStore.setLoading) globalStore.setLoading(false);
     }
   };
 
@@ -183,6 +189,9 @@ const Index: React.FC = () => {
           passHref>
           <Button type="primary">Tambah Transporter</Button>
         </Link>
+        <Button type="primary" onClick={() => getData()}>
+          Refress
+        </Button>
       </div>
 
       <div style={{ marginTop: "20px" }}>

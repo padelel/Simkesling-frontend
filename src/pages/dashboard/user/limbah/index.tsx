@@ -4,7 +4,7 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { Table } from "antd";
 import type { ColumnsType, TableProps } from "antd/es/table";
-import api from "../../../utils/HttpRequest";
+import api from "../../../../utils/HttpRequest";
 import {
   LoginOutlined,
   EditOutlined,
