@@ -15,7 +15,7 @@ const tmpTambahAkun = {
   id_kecamatan: 0,
   kelurahan: "",
   kecamatan: "",
-  notlp: null,
+  notlp: 0,
   nohp: "",
   email: "",
   izin_ipal: "",

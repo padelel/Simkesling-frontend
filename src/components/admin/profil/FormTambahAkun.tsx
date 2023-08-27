@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import { Button, Form, Input, Select } from "antd";
 
 import dayjs from "dayjs";
@@ -37,6 +37,10 @@ const FormTambahAkun: React.FC = () => {
     null
   );
 
+  const [getPassword, setPassword] = useState({
+    required: true,
+  });
+
   let tmpForm = {
     oldid: "",
     nama_user: "",
@@ -55,6 +59,7 @@ const FormTambahAkun: React.FC = () => {
 
   const getKecamatanData = async () => {
     try {
+      if (globalStore.setLoading) globalStore.setLoading(true);
       const response = await api.post("/user/kecamatan/data");
       const responseData = response.data.data.values;
 
@@ -69,11 +74,14 @@ const FormTambahAkun: React.FC = () => {
       );
     } catch (error) {
       console.error("Error fetching kecamatan data:", error);
+    } finally {
+      if (globalStore.setLoading) globalStore.setLoading(false);
     }
   };
 
   const getKelurahanData = async (id_kecamatan: number) => {
     try {
+      if (globalStore.setLoading) globalStore.setLoading(true);
       const response = await api.post(
         `/user/kelurahan/data?id_kecamatan=${id_kecamatan}`
       );
@@ -90,6 +98,8 @@ const FormTambahAkun: React.FC = () => {
       );
     } catch (error) {
       console.error("Error fetching kelurahan data:", error);
+    } finally {
+      if (globalStore.setLoading) globalStore.setLoading(false);
     }
   };
 
@@ -110,42 +120,6 @@ const FormTambahAkun: React.FC = () => {
   //     form_email: tambahAkunStore.email,
   //   });
   // }, []);
-
-  // jika create
-  formInstance.resetFields();
-  setForm(cloneDeep(tmpForm));
-
-  if (router.query.action === "edit") {
-    // jika edit set valuenya
-    // setForm({
-    //   oldid: tambahAkunStore.id_user?.toString() ?? "",
-    //   nama_user: tambahAkunStore.nama_user?.toString() ?? "",
-    //   username: tambahAkunStore.username?.toString() ?? "",
-    //   noreg_tempat: tambahAkunStore.noreg_tempat?.toString() ?? "",
-    //   level: tambahAkunStore.level?.toString() ?? "",
-    //   id_kecamatan: tambahAkunStore.id_kecamatan?.toString() ?? "",
-    //   id_kelurahan: tambahAkunStore.id_kelurahan?.toString() ?? "",
-    //   alamat_tempat: tambahAkunStore.alamat_tempat?.toString() ?? "",
-    //   notelp: tambahAkunStore.nohp?.toString() ?? "",
-    //   email: tambahAkunStore.email?.toString() ?? "",
-    // });
-
-    formInstance.setFieldsValue({
-      form_namauser: tambahAkunStore.nama_user,
-      form_username: tambahAkunStore.username,
-      form_noreg: tambahAkunStore.noreg_tempat,
-      level: tambahAkunStore.level,
-      form_kecamatan: tambahAkunStore.id_kecamatan,
-      form_kelurahan: tambahAkunStore.id_kelurahan,
-      form_alamat: tambahAkunStore.alamat_tempat,
-      form_nohp: tambahAkunStore.notlp,
-      form_email: tambahAkunStore.email,
-    });
-
-    // getKelurahanData(parseInt(tambahAkunStore.id_kecamatan ?? "0"));
-    // getFile(pengajuanTransporterStore.files);
-    // getFilesHere();
-  }
 
   const [dateRangeList, setDateRangeList] = useState<any[]>([]);
 
@@ -205,6 +179,61 @@ const FormTambahAkun: React.FC = () => {
     });
   };
 
+  useLayoutEffect(() => {
+    getKecamatanData();
+    console.log(router.query);
+    console.log(Object.values(tambahAkunStore));
+    console.log(tambahAkunStore);
+
+    // jika create
+    formInstance.resetFields();
+    setForm(cloneDeep(tmpForm));
+
+    if (router.query.action === "edit") {
+      // jika edit set valuenya
+
+      setPassword({
+        required: false,
+      });
+
+      setForm({
+        oldid: tambahAkunStore.id_user?.toString() ?? "",
+        nama_user: tambahAkunStore.nama_user?.toString() ?? "",
+        username: tambahAkunStore.username?.toString() ?? "",
+        noreg_tempat: tambahAkunStore.noreg_tempat?.toString() ?? "",
+        level: tambahAkunStore.level?.toString() ?? "",
+        id_kecamatan: tambahAkunStore.id_kecamatan?.toString() ?? "",
+        id_kelurahan: tambahAkunStore.id_kelurahan?.toString() ?? "",
+        alamat_tempat: tambahAkunStore.alamat_tempat?.toString() ?? "",
+        notelp: tambahAkunStore.nohp?.toString() ?? "",
+        email: tambahAkunStore.email?.toString() ?? "",
+        password: tambahAkunStore.email?.toString() ?? "",
+      });
+
+      formInstance.setFieldsValue({
+        form_namauser: tambahAkunStore.nama_user,
+        form_username: tambahAkunStore.username,
+        form_noreg: tambahAkunStore.noreg_tempat,
+        level: tambahAkunStore.level,
+        form_kecamatan: tambahAkunStore.id_kecamatan,
+        form_kelurahan: tambahAkunStore.id_kelurahan,
+        form_alamat: tambahAkunStore.alamat_tempat,
+        form_nohp: tambahAkunStore.notlp,
+        form_email: tambahAkunStore.email,
+      });
+
+      getKelurahanData(tambahAkunStore.id_kecamatan ?? "0");
+
+      // jika idnya kosong (dia melakukan refresh) balikin ke table
+      if (tambahAkunStore.id_user == null || tambahAkunStore.id_user == 0) {
+        router.push("/dashboard/admin/manajemen/profil");
+        return;
+      }
+      // getFile(pengajuanTransporterStore.files);
+      // getFilesHere();
+    }
+  }, []);
+
   // -- onSubmit
   const handleSubmit = async () => {
     console.log(form);
@@ -230,8 +259,8 @@ const FormTambahAkun: React.FC = () => {
     try {
       if (globalStore.setLoading) globalStore.setLoading(true);
       let responsenya = await api.post(url, dataForm);
-      console.log(dateRangeList);
-      console.log(responsenya);
+
+      router.push("/dashboard/admin/manajemen/profil");
     } catch (e) {
       console.error(e);
     } finally {
@@ -266,10 +295,7 @@ const FormTambahAkun: React.FC = () => {
             name="username"
           />
         </Form.Item>
-        <Form.Item
-          name="password"
-          label="Password"
-          rules={[{ required: true }]}>
+        <Form.Item name="password" label="Password" rules={[getPassword]}>
           <Input.Password
             onChange={handleChangeInput}
             value={form.password}
