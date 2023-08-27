@@ -29,38 +29,38 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
         {
             icon: <HomeOutlined />,
             label: "Dashboard",
-            path: "/admin/dashboard",
+            path: "/dashboard/admin",
         },
         {
             icon: <TableOutlined />,
             label: "Manajemen Puskesmas / Rumah Sakit",
-            path: "/admin/manajemenpuskesmas",
+            path: "/dashboard/admin/manajemen/profil",
         },
         {
             icon: <TableOutlined />,
             label: "Manajemen Transporter",
-            path: "/admin/manajementransporter",
+            path: "/dashboard/admin/manajemen/transporter",
         },
         {
             icon: <SafetyCertificateOutlined />,
             label: "Validasi Pengajuan Transporter",
-            path: "/admin/validasitransporter",
+            path: "/dashboard/admin/validasi",
         },
         {
             icon: <TableOutlined />,
             label: "Manajemen Laporan",
-            path: "/admin/manajemenlaporan",
+            path: "/dashboard/admin/manajemen/laporan",
         },
     ].map((item, index) => ({
         key: item.path,
         ...item,
-      }));
+    }));
 
-    
+
     const onClickMenu = (item: any) => {
         const clicked = items.find((_item) => _item.key === item.key);
         router.push(clicked!.path);
-      };
+    };
 
     return (
         <Layout style={{ minHeight: "100vh" }}>

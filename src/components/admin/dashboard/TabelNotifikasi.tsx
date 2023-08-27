@@ -108,7 +108,7 @@ const TabelNotifikasi = () => {
   return (
     <>
       <div style={{ marginTop: "20px" }}>
-        <Table columns={columns} dataSource={data} onChange={onChange} />;
+        <Table columns={columns} dataSource={data} onChange={onChange} />
       </div>
     </>
   );

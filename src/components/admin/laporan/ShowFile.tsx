@@ -43,45 +43,12 @@ const ShowFile: React.FC = () => {
     <>
       <Upload
         listType="text"
-        fileList={fileList}
         onPreview={handlePreview}
       >
         {/* {fileList.length >= 8 ? null : uploadButton} */}
       </Upload>
-      <Modal open={previewOpen} bodyStyle={{height: "80vh"}} style={{top: "5%"}} title={previewTitle} footer={null} onCancel={handleCancel}>
-        <Row>
-          <Col>
-            Nama Transporter :
-          </Col>
-          <Col>
-            PT God of Warrior
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            Nama Pemusnah :
-          </Col>
-          <Col>
-            PT God of Warrior
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            Metode Pemusnah :
-          </Col>
-          <Col>
-            PT God of Warrior
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            Memiliki Penyimpanan/TPS :
-          </Col>
-          <Col>
-            PT God of Warrior
-          </Col>
-        </Row>
-        <iframe src={firstFileUrl} style={{width: "100%", height: "100%"}}></iframe>
+      <Modal open={previewOpen} bodyStyle={{ height: "80vh" }} style={{ top: "5%" }} title={previewTitle} footer={null} onCancel={handleCancel}>
+        <iframe src={firstFileUrl} style={{ width: "100%", height: "100%" }}></iframe>
       </Modal>
     </>
   );

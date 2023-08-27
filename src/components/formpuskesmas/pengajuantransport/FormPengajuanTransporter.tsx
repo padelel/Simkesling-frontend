@@ -4,15 +4,16 @@ import {
   Divider,
   Form,
   Input,
+  Modal,
+  Popconfirm,
   Select,
   Upload,
   UploadFile,
   UploadProps,
-  message,
+  notification,
 } from "antd";
 
 import {
-  LoginOutlined,
   UploadOutlined,
   PlusOutlined,
   MinusCircleOutlined,
@@ -21,7 +22,6 @@ import {
 import dayjs from "dayjs";
 import type { Dayjs } from "dayjs";
 import { DatePicker, Space } from "antd";
-import type { DatePickerProps, RangePickerProps } from "antd/es/date-picker";
 import { RcFile, UploadChangeParam } from "antd/es/upload";
 import api from "@/utils/HttpRequest";
 import { usePengajuanTransporterStore } from "@/stores/pengajuanTransporterStore";
@@ -49,6 +49,8 @@ const tailLayoutUpload = {
 };
 
 const FormPengajuanTransporter: React.FC = () => {
+  const [apimessage, contextHolder] = notification.useNotification();
+
   const [formListKey, setFormListKey] = useState(new Date().toISOString());
   const pengajuanTransporterStore = usePengajuanTransporterStore();
   const [kecamatanOptions, setKecamatanOptions] = useState<
@@ -110,6 +112,7 @@ const FormPengajuanTransporter: React.FC = () => {
   const [dateRangeList, setDateRangeList] = useState<any[]>([]);
 
   let tmpForm = {
+    status_transporter: "",
     oldid: "",
     namatransporter: "",
     npwp: "",
@@ -118,6 +121,7 @@ const FormPengajuanTransporter: React.FC = () => {
     alamat: "",
     telp: "",
     email: "",
+    catatan: "",
   };
 
   const [form, setForm] = useState(cloneDeep(tmpForm));
@@ -255,6 +259,14 @@ const FormPengajuanTransporter: React.FC = () => {
 
   // -- onSubmit
   const handleSubmit = async () => {
+    apimessage.open({
+      message: "Validasi Transporter",
+      description: "Pengajuan Transporter berhasil diterima.",
+
+      duration: 0,
+      type: "success",
+    });
+
     console.log(form);
 
     let dataForm: any = new FormData();
@@ -304,12 +316,112 @@ const FormPengajuanTransporter: React.FC = () => {
     if (router.query.action == "edit") {
       url = "/user/pengajuan-transporter/update";
     }
+
+    if (router.query.action == "validasi") {
+      dataForm.append("status_transporter", "2");
+      url = "/user/pengajuan-transporter/validasi";
+    }
     let responsenya = await api.post(url, dataForm);
 
     console.log(fileListList);
     console.log(dateRangeList);
     console.log(responsenya);
   };
+
+  const handleTolak = () => {
+    Modal.info({
+      title: "Berikan Catatan!",
+      centered: true,
+      content: (
+        <Form>
+          <Form.Item
+            name="form_catatan"
+            label="Catatan"
+            rules={[{ required: true }]}>
+            <Input
+              onChange={handleChangeInput}
+              value={form.catatan}
+              name="catatan"
+            />
+          </Form.Item>
+        </Form>
+      ),
+      onOk: async () => {
+        apimessage.open({
+          message: "Validasi Transporter",
+          description: "Pengajuan Transporter ditolak.",
+          duration: 0,
+          type: "error",
+        });
+
+        console.log(form);
+
+        let dataForm: any = new FormData();
+        dataForm.append("oldid", form.oldid);
+        dataForm.append("nama_transporter", form.namatransporter);
+        dataForm.append("npwp_transporter", form.npwp);
+        dataForm.append("id_kecamatan", form.id_kecamatan);
+        dataForm.append("id_kelurahan", form.id_kelurahan);
+        dataForm.append("alamat_transporter", form.alamat);
+        dataForm.append("notlp", form.telp);
+        dataForm.append("nohp", "-");
+        dataForm.append("email", form.email);
+
+        console.log(fileListList);
+
+        // Append tgl_mulai and tgl_akhir based on dateRangeList
+        fileListList.forEach((file, index) => {
+          console.log(typeof file[0]);
+          console.log(file[0].hasOwnProperty("blob"));
+          //@ts-ignore
+          if (file[0].hasOwnProperty("blob")) {
+            // @ts-ignore
+            dataForm.append("file_mou[]", file[0].blob, file[0].name);
+          } else {
+            //@ts-ignore
+            dataForm.append("file_mou[]", file[0], file[0].fileName);
+          }
+          console.log(file);
+          // return;
+        });
+
+        // Append tgl_mulai and tgl_akhir based on dateRangeList
+        dateRangeList.forEach((rangeDates, index) => {
+          if (rangeDates.length === 2) {
+            // Format the dates to the required format
+            const tglMulai = rangeDates[0].format("YYYY-MM-DD");
+            const tglAkhir = rangeDates[1].format("YYYY-MM-DD");
+
+            // dataForm.append(`tgl_mulai`, tglMulai);
+            // dataForm.append(`tgl_akhir`, tglAkhir);
+            dataForm.append(`tgl_mulai[]`, tglMulai);
+            dataForm.append(`tgl_akhir[]`, tglAkhir);
+          }
+        });
+
+        let url = "/user/pengajuan-transporter/create";
+        if (router.query.action == "edit") {
+          url = "/user/pengajuan-transporter/update";
+        }
+
+        if (router.query.action == "validasi") {
+          dataForm.append("status_transporter", "0");
+          dataForm.append("catatan", form.catatan);
+          url = "/user/pengajuan-transporter/validasi";
+        }
+        let responsenya = await api.post(url, dataForm);
+
+        console.log(fileListList);
+        console.log(dateRangeList);
+        console.log(responsenya);
+      },
+    });
+  };
+
+  // -- onSubmit
+  // const ifTolak = async () => {
+
+  // };
 
   const getFile = async (file: any) => {
     try {
@@ -329,7 +441,14 @@ const FormPengajuanTransporter: React.FC = () => {
 
       // Create a Blob URL
       const blobUrl = URL.createObjectURL(blob);
-
+      // fileListList.push([
+      //   {
+      //     uid: new Date().toISOString(),
+      //     name: filename,
+      //     status: "done",
+      //     url: blobUrl,
+      //   },
+      // ]);
       return {
         uid: new Date().toISOString(),
         name: filename,
@@ -355,6 +474,7 @@ const FormPengajuanTransporter: React.FC = () => {
       if (pengajuanTransporterStore.files) {
         let val = pengajuanTransporterStore.files[index];
         let tmpfile = await getFile(val.file1);
+        // let tmpawal = await setDateRangeList(val.tgl_mulai);
         arrfile.push([tmpfile]);
       }
     }
@@ -417,8 +537,10 @@ const FormPengajuanTransporter: React.FC = () => {
     setForm(cloneDeep(tmpForm));
 
     // jika edit set valuenya
-    if (router.query.action == "edit") {
+    if (router.query.action === "edit" || router.query.action === "validasi") {
       setForm({
+        status_transporter:
+          pengajuanTransporterStore.status_transporter_tmp?.toString() ?? "",
         oldid: pengajuanTransporterStore.id_transporter_tmp?.toString() ?? "",
         namatransporter:
           pengajuanTransporterStore.nama_transporter?.toString() ?? "",
@@ -426,8 +548,9 @@ const FormPengajuanTransporter: React.FC = () => {
         id_kecamatan: pengajuanTransporterStore.id_kecamatan?.toString() ?? "",
         id_kelurahan: pengajuanTransporterStore.id_kelurahan?.toString() ?? "",
         alamat: pengajuanTransporterStore.alamat_transporter?.toString() ?? "",
-        telp: pengajuanTransporterStore.notlp?.toString() ?? "",
+        telp: pengajuanTransporterStore.nohp?.toString() ?? "",
         email: pengajuanTransporterStore.email?.toString() ?? "",
+        catatan: pengajuanTransporterStore.catatan?.toString() ?? "",
       });
 
       formInstance.setFieldsValue({
@@ -447,6 +570,7 @@ const FormPengajuanTransporter: React.FC = () => {
   }, []);
   return (
     <>
+      {contextHolder}
       <Form
         {...layout}
         onFinish={handleSubmit}
@@ -525,7 +649,10 @@ const FormPengajuanTransporter: React.FC = () => {
 
         <Divider />
 
-        <Form.List name="listMouDynamic" key={formListKey}>
+        <Form.List
+          name="listMouDynamic"
+          initialValue={fileListList}
+          key={formListKey}>
           {(fields, { add, remove }) => (
             <>
               {fields.map(({ key, name, ...restField }) => (
@@ -610,9 +737,15 @@ const FormPengajuanTransporter: React.FC = () => {
         </Form.List>
 
         <Form.Item {...tailLayoutUpload}>
-          <Button type="primary" htmlType="submit">
-            Submit
-          </Button>
+          <Popconfirm
+            title="Delete the task"
+            description="Are you sure to delete this task?"
+            onConfirm={handleSubmit}
+            onCancel={handleTolak}
+            okText="Validasi"
+            cancelText="Tolak">
+            <Button>Validasi</Button>
+          </Popconfirm>
         </Form.Item>
       </Form>
     </>

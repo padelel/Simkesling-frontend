@@ -12,8 +12,8 @@ import {
   DeleteOutlined,
   ExclamationCircleFilled,
 } from "@ant-design/icons";
-import { MPengajuanTransporter } from "../../../../../../models/MPengajuanTransporter";
-import { usePengajuanTransporterStore } from "../../../../stores/pengajuanTransporterStore";
+import { MPengajuanTransporter } from "../../../../../models/MPengajuanTransporter";
+import { usePengajuanTransporterStore } from "@/stores/pengajuanTransporterStore";
 import { useRouter } from "next/router";
 
 interface DataType {
@@ -96,8 +96,13 @@ const Index: React.FC = () => {
         },
         {
           text: "Ditolak",
-          value: "o",
+          value: "0",
         },
+        {
+          text: "Aktif",
+          value: "2",
+        },
+
       ],
       // specify the condition of filtering result
       // here is that finding the name started with `value`
@@ -124,7 +129,7 @@ const Index: React.FC = () => {
           if (pengajuanTransporterStore.simpenSementara) {
             pengajuanTransporterStore.simpenSementara(param);
             router.push(
-              "/dashboard/user/pengajuantransporter/PagePengajuanTransporter"
+              "/dashboard/admin/manajemen/transporter/PengajuanTransporter?action=edit"
             );
           }
         };
@@ -154,14 +159,14 @@ const Index: React.FC = () => {
 
   const getData = async () => {
     try {
-      const response = await api.post("/user/pengajuan-transporter/data");
+      const response = await api.post("/user/transporter/data");
       const responseData = response.data.data.values;
 
       const transformedData = responseData.map((item: any) => ({
         ...item,
         namaTransporter: item.nama_transporter,
         tanggalPengajuan: item.created_at,
-        status: item.statusactive_transporter_tmp,
+        status: item.status_transporter,
         key: item.id_transporter_tmp.toString(),
       }));
 
@@ -179,14 +184,14 @@ const Index: React.FC = () => {
     <MainLayout title="Pengajuan Transporter">
       <div>
         <Link
-          href="/dashboard/user/pengajuantransporter/PagePengajuanTransporter"
+          href="/dashboard/admin/manajemen/transporter/PengajuanTransporter"
           passHref>
           <Button type="primary">Tambah Transporter</Button>
         </Link>
       </div>
 
       <div style={{ marginTop: "20px" }}>
-        <Table columns={columns} dataSource={data} onChange={onChange} />;
+        <Table columns={columns} dataSource={data} onChange={onChange} />
       </div>
     </MainLayout>
   );

@@ -29,13 +29,13 @@ const DashboardPage: React.FC = () => {
       <h2>Grafik</h2>
       <Row>
         <Col>
-        {(typeof window !== undefined) && <Chart options={options} type="bar" series={series} />}
+          {(typeof window !== undefined) && <Chart options={options} type="bar" series={series} />}
         </Col>
         <Col>
-        {(typeof window !== undefined) && <Chart options={options} type="line" series={series} />}
+          {(typeof window !== undefined) && <Chart options={options} type="line" series={series} />}
         </Col>
         <Col>
-        {(typeof window !== undefined) && <Chart options={options} type="bar" series={series} />}
+          {(typeof window !== undefined) && <Chart options={options} type="bar" series={series} />}
         </Col>
       </Row>
       <h2>Total Laporan Sepanjang Tahun</h2>
