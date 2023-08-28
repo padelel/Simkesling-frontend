@@ -134,6 +134,7 @@ const Index: React.FC = () => {
   ];
 
   const getData = async () => {
+    if (globalStore.setLoading) globalStore.setLoading(true);
     try {
       const response = await api.post("/user/laporan-bulanan/data");
       const responseData = response.data.data.values;
@@ -150,6 +151,8 @@ const Index: React.FC = () => {
       setDataSearch(transformedData);
     } catch (error) {
       console.error("Error fetching data:", error);
+    } finally {
+      if (globalStore.setLoading) globalStore.setLoading(false);
     }
   };
   const doSearch = async (e: any) => {

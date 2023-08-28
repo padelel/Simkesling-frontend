@@ -15,6 +15,7 @@ import {
 import { MPengajuanTransporter } from "../../../../models/MPengajuanTransporter";
 import { usePengajuanTransporterStore } from "@/stores/pengajuanTransporterStore";
 import { useRouter } from "next/router";
+import { useGlobalStore } from "@/stores/globalStore";
 
 interface DataType {
   status: any;
@@ -70,6 +71,7 @@ const showDeleteConfirm = () => {
 };
 
 const Index: React.FC = () => {
+  const globalStore = useGlobalStore();
   const [data, setData] = useState<DataType[]>([]);
   const pengajuanTransporterStore = usePengajuanTransporterStore();
   const router = useRouter();
@@ -104,7 +106,7 @@ const Index: React.FC = () => {
           if (pengajuanTransporterStore.simpenSementara) {
             pengajuanTransporterStore.simpenSementara(param);
             router.push(
-              "/dashboard/user/pengajuantransporter/PagePengajuanTransporter"
+              "/dashboard/user/pengajuantransporter/PagePengajuanTransporter?action=edit"
             );
           }
         };
@@ -133,6 +135,7 @@ const Index: React.FC = () => {
   ];
 
   const getData = async () => {
+    if (globalStore.setLoading) globalStore.setLoading(true);
     try {
       const response = await api.post("/user/transporter/data");
       const responseData = response.data.data.values;
@@ -149,6 +152,8 @@ const Index: React.FC = () => {
       setData(transformedData);
     } catch (error) {
       console.error("Error fetching data:", error);
+    } finally {
+      if (globalStore.setLoading) globalStore.setLoading(false);
     }
   };
 

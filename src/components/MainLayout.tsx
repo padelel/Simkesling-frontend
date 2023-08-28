@@ -49,7 +49,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
     },
     {
       icon: <OrderedListOutlined />,
-      label: "Daftar Transporter",
+      label: "List Transporter",
       path: "/dashboard/user/transporter",
     },
     {
