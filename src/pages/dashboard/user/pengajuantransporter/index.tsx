@@ -16,6 +16,8 @@ import { MPengajuanTransporter } from "../../../../models/MPengajuanTransporter"
 import { usePengajuanTransporterStore } from "@/stores/pengajuanTransporterStore";
 import { useRouter } from "next/router";
 import { useGlobalStore } from "@/stores/globalStore";
+import cloneDeep from "clone-deep";
+import { url } from "inspector";
 
 interface DataType {
   status: any;
@@ -50,31 +52,47 @@ const onChange: TableProps<DataType>["onChange"] = (
   console.log("params", pagination, filters, sorter, extra);
 };
 
-const { confirm } = Modal;
-
-const showDeleteConfirm = () => {
-  confirm({
-    title: "Are you sure delete this task?",
-    icon: <ExclamationCircleFilled />,
-    content: "Some descriptions",
-    okText: "Yes",
-    okType: "danger",
-    cancelText: "No",
-    onOk() {
-      console.log("OK");
-    },
-    onCancel() {
-      console.log("Cancel");
-    },
-  });
-};
-
 const Index: React.FC = () => {
+  let tmpForm = {
+    oldid: "",
+  };
+
+  const [form, setForm] = useState({ oldid: 0 });
   const [data, setData] = useState<DataType[]>([]);
   const pengajuanTransporterStore = usePengajuanTransporterStore();
   const globalStore = useGlobalStore();
 
   const router = useRouter();
+
+  const { confirm } = Modal;
+  const handleViewClick = (idTransporter: string) => {
+    console.log("View clicked for id_transporter:", idTransporter);
+  };
+
+  const handleDelete = async (idTransporter: string) => {
+    let dataForm: any = new FormData();
+    console.log(idTransporter);
+    dataForm.append("oldid", idTransporter);
+    let url = "/user/pengajuan-transporter/delete";
+    let responsenya = await api.post(url, dataForm);
+  };
+
+  // const showDeleteConfirm = () => {
+  //   confirm({
+  //     title: "Are you sure delete this task?",
+  //     icon: <ExclamationCircleFilled />,
+  //     content: "Some descriptions",
+  //     okText: "Yes",
+  //     okType: "danger",
+  //     cancelText: "No",
+  //     onOk() {
+  //       handleDelete();
+  //     },
+  //     onCancel() {
+  //       console.log("Cancel");
+  //     },
+  //   });
+  // };
 
   const columns: ColumnsType<DataType> = [
     {
@@ -139,11 +157,17 @@ const Index: React.FC = () => {
               style={{ backgroundColor: "yellow" }}>
               Edit
             </Button>
-            <Button icon={<EyeOutlined />} type="primary">
+            <Button
+              icon={<EyeOutlined />}
+              type="primary"
+              onClick={() => handleViewClick(record.id_transporter_tmp)}>
               View
             </Button>
             <Button
-              onClick={showDeleteConfirm}
+              onClick={() => {
+                // setForm({ oldid: record.id_transporter_tmp }); // Set oldid when delete button is clicked
+                handleDelete(record.id_transporter_tmp);
+              }}
               icon={<DeleteOutlined />}
               type="primary"
               danger>
