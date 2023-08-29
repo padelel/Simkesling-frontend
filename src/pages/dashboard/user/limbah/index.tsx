@@ -1,5 +1,5 @@
 import MainLayout from "@/components/MainLayout";
-import { Button, Space, Modal } from "antd";
+import { Button, Space, Modal, Input } from "antd";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { Table } from "antd";
@@ -19,6 +19,7 @@ import { MLaporanBulanan } from "@/models/MLaporanBulanan";
 import { useLaporanBulananStore } from "@/stores/laporanBulananStore";
 import { useGlobalStore } from "@/stores/globalStore";
 import cloneDeep from "clone-deep";
+import Search from "antd/es/input/Search";
 
 interface DataType {
   namaTransporter: any;
@@ -179,9 +180,19 @@ const Index: React.FC = () => {
         </Link>
       </div>
 
-      <div style={{ marginTop: "20px" }}>
-        <input type="text" onChange={(e) => doSearch(e)} />
-        <Table columns={columns} dataSource={data} onChange={onChange} />;
+      <div style={{ marginTop: "20px", marginBottom: "20px" }}>
+        <Search
+          style={{ width: 300 }}
+          placeholder="Cari berdasarkasn Berat"
+          onChange={(e) => doSearch(e)}
+        />
+        <Table
+          style={{ marginTop: 20 }}
+          columns={columns}
+          dataSource={data}
+          onChange={onChange}
+        />
+        ;
       </div>
     </MainLayout>
   );

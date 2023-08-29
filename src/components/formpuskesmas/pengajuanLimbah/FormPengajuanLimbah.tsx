@@ -340,6 +340,7 @@ const FormPengajuanLimbah: React.FC = () => {
     } catch (e) {
       console.error(e);
     } finally {
+      router.push("/dashboard/user/limbah");
       if (globalStore.setLoading) globalStore.setLoading(false);
     }
   };
@@ -606,7 +607,7 @@ const FormPengajuanLimbah: React.FC = () => {
           />
         </Form.Item>
         <Divider />
-        {/* <Form.Item name="form_TPS" label="Memiliki TPS?">
+        <Form.Item name="form_TPS" label="Memiliki TPS?">
           <Checkbox
             style={{ marginLeft: 10 }}
             checked={[1, "1"].includes(form.statustps)}
@@ -640,7 +641,7 @@ const FormPengajuanLimbah: React.FC = () => {
             name="form_ukuranPemusnah"
           />{" "}
           Ukuran
-        </Form.Item> */}
+        </Form.Item>
         <Divider />
         <Form.Item
           name="form_beratLimbah"

@@ -32,6 +32,8 @@ import router from "next/router";
 import cloneDeep from "clone-deep";
 import { useGlobalStore } from "@/stores/globalStore";
 
+type NotificationType = "success" | "info" | "warning" | "error";
+
 const { RangePicker } = DatePicker;
 
 const { Option } = Select;
@@ -51,7 +53,26 @@ const tailLayoutUpload = {
 
 const FormPengajuanTransporter: React.FC = () => {
   const globalStore = useGlobalStore();
-  const [apimessage, contextHolder] = notification.useNotification();
+  const [apimessageCreate, contextHolderCreate] =
+    notification.useNotification();
+  const [apimessageUpdate, contextHolderUpdate] =
+    notification.useNotification();
+
+  const openNotificationCreate = (type: NotificationType) => {
+    apimessageCreate[type]({
+      message: "Tambah Transporter",
+      description:
+        "Transporter Berhasil Ditambahkan, silahkan tunggu validasi Admin",
+    });
+  };
+
+  const openNotificationUpdate = (type: NotificationType) => {
+    apimessageUpdate[type]({
+      message: "Update Transporter",
+      description:
+        "Transporter Berhasil Diupdate, silahkan tunggu validasi Admin",
+    });
+  };
 
   const [formListKey, setFormListKey] = useState(new Date().toISOString());
   const pengajuanTransporterStore = usePengajuanTransporterStore();
@@ -330,6 +351,12 @@ const FormPengajuanTransporter: React.FC = () => {
     } catch (e) {
       console.error(e);
     } finally {
+      if (router.query.action == "edit") {
+        openNotificationUpdate("success");
+      } else {
+        openNotificationCreate("success");
+      }
+      router.push("/dashboard/user/pengajuantransporter");
       if (globalStore.setLoading) globalStore.setLoading(false);
     }
   };
@@ -490,7 +517,8 @@ const FormPengajuanTransporter: React.FC = () => {
   }, []);
   return (
     <>
-      {contextHolder}
+      {contextHolderCreate}
+      {contextHolderUpdate}
       <Form
         {...layout}
         onFinish={handleSubmit}

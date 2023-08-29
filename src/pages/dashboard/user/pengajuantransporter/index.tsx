@@ -1,5 +1,5 @@
 import MainLayout from "@/components/MainLayout";
-import { Button, Space, Modal } from "antd";
+import { Button, Space, Modal, Popconfirm, notification } from "antd";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { Table } from "antd";
@@ -18,6 +18,9 @@ import { useRouter } from "next/router";
 import { useGlobalStore } from "@/stores/globalStore";
 import cloneDeep from "clone-deep";
 import { url } from "inspector";
+import Search from "antd/es/input/Search";
+
+type NotificationType = "success" | "info" | "warning" | "error";
 
 interface DataType {
   status: any;
@@ -29,20 +32,6 @@ interface DataType {
   address: string;
 }
 
-// const data = [
-//   {
-//     namaTransporter: {{nama_transporter}},
-//     tanggalPengajuan: {{created_at}},
-//     status: {{statusactive_transporter_tmp}},
-//   },
-//   {
-//     namaTransporter: {{nama_transporter}},
-//     tanggalPengajuan: {{created_at}},
-//     status: {{statusactive_transporter_tmp}},
-//   },
-
-// ];
-
 const onChange: TableProps<DataType>["onChange"] = (
   pagination,
   filters,
@@ -53,6 +42,16 @@ const onChange: TableProps<DataType>["onChange"] = (
 };
 
 const Index: React.FC = () => {
+  const [apicontext, contextHolder] = notification.useNotification();
+  const [dataSearch, setDataSearch] = useState<DataType[]>([]);
+  const openNotificationWithIcon = (type: NotificationType) => {
+    apicontext[type]({
+      message: "Transporter Berhasil Dihapus",
+      description: "Transporter Telah Berhasil Dihapus",
+      duration: 3,
+    });
+  };
+
   let tmpForm = {
     oldid: "",
   };
@@ -70,29 +69,19 @@ const Index: React.FC = () => {
   };
 
   const handleDelete = async (idTransporter: string) => {
-    let dataForm: any = new FormData();
-    console.log(idTransporter);
-    dataForm.append("oldid", idTransporter);
-    let url = "/user/pengajuan-transporter/delete";
-    let responsenya = await api.post(url, dataForm);
+    try {
+      let dataForm: any = new FormData();
+      console.log(idTransporter);
+      dataForm.append("oldid", idTransporter);
+      let url = "/user/pengajuan-transporter/delete";
+      let responsenya = await api.post(url, dataForm);
+      openNotificationWithIcon("error");
+    } catch (error) {
+      console.error("Error hapus Data:", error);
+    } finally {
+      getData();
+    }
   };
-
-  // const showDeleteConfirm = () => {
-  //   confirm({
-  //     title: "Are you sure delete this task?",
-  //     icon: <ExclamationCircleFilled />,
-  //     content: "Some descriptions",
-  //     okText: "Yes",
-  //     okType: "danger",
-  //     cancelText: "No",
-  //     onOk() {
-  //       handleDelete();
-  //     },
-  //     onCancel() {
-  //       console.log("Cancel");
-  //     },
-  //   });
-  // };
 
   const columns: ColumnsType<DataType> = [
     {
@@ -163,16 +152,17 @@ const Index: React.FC = () => {
               onClick={() => handleViewClick(record.id_transporter_tmp)}>
               View
             </Button>
-            <Button
-              onClick={() => {
+            <Popconfirm
+              title="Hapus Transporter"
+              description="Apakah anda yakin untuk menghapus Transporter Anda?"
+              onConfirm={() => {
                 // setForm({ oldid: record.id_transporter_tmp }); // Set oldid when delete button is clicked
                 handleDelete(record.id_transporter_tmp);
-              }}
-              icon={<DeleteOutlined />}
-              type="primary"
-              danger>
-              Delete
-            </Button>
+              }}>
+              <Button icon={<DeleteOutlined />} type="primary" danger>
+                Delete
+              </Button>
+            </Popconfirm>
           </Space>
         );
       },
@@ -194,11 +184,22 @@ const Index: React.FC = () => {
       }));
 
       setData(transformedData);
+      setDataSearch(transformedData);
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
       if (globalStore.setLoading) globalStore.setLoading(false);
     }
+  };
+
+  const doSearch = async (e: any) => {
+    // console.log(e.target.value);
+    let tmpdata = dataSearch.filter((val) => {
+      // console.log(val);
+      return val.namaTransporter.toString().includes(e.target.value);
+    });
+    console.log(tmpdata);
+    setData(cloneDeep(tmpdata));
   };
 
   useEffect(() => {
@@ -207,6 +208,7 @@ const Index: React.FC = () => {
 
   return (
     <MainLayout title="Pengajuan Transporter">
+      {contextHolder}
       <div>
         <Link
           href="/dashboard/user/pengajuantransporter/PagePengajuanTransporter"
@@ -219,7 +221,18 @@ const Index: React.FC = () => {
       </div>
 
       <div style={{ marginTop: "20px" }}>
-        <Table columns={columns} dataSource={data} onChange={onChange} />;
+        <Search
+          style={{ width: 300 }}
+          placeholder="Cari Nama Transporter"
+          onChange={(e) => doSearch(e)}
+        />
+        <Table
+          style={{ marginTop: 20 }}
+          columns={columns}
+          dataSource={data}
+          onChange={onChange}
+        />
+        ;
       </div>
     </MainLayout>
   );
