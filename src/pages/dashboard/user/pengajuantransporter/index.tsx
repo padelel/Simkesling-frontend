@@ -87,13 +87,13 @@ const Index: React.FC = () => {
     {
       title: "Nama Transporter",
       dataIndex: "namaTransporter",
-      defaultSortOrder: "descend",
-      sorter: (a, b) => a.namaTransporter - b.namaTransporter,
+      defaultSortOrder: "ascend",
+      sorter: (a, b) => a.namaTransporter.length - b.namaTransporter.length,
     },
     {
       title: "Tanggal Pengajuan",
       dataIndex: "tanggalPengajuan",
-      defaultSortOrder: "descend",
+      // defaultSortOrder: "descend",
       sorter: (a, b) => a.tanggalPengajuan.localeCompare(b.tanggalPengajuan),
     },
     {
@@ -109,6 +109,7 @@ const Index: React.FC = () => {
           value: "o",
         },
       ],
+
       // specify the condition of filtering result
       // here is that finding the name started with `value`
       render: (status: string) => {
