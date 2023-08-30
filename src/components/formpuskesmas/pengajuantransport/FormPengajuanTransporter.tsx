@@ -178,8 +178,8 @@ const FormPengajuanTransporter: React.FC = () => {
   // name: itu index 0 1 2 3 4 5 urut
   // key: itu name yang nambah terus 1 3 7 8 9 10
   const handleAddRowDynamic = (add: Function) => {
-    fileListList.push([]);
-    dateRangeList.push([]);
+    // fileListList.push([]);
+    // dateRangeList.push([]);
     console.log(fileListList);
     add();
   };

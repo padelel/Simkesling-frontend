@@ -121,13 +121,6 @@ const Index: React.FC = () => {
             <Button icon={<EyeOutlined />} type="primary">
               View
             </Button>
-            <Button
-              onClick={showDeleteConfirm}
-              icon={<DeleteOutlined />}
-              type="primary"
-              danger>
-              Delete
-            </Button>
           </Space>
         );
       },
