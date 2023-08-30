@@ -122,14 +122,15 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
       <Sider
         breakpoint="lg"
         collapsedWidth="0"
-        onBreakpoint={(broken) => {
+        onBreakpoint={(broken: any) => {
           console.log(broken);
         }}
         width={200}
         collapsible
         collapsed={collapsed}
-        onCollapse={(value) => setCollapsed(value)}
-        style={{ background: colorBgContainer }}>
+        onCollapse={(value: any) => setCollapsed(value)}
+        style={{ background: colorBgContainer }}
+      >
         {/* <Sider
         breakpoint="lg"
         collapsedWidth="0"
@@ -148,12 +149,13 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
             justifyContent: "center",
             display: "flex",
             marginTop: "30px",
-          }}>
+          }}
+        >
           <Image
             src="/icon-navbar/kotadepok.png"
             alt="Vercel Logo"
             width={75}
-            height={75}
+            height={85}
             priority
           />
           <br />
@@ -164,9 +166,9 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
           Kota Depok
         </h4>
         <div>
-          <h5 style={{ textAlign: "center" }}>
+          {/* <h5 style={{ textAlign: "center" }}>
             Puskesmas Pasir Gunung Selatan
-          </h5>
+          </h5> */}
         </div>
         <Menu
           mode="inline"
@@ -189,7 +191,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
               style={{
                 padding: 8,
                 background: colorBgContainer,
-              }}>
+              }}
+            >
               {/* Lorem ipsum dolor sit amet consectetur adipisicing elit. Officia */}
               {children}
             </div>

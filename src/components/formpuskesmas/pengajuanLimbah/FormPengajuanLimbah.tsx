@@ -33,6 +33,7 @@ import { useLaporanBulananStore } from "@/stores/laporanBulananStore";
 import router from "next/router";
 import { useGlobalStore } from "@/stores/globalStore";
 import apifile from "@/utils/HttpRequestFile";
+import Notif from "@/utils/Notif";
 
 const { RangePicker } = DatePicker;
 
@@ -67,7 +68,7 @@ const props: UploadProps = {
   headers: {
     authorization: "authorization-text",
   },
-  onChange(info) {
+  onChange(info: any) {
     if (info.file.status !== "uploading") {
       console.log(info.file, info.fileList);
     }
@@ -109,7 +110,7 @@ const FormPengajuanLimbah: React.FC = () => {
       setTransporterOptions(
         responseData.map(
           (item: { nama_transporter: string; id_transporter: number }) => ({
-            value: item.id_transporter.toString(),
+            value: item.id_transporter,
             label: item.nama_transporter,
             id_transporter: item.id_transporter,
           })
@@ -122,6 +123,7 @@ const FormPengajuanLimbah: React.FC = () => {
 
   const [isCheckboxChecked, setIsCheckboxChecked] = useState(false);
   const [isCheckboxChecked1, setIsCheckboxChecked1] = useState(false);
+  const [isCheckboxCheckedSyarat, setIsCheckboxCheckedSyarat] = useState(false);
 
   const [activeTabKey2, setActiveTabKey2] = useState<string>("limbahPadat");
 
@@ -139,6 +141,7 @@ const FormPengajuanLimbah: React.FC = () => {
     oldid: "",
     periode: "",
     tahun: "",
+    idtransporter: 0,
     namatransporter: "",
     namapemusnah: "",
     metodepemusnah: "",
@@ -164,7 +167,7 @@ const FormPengajuanLimbah: React.FC = () => {
   const handleChangeInput = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    console.log(event);
+    // console.log(event);
     setForm({
       ...form,
       [event.target.name]: event.target.value,
@@ -182,7 +185,8 @@ const FormPengajuanLimbah: React.FC = () => {
 
   const handleChangePeriode = (val: any, name: string, event: any) => {
     const id_periode = parseInt(val);
-    setSelectedTransporter(id_periode);
+    console.log(val);
+    console.log(id_periode);
     setForm({
       ...form,
       [name]: val,
@@ -219,7 +223,7 @@ const FormPengajuanLimbah: React.FC = () => {
       ...form,
       stastuslimbahcair: newStatus2,
     });
-    setIsCheckboxChecked1(e.target.checked);
+    setIsCheckboxCheckedSyarat(e.target.checked);
   };
 
   const handleAddRowDynamic = (
@@ -227,12 +231,15 @@ const FormPengajuanLimbah: React.FC = () => {
     key: number = -1,
     name: number = -1
   ) => {
+    console.log(limbahPadatList);
     limbahPadatList.push({
       kategori: "",
       catatan: "",
       berat: "",
     });
+    console.log(limbahPadatList);
     add();
+    console.log("--limbahPadatList");
   };
   const handleRemoveRowDynamic = (
     remove: Function,
@@ -274,12 +281,12 @@ const FormPengajuanLimbah: React.FC = () => {
     console.log(form);
     let dataForm: any = new FormData();
     dataForm.append("oldid", form.oldid);
-    dataForm.append("id_transporter", form.namatransporter);
+    dataForm.append("id_transporter", form.idtransporter);
     dataForm.append("nama_pemusnah", form.namapemusnah);
     dataForm.append("metode_pemusnah", form.metodepemusnah);
     dataForm.append("berat_limbah_total", form.totallimbahpadat);
     dataForm.append("punya_penyimpanan_tps", form.statustps);
-    dataForm.append("ukuran_penyimpanan_tps", 1);
+    dataForm.append("ukuran_penyimpanan_tps", form.ukurantps);
     dataForm.append("punya_pemusnahan_sendiri", form.statuspemusnah);
     dataForm.append("ukuran_pemusnahan_sendiri", form.ukuranpemusnah);
     dataForm.append("limbah_b3_covid", form.totallimbahcovid);
@@ -288,7 +295,7 @@ const FormPengajuanLimbah: React.FC = () => {
     dataForm.append("kapasitas_ipal", form.kapasitasinpal);
     dataForm.append("memenuhi_syarat", form.stastuslimbahcair);
     dataForm.append("catatan", form.catatanlimbahcair);
-    dataForm.append("periode", form.periode);
+    dataForm.append("periode", parseInt(form.periode));
     dataForm.append("tahun", form.tahun);
 
     fileLogbook.forEach((file, index) => {
@@ -335,12 +342,13 @@ const FormPengajuanLimbah: React.FC = () => {
     try {
       if (globalStore.setLoading) globalStore.setLoading(true);
       let responsenya = await api.post(url, dataForm);
+      Notif("success", "Sukses", "Berhasil tambah laporan.!");
       console.log(limbahPadatList);
       console.log(responsenya);
+      router.push("/dashboard/user/limbah");
     } catch (e) {
       console.error(e);
     } finally {
-      router.push("/dashboard/user/limbah");
       if (globalStore.setLoading) globalStore.setLoading(false);
     }
   };
@@ -450,8 +458,18 @@ const FormPengajuanLimbah: React.FC = () => {
 
     formInstance.resetFields();
     setForm(cloneDeep(tmpForm));
+    setLimbahPadatList([]);
 
     if (router.query.action === "edit") {
+      console.log("masuk sini? #1");
+      if (
+        laporanBulananStore.id_laporan_bulanan == null ||
+        laporanBulananStore.id_laporan_bulanan == 0
+      ) {
+        console.log("masuk sini? #2");
+        router.push("/dashboard/user/limbah");
+        return;
+      }
       // jika edit set valuenya
       // setForm({
       //   oldid: laporanBulananStore.id_laporan_bulanan?.toString() ?? "",
@@ -473,7 +491,9 @@ const FormPengajuanLimbah: React.FC = () => {
         oldid: laporanBulananStore.id_laporan_bulanan?.toString() ?? "",
         periode: laporanBulananStore.periode?.toString() ?? "",
         tahun: laporanBulananStore.tahun?.toString() ?? "",
-        namatransporter: laporanBulananStore.id_transporter?.toString() ?? "",
+        idtransporter:
+          parseInt(laporanBulananStore.id_transporter?.toString() ?? "0") ?? 0,
+        namatransporter: laporanBulananStore.nama_transporter?.toString() ?? "",
         namapemusnah: laporanBulananStore.nama_pemusnah?.toString() ?? "",
         metodepemusnah: laporanBulananStore.metode_pemusnah?.toString() ?? "",
         catatanlimbahcair: laporanBulananStore.catatan?.toString() ?? "",
@@ -570,26 +590,30 @@ const FormPengajuanLimbah: React.FC = () => {
         onFinish={handleNextButton}
         {...layout}
         name="control-hooks"
-        style={{ maxWidth: 600 }}>
+        style={{ maxWidth: 600 }}
+      >
         <h2 style={{ display: "flex", justifyContent: "center" }}>
           Pencatatan Limbah Padat
         </h2>
         <Form.Item
           name="form_transporter"
           label="Pilih Transporter"
-          initialValue={form.namatransporter}
-          rules={[{ required: true }]}>
+          initialValue={form.idtransporter}
+          rules={[{ required: true }]}
+        >
           <Select
-            value={form.namatransporter}
-            onChange={(v) => handleChangeSelect(v, "namatransporter", event)}
+            value={form.idtransporter}
+            onChange={(v) => handleChangeSelect(v, "idtransporter", event)}
             placeholder="Select a option and change input text above"
             allowClear
-            options={transporterOptions}></Select>
+            options={transporterOptions}
+          ></Select>
         </Form.Item>
         <Form.Item
           name="form_namaPemusnah"
           label="Nama Pemusnah"
-          rules={[{ required: true }]}>
+          rules={[{ required: true }]}
+        >
           <Input
             onChange={handleChangeInput}
             value={form.namapemusnah}
@@ -599,7 +623,8 @@ const FormPengajuanLimbah: React.FC = () => {
         <Form.Item
           name="form_metodePemusnahan"
           label="Metode Pemusnahan"
-          rules={[{ required: true }]}>
+          rules={[{ required: true }]}
+        >
           <Input
             onChange={handleChangeInput}
             value={form.metodepemusnah}
@@ -612,7 +637,8 @@ const FormPengajuanLimbah: React.FC = () => {
             style={{ marginLeft: 10 }}
             checked={[1, "1"].includes(form.statustps)}
             name="form_statusTps"
-            onChange={handleCheckboxChange}>
+            onChange={handleCheckboxChange}
+          >
             Iya
           </Checkbox>
           <Input
@@ -620,7 +646,7 @@ const FormPengajuanLimbah: React.FC = () => {
             onChange={handleChangeInput}
             disabled={!isCheckboxChecked}
             value={form.ukurantps}
-            name="form_ukuranTps"
+            name="ukurantps"
           />{" "}
           Ukuran
         </Form.Item>
@@ -630,7 +656,8 @@ const FormPengajuanLimbah: React.FC = () => {
             style={{ marginLeft: 10 }}
             value={form.statuspemusnah}
             name="form_statusPemusnah"
-            onChange={handleCheckboxChange1}>
+            onChange={handleCheckboxChange1}
+          >
             Iya
           </Checkbox>
           <Input
@@ -638,7 +665,7 @@ const FormPengajuanLimbah: React.FC = () => {
             onChange={handleChangeInput}
             disabled={!isCheckboxChecked1}
             value={form.ukuranpemusnah}
-            name="form_ukuranPemusnah"
+            name="ukuranpemusnah"
           />{" "}
           Ukuran
         </Form.Item>
@@ -646,7 +673,8 @@ const FormPengajuanLimbah: React.FC = () => {
         <Form.Item
           name="form_beratLimbah"
           label="Total Limbah Padat(Kg)"
-          rules={[]}>
+          rules={[]}
+        >
           <InputNumber
             onChange={(v) => handleChangeSelect(v, "totallimbahpadat", event)}
             value={form.totallimbahpadat}
@@ -657,7 +685,8 @@ const FormPengajuanLimbah: React.FC = () => {
         <Form.Item
           name="form_beratLimbahNonCovid"
           label="Total Limbah NonCovid(Kg)"
-          rules={[]}>
+          rules={[]}
+        >
           <InputNumber
             onChange={(v) =>
               handleChangeSelect(v, "totallimbahnoncovid", event)
@@ -670,7 +699,8 @@ const FormPengajuanLimbah: React.FC = () => {
         <Form.Item
           name="form_beratLimbahCovid"
           label="Total Limbah Covid(Kg)"
-          rules={[]}>
+          rules={[]}
+        >
           <InputNumber
             onChange={(v) => handleChangeSelect(v, "totallimbahcovid", event)}
             value={form.totallimbahcovid}
@@ -683,14 +713,16 @@ const FormPengajuanLimbah: React.FC = () => {
         <Form.List
           name="detailLimbahDynamic"
           key={formListKey}
-          initialValue={limbahPadatList}>
+          initialValue={limbahPadatList}
+        >
           {(fields, { add, remove }) => (
             <>
               {fields.map(({ key, name, ...restField }) => (
                 <Space
                   key={key}
                   style={{ display: "flex", marginBottom: 8 }}
-                  align="baseline">
+                  align="baseline"
+                >
                   <Form.Item
                     {...restField}
                     name={[name, "form_kategoriLimbahPadat"]}
@@ -698,12 +730,21 @@ const FormPengajuanLimbah: React.FC = () => {
                     rules={[
                       { required: true, message: "Masukan Kategori Limbah" },
                     ]}
-                    initialValue={limbahPadatList[name].kategori}>
+                    initialValue={
+                      limbahPadatList[name]
+                        ? limbahPadatList[name].kategori ?? ""
+                        : ""
+                    }
+                  >
                     <Input
-                      onChange={(v) =>
+                      onChange={(v: any) =>
                         handleChangeLimbahPadatInput(v, key, name, "kategori")
                       }
-                      value={limbahPadatList[name].kategori}
+                      value={
+                        limbahPadatList[name]
+                          ? limbahPadatList[name].kategori ?? ""
+                          : ""
+                      }
                       name={"kategoridetaillimbah" + key}
                       key={"kategoridetaillimbahKey" + key}
                       style={{ width: 150 }}
@@ -715,12 +756,21 @@ const FormPengajuanLimbah: React.FC = () => {
                     name={[name, "form_catatanLimbahPadat"]}
                     key={"form_catatanLimbahPadat" + key}
                     rules={[{}]}
-                    initialValue={limbahPadatList[name].catatan}>
+                    initialValue={
+                      limbahPadatList[name]
+                        ? limbahPadatList[name].catatan ?? ""
+                        : ""
+                    }
+                  >
                     <Input
-                      onChange={(v) =>
+                      onChange={(v: any) =>
                         handleChangeLimbahPadatInput(v, key, name, "catatan")
                       }
-                      value={limbahPadatList[name].catatan}
+                      value={
+                        limbahPadatList[name]
+                          ? limbahPadatList[name].catatan ?? ""
+                          : ""
+                      }
                       name={"catatandetaillimbah" + key}
                       key={"catatandetaillimbahKey" + key}
                       style={{ width: 150 }}
@@ -734,13 +784,22 @@ const FormPengajuanLimbah: React.FC = () => {
                     rules={[
                       { required: true, message: "Masukan Berat Limbah" },
                     ]}
-                    initialValue={limbahPadatList[name].berat}>
+                    initialValue={
+                      limbahPadatList[name]
+                        ? limbahPadatList[name].berat ?? ""
+                        : ""
+                    }
+                  >
                     <Input
-                      onChange={(v) =>
+                      onChange={(v: any) =>
                         handleChangeLimbahPadatInput(v, key, name, "berat")
                       }
                       style={{ width: 150 }}
-                      value={limbahPadatList[name].berat}
+                      value={
+                        limbahPadatList[name]
+                          ? limbahPadatList[name].berat ?? ""
+                          : ""
+                      }
                       name="beratdetaillimbah"
                       key={"beratdetaillimbahKey" + key}
                       placeholder="Berat"
@@ -756,7 +815,8 @@ const FormPengajuanLimbah: React.FC = () => {
                   type="dashed"
                   onClick={() => handleAddRowDynamic(add)}
                   block
-                  icon={<PlusOutlined />}>
+                  icon={<PlusOutlined />}
+                >
                   Tambahkan List Detail Limbah Padat
                 </Button>
               </Form.Item>
@@ -768,28 +828,32 @@ const FormPengajuanLimbah: React.FC = () => {
         <Form.Item
           initialValue={fileManifest}
           name="form_manifest"
-          label="Upload Manifest">
+          label="Upload Manifest"
+        >
           <Upload
             name="manifest"
             multiple
-            beforeUpload={(file) => beforeUploadFileDynamic(file)}
+            beforeUpload={(file: any) => beforeUploadFileDynamic(file)}
             fileList={fileManifest}
-            onChange={(file) => setFileManifest(file.fileList)}>
+            onChange={(file: any) => setFileManifest(file.fileList)}
+          >
             <Button icon={<UploadOutlined />}>
-              Klik Untuk Upload MOU Transporter
+              Klik Untuk Upload Manifest
             </Button>
           </Upload>
         </Form.Item>
         <Form.Item
           initialValue={fileLogbook}
           name="form_logbook"
-          label="Upload Logbook">
+          label="Upload Logbook"
+        >
           <Upload
             name="logbook"
             multiple
-            beforeUpload={(file) => beforeUploadFileDynamic(file)}
+            beforeUpload={(file: any) => beforeUploadFileDynamic(file)}
             fileList={fileLogbook}
-            onChange={(file) => setFileLogbook(file.fileList)}>
+            onChange={(file: any) => setFileLogbook(file.fileList)}
+          >
             <Button icon={<UploadOutlined />}>Klik Untuk Upload Logbook</Button>
           </Upload>
         </Form.Item>
@@ -806,7 +870,8 @@ const FormPengajuanLimbah: React.FC = () => {
         onFinish={handleSubmitButton}
         {...layout}
         name="control-hooks"
-        style={{ maxWidth: 600 }}>
+        style={{ maxWidth: 600 }}
+      >
         <h2 style={{ display: "flex", justifyContent: "center" }}>
           Pencatatan Limbah Cair
         </h2>
@@ -829,11 +894,12 @@ const FormPengajuanLimbah: React.FC = () => {
 
         <Form.Item name="form_ukuranTPS" label="Apakah Memenuhi Syarat?">
           <Checkbox
-            checked={[1, "1"].includes(form.statuspemusnah)}
+            checked={[1, "1"].includes(form.stastuslimbahcair)}
             style={{ marginLeft: 10 }}
-            value={form.statuspemusnah}
+            value={form.stastuslimbahcair}
             onChange={handleCheckboxChange2}
-            name="form_statussyaratipal">
+            name="form_statussyaratipal"
+          >
             Iya
           </Checkbox>
         </Form.Item>
@@ -871,7 +937,8 @@ const FormPengajuanLimbah: React.FC = () => {
             name="form_periode"
             initialValue={form.periode}
             rules={[{ required: true }]}
-            label="Periode">
+            label="Periode"
+          >
             <Select
               value={form.periode}
               placeholder="Pilih Bulan Periode"
@@ -879,25 +946,26 @@ const FormPengajuanLimbah: React.FC = () => {
               style={{ width: 200 }}
               // onChange={handleChange}
               options={[
-                { value: "1", label: "Januari" },
-                { value: "2", label: "Februari" },
-                { value: "3", label: "Maret" },
-                { value: "4", label: "April" },
-                { value: "5", label: "Mei" },
-                { value: "6", label: "Juni" },
-                { value: "7", label: "Juli" },
-                { value: "8", label: "Agustus" },
-                { value: "9", label: "September" },
-                { value: "10", label: "Oktober" },
-                { value: "11", label: "November" },
-                { value: "12", label: "Desember" },
+                { value: 1, label: "Januari" },
+                { value: 2, label: "Februari" },
+                { value: 3, label: "Maret" },
+                { value: 4, label: "April" },
+                { value: 5, label: "Mei" },
+                { value: 6, label: "Juni" },
+                { value: 7, label: "Juli" },
+                { value: 8, label: "Agustus" },
+                { value: 9, label: "September" },
+                { value: 10, label: "Oktober" },
+                { value: 11, label: "November" },
+                { value: 12, label: "Desember" },
               ]}
             />
           </Form.Item>
           <Form.Item
             name="form_tahun"
             label="Tahun"
-            rules={[{ required: true }]}>
+            rules={[{ required: true }]}
+          >
             <Input
               placeholder="Masukan Tahun"
               onChange={handleChangeInput}
@@ -911,7 +979,8 @@ const FormPengajuanLimbah: React.FC = () => {
       <Card
         style={{ width: "100%" }}
         tabList={tabListNoTitle}
-        activeTabKey={activeTabKey2}>
+        activeTabKey={activeTabKey2}
+      >
         <div style={{ display: "flex", justifyContent: "center" }}>
           {contentListNoTitle[activeTabKey2]}
         </div>

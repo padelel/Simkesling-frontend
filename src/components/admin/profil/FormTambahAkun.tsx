@@ -66,7 +66,7 @@ const FormTambahAkun: React.FC = () => {
       setKecamatanOptions(
         responseData.map(
           (item: { nama_kecamatan: string; id_kecamatan: number }) => ({
-            value: item.id_kecamatan.toString(),
+            value: item.id_kecamatan,
             label: item.nama_kecamatan,
             id_kecamatan: item.id_kecamatan,
           })
@@ -90,7 +90,7 @@ const FormTambahAkun: React.FC = () => {
       setKelurahanOptions(
         responseData.map(
           (item: { nama_kelurahan: string; id_kelurahan: number }) => ({
-            value: item.id_kelurahan.toString(),
+            value: item.id_kelurahan,
             label: item.nama_kelurahan,
             id_kelurahan: item.id_kelurahan,
           })
@@ -274,11 +274,13 @@ const FormTambahAkun: React.FC = () => {
         onFinish={handleSubmit}
         name="control-hooks"
         style={{ maxWidth: 600 }}
-        form={formInstance}>
+        form={formInstance}
+      >
         <Form.Item
           name="form_namauser"
           label="Nama Instansi"
-          rules={[{ required: true }]}>
+          rules={[{ required: true }]}
+        >
           <Input
             onChange={handleChangeInput}
             value={form.nama_user}
@@ -288,7 +290,8 @@ const FormTambahAkun: React.FC = () => {
         <Form.Item
           name="form_username"
           label="Username"
-          rules={[{ required: true }]}>
+          rules={[{ required: true }]}
+        >
           <Input
             onChange={handleChangeInput}
             value={form.username}
@@ -305,7 +308,8 @@ const FormTambahAkun: React.FC = () => {
         <Form.Item
           name="form_noreg"
           label="Nomor registrasi / Nomor izin RS"
-          rules={[{ required: true }]}>
+          rules={[{ required: false }]}
+        >
           <Input
             onChange={handleChangeInput}
             value={form.noreg_tempat}
@@ -316,7 +320,8 @@ const FormTambahAkun: React.FC = () => {
           name="level"
           label="Jenis Instansi"
           initialValue={form.level}
-          rules={[{ required: true }]}>
+          rules={[{ required: false }]}
+        >
           <Select
             style={{ width: 250 }}
             showSearch
@@ -324,8 +329,8 @@ const FormTambahAkun: React.FC = () => {
             placeholder="Silahkan Pilih Tipe Instansi"
             allowClear
             options={[
-              { value: "3", label: "Puskesmas" },
-              { value: "2", label: "Rumah Sakit" },
+              { value: 3, label: "Puskesmas" },
+              { value: 2, label: "Rumah Sakit" },
             ]}
           />
         </Form.Item>
@@ -333,7 +338,8 @@ const FormTambahAkun: React.FC = () => {
           name="form_kecamatan"
           label="Kecamatan"
           initialValue={form.id_kecamatan}
-          rules={[{ required: true }]}>
+          rules={[{ required: false }]}
+        >
           <Select
             style={{ width: 250 }}
             showSearch
@@ -350,7 +356,8 @@ const FormTambahAkun: React.FC = () => {
           name="form_kelurahan"
           label="Kelurahan"
           initialValue={form.id_kelurahan}
-          rules={[{ required: true }]}>
+          rules={[{ required: false }]}
+        >
           <Select
             style={{ width: 250 }}
             showSearch
@@ -366,7 +373,8 @@ const FormTambahAkun: React.FC = () => {
         <Form.Item
           name="form_alamat"
           label="Alamat"
-          rules={[{ required: true }]}>
+          rules={[{ required: false }]}
+        >
           <TextArea
             style={{ width: 250 }}
             showCount
@@ -379,14 +387,19 @@ const FormTambahAkun: React.FC = () => {
         <Form.Item
           name="form_nohp"
           label="Nomor Handphone"
-          rules={[{ required: true }]}>
+          rules={[{ required: false }]}
+        >
           <Input
             onChange={handleChangeInput}
             value={form.notelp}
             name="notelp"
           />
         </Form.Item>
-        <Form.Item name="form_email" label="Email" rules={[{ required: true }]}>
+        <Form.Item
+          name="form_email"
+          label="Email"
+          rules={[{ required: false }]}
+        >
           <Input onChange={handleChangeInput} value={form.email} name="email" />
         </Form.Item>
 

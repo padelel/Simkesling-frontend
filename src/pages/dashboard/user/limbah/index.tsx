@@ -19,7 +19,8 @@ import { MLaporanBulanan } from "@/models/MLaporanBulanan";
 import { useLaporanBulananStore } from "@/stores/laporanBulananStore";
 import { useGlobalStore } from "@/stores/globalStore";
 import cloneDeep from "clone-deep";
-import Search from "antd/es/input/Search";
+import { parsingDate } from "@/utils/common";
+// import Search from "antd/es/input/Search";
 
 interface DataType {
   namaTransporter: any;
@@ -44,10 +45,10 @@ interface DataType {
 // ];
 
 const onChange: TableProps<DataType>["onChange"] = (
-  pagination,
-  filters,
-  sorter,
-  extra
+  pagination: any,
+  filters: any,
+  sorter: any,
+  extra: any
 ) => {
   console.log("params", pagination, filters, sorter, extra);
 };
@@ -80,28 +81,47 @@ const Index: React.FC = () => {
 
   const columns: ColumnsType<DataType> = [
     {
-      title: "Tanggal Pelaporan",
-      dataIndex: "tanggalPelaporan",
+      title: "Periode (Bulan)",
+      dataIndex: "periode_nama",
       defaultSortOrder: "descend",
-      sorter: (a, b) => a.tanggalPelaporan - b.namaTransporter,
+      sorter: (a: any, b: any) => a.periode_nama - b.periode_nama,
+    },
+    {
+      title: "Tahun",
+      dataIndex: "tahun",
+      defaultSortOrder: "descend",
+      sorter: (a: any, b: any) => a.tahun - b.tahun,
     },
     {
       title: "Nama Transporter",
       dataIndex: "namaTransporter",
       defaultSortOrder: "descend",
-      sorter: (a, b) => a.namaTransporter - b.namaTransporter,
+      sorter: (a: any, b: any) => a.namaTransporter - b.namaTransporter,
     },
     {
       title: "Berat Limbah Total",
       dataIndex: "beratLimbahTotal",
       defaultSortOrder: "descend",
-      sorter: (a, b) => a.beratLimbahTotal.localeCompare(b.beratLimbahTotal),
+      sorter: (a: any, b: any) =>
+        a.beratLimbahTotal.localeCompare(b.beratLimbahTotal),
+    },
+    {
+      title: "Tanggal Dibuat",
+      dataIndex: "created_at",
+      defaultSortOrder: "descend",
+      sorter: (a: any, b: any) => a.created_at - b.created_at,
+    },
+    {
+      title: "Tanggal Diubah",
+      dataIndex: "updated_at",
+      defaultSortOrder: "descend",
+      sorter: (a: any, b: any) => a.updated_at - b.updated_at,
     },
 
     {
       title: "Action",
       key: "action",
-      render: (_, record: MLaporanBulanan) => {
+      render: (_: any, record: MLaporanBulanan) => {
         // console.log(record);
 
         const toFormPage = (param: MLaporanBulanan) => {
@@ -115,7 +135,8 @@ const Index: React.FC = () => {
             <Button
               onClick={() => toFormPage(record)}
               icon={<EditOutlined />}
-              style={{ backgroundColor: "yellow" }}>
+              style={{ backgroundColor: "yellow" }}
+            >
               Edit
             </Button>
             <Button icon={<EyeOutlined />} type="primary">
@@ -135,9 +156,12 @@ const Index: React.FC = () => {
 
       const transformedData = responseData.map((item: any) => ({
         ...item,
-        tanggalPelaporan: item.created_at,
+        periode_nama: item.periode_nama,
+        tahun: item.tahun,
         namaTransporter: item.nama_transporter,
         beratLimbahTotal: item.berat_limbah_total,
+        created_at: parsingDate(item.created_at),
+        updated_at: parsingDate(item.updated_at),
         key: item.id_laporan_bulanan.toString(),
       }));
 
@@ -168,17 +192,18 @@ const Index: React.FC = () => {
       <div>
         <Link
           href="/dashboard/user/limbah/PageTambahLimbah?action=create"
-          passHref>
+          passHref
+        >
           <Button type="primary">Tambah Pelaporan Limbah</Button>
         </Link>
       </div>
 
       <div style={{ marginTop: "20px", marginBottom: "20px" }}>
-        <Search
+        {/* <Search
           style={{ width: 300 }}
           placeholder="Cari berdasarkasn Berat"
           onChange={(e) => doSearch(e)}
-        />
+        /> */}
         <Table
           style={{ marginTop: 20 }}
           columns={columns}

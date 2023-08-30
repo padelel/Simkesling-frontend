@@ -97,13 +97,11 @@ const FormPengajuanTransporter: React.FC = () => {
       const responseData = response.data.data.values;
 
       setKecamatanOptions(
-        responseData.map(
-          (item: { nama_kecamatan: string; id_kecamatan: number }) => ({
-            value: item.id_kecamatan.toString(),
-            label: item.nama_kecamatan,
-            id_kecamatan: item.id_kecamatan,
-          })
-        )
+        responseData.map((item: any) => ({
+          value: item.id_kecamatan,
+          label: item.nama_kecamatan,
+          id_kecamatan: item.id_kecamatan,
+        }))
       );
     } catch (error) {
       console.error("Error fetching kecamatan data:", error);
@@ -121,13 +119,11 @@ const FormPengajuanTransporter: React.FC = () => {
       const responseData = response.data.data.values;
 
       setKelurahanOptions(
-        responseData.map(
-          (item: { nama_kelurahan: string; id_kelurahan: number }) => ({
-            value: item.id_kelurahan.toString(),
-            label: item.nama_kelurahan,
-            id_kelurahan: item.id_kelurahan,
-          })
-        )
+        responseData.map((item: any) => ({
+          value: item.id_kelurahan,
+          label: item.nama_kelurahan,
+          id_kelurahan: item.id_kelurahan,
+        }))
       );
     } catch (error) {
       console.error("Error fetching kelurahan data:", error);
@@ -161,13 +157,13 @@ const FormPengajuanTransporter: React.FC = () => {
   const [showMOUFields, setShowMOUFields] = useState(false);
 
   const props: UploadProps = {
-    onRemove: (file) => {
+    onRemove: (file: any) => {
       const index = fileList.indexOf(file);
       const newFileList = fileList.slice();
       newFileList.splice(index, 1);
       setFileList(newFileList);
     },
-    beforeUpload: (file) => {
+    beforeUpload: (file: any) => {
       setFileList([...fileList, file]);
 
       return false;
@@ -304,7 +300,16 @@ const FormPengajuanTransporter: React.FC = () => {
     console.log(fileListList);
 
     // Append tgl_mulai and tgl_akhir based on dateRangeList
+    let iserror = false;
     fileListList.forEach((file, index) => {
+      if (file.length == 0) {
+        apimessageUpdate["error"]({
+          message: "Upps",
+          description: "Form ada yang masih kosong, Silahkan dilengkapi.!",
+        });
+        iserror = true;
+        return;
+      }
       console.log(typeof file[0]);
       console.log(file[0].hasOwnProperty("blob"));
       //@ts-ignore
@@ -318,7 +323,7 @@ const FormPengajuanTransporter: React.FC = () => {
       console.log(file);
       // return;
     });
-
+    if (iserror) return;
     // Append tgl_mulai and tgl_akhir based on dateRangeList
     dateRangeList.forEach((rangeDates, index) => {
       if (rangeDates.length === 2) {
@@ -472,7 +477,6 @@ const FormPengajuanTransporter: React.FC = () => {
   };
 
   const [formInstance] = Form.useForm();
-
   useLayoutEffect(() => {
     getKecamatanData();
     console.log(router.query);
@@ -521,14 +525,15 @@ const FormPengajuanTransporter: React.FC = () => {
       {contextHolderUpdate}
       <Form
         {...layout}
-        onFinish={handleSubmit}
         name="control-hooks"
         style={{ maxWidth: 600 }}
-        form={formInstance}>
+        form={formInstance}
+      >
         <Form.Item
           name="form_namatransporter"
           label="Nama Transporter"
-          rules={[{ required: true }]}>
+          rules={[{ required: true }]}
+        >
           <Input
             onChange={handleChangeInput}
             value={form.namatransporter}
@@ -542,7 +547,8 @@ const FormPengajuanTransporter: React.FC = () => {
           name="form_kecamatan"
           label="Kecamatan"
           initialValue={form.id_kecamatan}
-          rules={[{ required: true }]}>
+          rules={[{ required: true }]}
+        >
           <Select
             style={{ width: 250 }}
             showSearch
@@ -559,7 +565,8 @@ const FormPengajuanTransporter: React.FC = () => {
           name="form_kelurahan"
           label="Kelurahan"
           initialValue={form.id_kelurahan}
-          rules={[{ required: true }]}>
+          rules={[{ required: true }]}
+        >
           <Select
             style={{ width: 250 }}
             showSearch
@@ -575,7 +582,8 @@ const FormPengajuanTransporter: React.FC = () => {
         <Form.Item
           name="form_alamat"
           label="Alamat"
-          rules={[{ required: true }]}>
+          rules={[{ required: true }]}
+        >
           <TextArea
             style={{ width: 250 }}
             showCount
@@ -588,7 +596,8 @@ const FormPengajuanTransporter: React.FC = () => {
         <Form.Item
           name="form_nohp"
           label="Nomor Handphone"
-          rules={[{ required: true }]}>
+          rules={[{ required: true }]}
+        >
           <Input onChange={handleChangeInput} value={form.telp} name="telp" />
         </Form.Item>
         <Form.Item name="form_email" label="Email" rules={[{ required: true }]}>
@@ -600,7 +609,8 @@ const FormPengajuanTransporter: React.FC = () => {
         <Form.List
           name="listMouDynamic"
           initialValue={fileListList}
-          key={formListKey}>
+          key={formListKey}
+        >
           {(fields, { add, remove }) => (
             <>
               {fields.map(({ key, name, ...restField }) => (
@@ -608,7 +618,8 @@ const FormPengajuanTransporter: React.FC = () => {
                   direction="vertical"
                   size="middle"
                   key={"spaceKey" + key}
-                  style={{ display: "flex", justifyContent: "center" }}>
+                  style={{ display: "flex", justifyContent: "center" }}
+                >
                   <MinusCircleOutlined
                     onClick={() => handleRemoveRowDynamic(remove, name, key)}
                   />
@@ -624,18 +635,20 @@ const FormPengajuanTransporter: React.FC = () => {
                     ]}
                     label="Upload MOU"
                     name={"fileMOU" + key}
-                    key={"fileMOUKey" + key}>
+                    key={"fileMOUKey" + key}
+                  >
                     <div>
                       <Upload
-                        beforeUpload={(file) =>
+                        beforeUpload={(file: any) =>
                           beforeUploadFileDynamic(file, key)
                         }
-                        onChange={(v) => onChangeFileDynamic(v, key, name)}
-                        onRemove={(v) => onRemoveFileDynamic(v, key, name)}
+                        onChange={(v: any) => onChangeFileDynamic(v, key, name)}
+                        onRemove={(v: any) => onRemoveFileDynamic(v, key, name)}
                         fileList={fileListList[name]}
                         maxCount={1}
                         name={"upload" + key}
-                        key={"uploadKey" + key}>
+                        key={"uploadKey" + key}
+                      >
                         <Button icon={<UploadOutlined />}>
                           Klik Untuk Upload MOU Transporter
                         </Button>
@@ -654,11 +667,12 @@ const FormPengajuanTransporter: React.FC = () => {
                     initialValue={dateRangeList[name]}
                     label="Masa Berlaku MOU"
                     name={"masaBerlaku" + key}
-                    key={"masaBerlakuKey" + key}>
+                    key={"masaBerlakuKey" + key}
+                  >
                     <div>
                       <RangePicker
                         format="YYYY-MM-DD"
-                        onChange={(v1, v2) =>
+                        onChange={(v1: any, v2: any) =>
                           onChangeRangeDateDynamic(v1, v2, key, name)
                         }
                         defaultValue={dateRangeList[name]}
@@ -675,7 +689,8 @@ const FormPengajuanTransporter: React.FC = () => {
                   type="dashed"
                   onClick={() => handleAddRowDynamic(add)}
                   block
-                  icon={<PlusOutlined />}>
+                  icon={<PlusOutlined />}
+                >
                   Tambahkan MOU Transporter
                 </Button>
               </Form.Item>

@@ -143,13 +143,13 @@ const FormValidasiTransporter: React.FC = () => {
     showUploadList: {
       showRemoveIcon: false,
     },
-    onRemove: (file) => {
+    onRemove: (file: any) => {
       const index = fileList.indexOf(file);
       const newFileList = fileList.slice();
       newFileList.splice(index, 1);
       setFileList(newFileList);
     },
-    beforeUpload: (file) => {
+    beforeUpload: (file: any) => {
       setFileList([...fileList, file]);
 
       return false;
@@ -237,7 +237,7 @@ const FormValidasiTransporter: React.FC = () => {
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     // console.log(event);
-    console.log(event.target.name, event.target.value);
+    // console.log(event.target.name, event.target.value);
     // console.log();
     setForm({
       ...form,
@@ -360,7 +360,8 @@ const FormValidasiTransporter: React.FC = () => {
           <Form.Item
             name="form_catatan"
             label="Catatan"
-            rules={[{ required: true }]}>
+            rules={[{ required: true }]}
+          >
             <Input
               onChange={handleChangeInput}
               value={form.catatan}
@@ -444,7 +445,7 @@ const FormValidasiTransporter: React.FC = () => {
         message: "Validasi Transporter",
         description: "Pengajuan Transporter ditolak.",
         duration: 2,
-        type: "error",
+        type: "success",
       });
       router.push("/dashboard/admin/validasi");
     } catch (e) {
@@ -573,14 +574,14 @@ const FormValidasiTransporter: React.FC = () => {
     setForm(cloneDeep(tmpForm));
 
     // jika idnya kosong (dia melakukan refresh) balikin ke table
-    if (
-      pengajuanTransporterStore.id_transporter_tmp == null ||
-      pengajuanTransporterStore.id_transporter_tmp == 0
-    ) {
-      router.push("/dashboard/admin/validasi");
-      return;
-    }
     if (router.query.action === "edit" || router.query.action === "validasi") {
+      if (
+        pengajuanTransporterStore.id_transporter_tmp == null ||
+        pengajuanTransporterStore.id_transporter_tmp == 0
+      ) {
+        router.push("/dashboard/admin/validasi");
+        return;
+      }
       // jika edit set valuenya
       setForm({
         status_transporter:
@@ -620,11 +621,13 @@ const FormValidasiTransporter: React.FC = () => {
         onFinish={handleSubmit}
         name="control-hooks"
         style={{ maxWidth: 600 }}
-        form={formInstance}>
+        form={formInstance}
+      >
         <Form.Item
           name="form_namatransporter"
           label="Nama Transporter"
-          rules={[{ required: true }]}>
+          rules={[{ required: true }]}
+        >
           <Input
             disabled={true}
             onChange={handleChangeInput}
@@ -644,7 +647,8 @@ const FormValidasiTransporter: React.FC = () => {
           name="form_kecamatan"
           label="Kecamatan"
           initialValue={form.id_kecamatan}
-          rules={[{ required: true }]}>
+          rules={[{ required: true }]}
+        >
           <Select
             disabled={true}
             style={{ width: 250 }}
@@ -662,7 +666,8 @@ const FormValidasiTransporter: React.FC = () => {
           name="form_kelurahan"
           label="Kelurahan"
           initialValue={form.id_kelurahan}
-          rules={[{ required: true }]}>
+          rules={[{ required: true }]}
+        >
           <Select
             disabled={true}
             style={{ width: 250 }}
@@ -679,7 +684,8 @@ const FormValidasiTransporter: React.FC = () => {
         <Form.Item
           name="form_alamat"
           label="Alamat"
-          rules={[{ required: true }]}>
+          rules={[{ required: true }]}
+        >
           <TextArea
             disabled={true}
             style={{ width: 250 }}
@@ -693,7 +699,8 @@ const FormValidasiTransporter: React.FC = () => {
         <Form.Item
           name="form_nohp"
           label="Nomor Handphone"
-          rules={[{ required: true }]}>
+          rules={[{ required: true }]}
+        >
           <Input
             onChange={handleChangeInput}
             value={form.telp}
@@ -715,7 +722,8 @@ const FormValidasiTransporter: React.FC = () => {
         <Form.List
           name="listMouDynamic"
           initialValue={fileListList}
-          key={formListKey}>
+          key={formListKey}
+        >
           {(fields, { add, remove }) => (
             <>
               {fields.map(({ key, name, ...restField }) => (
@@ -723,7 +731,8 @@ const FormValidasiTransporter: React.FC = () => {
                   direction="vertical"
                   size="middle"
                   key={"spaceKey" + key}
-                  style={{ display: "flex", justifyContent: "center" }}>
+                  style={{ display: "flex", justifyContent: "center" }}
+                >
                   <Form.Item
                     rules={[
                       {
@@ -735,17 +744,19 @@ const FormValidasiTransporter: React.FC = () => {
                     ]}
                     label="Upload MOU"
                     name={"fileMOU" + key}
-                    key={"fileMOUKey" + key}>
+                    key={"fileMOUKey" + key}
+                  >
                     <div>
                       <Upload
                         {...props}
-                        beforeUpload={(file) =>
+                        beforeUpload={(file: any) =>
                           beforeUploadFileDynamic(file, key)
                         }
                         fileList={fileListList[name]}
                         maxCount={1}
                         name={"upload" + key}
-                        key={"uploadKey" + key}></Upload>
+                        key={"uploadKey" + key}
+                      ></Upload>
                     </div>
                   </Form.Item>
                   <Form.Item
@@ -760,12 +771,13 @@ const FormValidasiTransporter: React.FC = () => {
                     initialValue={dateRangeList[name]}
                     label="Masa Berlaku MOU"
                     name={"masaBerlaku" + key}
-                    key={"masaBerlakuKey" + key}>
+                    key={"masaBerlakuKey" + key}
+                  >
                     <div>
                       <RangePicker
                         disabled={true}
                         format="YYYY-MM-DD"
-                        onChange={(v1, v2) =>
+                        onChange={(v1: any, v2: any) =>
                           onChangeRangeDateDynamic(v1, v2, key, name)
                         }
                         defaultValue={dateRangeList[name]}
@@ -788,7 +800,8 @@ const FormValidasiTransporter: React.FC = () => {
             onConfirm={handleSubmit}
             onCancel={handleTolak}
             okText="Validasi"
-            cancelText="Tolak">
+            cancelText="Tolak"
+          >
             <Button>Validasi</Button>
           </Popconfirm>
         </Form.Item>

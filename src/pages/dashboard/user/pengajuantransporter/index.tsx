@@ -1,5 +1,5 @@
 import MainLayout from "@/components/MainLayout";
-import { Button, Space, Modal, Popconfirm, notification } from "antd";
+import { Button, Space, Modal, Popconfirm, notification, Tag } from "antd";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { Table } from "antd";
@@ -18,7 +18,8 @@ import { useRouter } from "next/router";
 import { useGlobalStore } from "@/stores/globalStore";
 import cloneDeep from "clone-deep";
 import { url } from "inspector";
-import Search from "antd/es/input/Search";
+// import Search from "antd/es/input/Search";
+import { parsingDate } from "@/utils/common";
 
 type NotificationType = "success" | "info" | "warning" | "error";
 
@@ -33,10 +34,10 @@ interface DataType {
 }
 
 const onChange: TableProps<DataType>["onChange"] = (
-  pagination,
-  filters,
-  sorter,
-  extra
+  pagination: any,
+  filters: any,
+  sorter: any,
+  extra: any
 ) => {
   console.log("params", pagination, filters, sorter, extra);
 };
@@ -88,13 +89,15 @@ const Index: React.FC = () => {
       title: "Nama Transporter",
       dataIndex: "namaTransporter",
       defaultSortOrder: "ascend",
-      sorter: (a, b) => a.namaTransporter.length - b.namaTransporter.length,
+      sorter: (a: any, b: any) =>
+        a.namaTransporter.length - b.namaTransporter.length,
     },
     {
       title: "Tanggal Pengajuan",
       dataIndex: "tanggalPengajuan",
       // defaultSortOrder: "descend",
-      sorter: (a, b) => a.tanggalPengajuan.localeCompare(b.tanggalPengajuan),
+      sorter: (a: any, b: any) =>
+        a.tanggalPengajuan.localeCompare(b.tanggalPengajuan),
     },
     {
       title: "Status Pengajuan",
@@ -112,23 +115,40 @@ const Index: React.FC = () => {
 
       // specify the condition of filtering result
       // here is that finding the name started with `value`
-      render: (status: string) => {
-        if (status === "1") {
-          return "Menunggu";
-        } else if (status === "0") {
-          return "Ditolak";
-        } else if (status === "2") {
-          return "Aktif";
+      render: (status: any) => {
+        let sts = "-- ups --";
+        let color = "-";
+        if (status == 1) {
+          color = "geekblue";
+          sts = "Menunggu";
         }
-        return "Unknown"; // Handle other cases if needed
+        if (status == 2) {
+          color = "green";
+          sts = "Diterima";
+        }
+        if (status == 0) {
+          color = "volcano";
+          sts = "Ditolak";
+        }
+        return (
+          <>
+            <Tag color={color}>{sts.toUpperCase()}</Tag>
+          </>
+        );
       },
-      sorter: (a, b) => a.status.localeCompare(b.status),
+      sorter: (a: any, b: any) => a.status.localeCompare(b.status),
+    },
+    {
+      title: "Catatan",
+      dataIndex: "catatan",
+      defaultSortOrder: "ascend",
+      sorter: (a: any, b: any) => a.catatan.length - b.catatan.length,
     },
 
     {
       title: "Action",
       key: "action",
-      render: (_, record: MPengajuanTransporter) => {
+      render: (_: any, record: MPengajuanTransporter) => {
         // console.log(record);
 
         const toFormPage = (param: MPengajuanTransporter) => {
@@ -144,13 +164,17 @@ const Index: React.FC = () => {
             <Button
               onClick={() => toFormPage(record)}
               icon={<EditOutlined />}
-              style={{ backgroundColor: "yellow" }}>
+              style={{ backgroundColor: "yellow" }}
+            >
               Edit
             </Button>
             <Button
               icon={<EyeOutlined />}
               type="primary"
-              onClick={() => handleViewClick(record.id_transporter_tmp)}>
+              onClick={() =>
+                handleViewClick(record.id_transporter_tmp?.toString() ?? "")
+              }
+            >
               View
             </Button>
             <Popconfirm
@@ -158,8 +182,9 @@ const Index: React.FC = () => {
               description="Apakah anda yakin untuk menghapus Transporter Anda?"
               onConfirm={() => {
                 // setForm({ oldid: record.id_transporter_tmp }); // Set oldid when delete button is clicked
-                handleDelete(record.id_transporter_tmp);
-              }}>
+                handleDelete(record.id_transporter_tmp?.toString() ?? "");
+              }}
+            >
               <Button icon={<DeleteOutlined />} type="primary" danger>
                 Delete
               </Button>
@@ -179,8 +204,9 @@ const Index: React.FC = () => {
       const transformedData = responseData.map((item: any) => ({
         ...item,
         namaTransporter: item.nama_transporter,
-        tanggalPengajuan: item.created_at,
-        status: item.statusactive_transporter_tmp,
+        tanggalPengajuan: parsingDate(item.created_at),
+        status: item.status_transporter_tmp,
+        catatan: item.catatan,
         key: item.id_transporter_tmp.toString(),
       }));
 
@@ -213,7 +239,8 @@ const Index: React.FC = () => {
       <div>
         <Link
           href="/dashboard/user/pengajuantransporter/PagePengajuanTransporter"
-          passHref>
+          passHref
+        >
           <Button type="primary">Tambah Transporter</Button>
         </Link>
         <Button type="primary" onClick={() => getData()}>
@@ -222,11 +249,11 @@ const Index: React.FC = () => {
       </div>
 
       <div style={{ marginTop: "20px" }}>
-        <Search
+        {/* <Search
           style={{ width: 300 }}
           placeholder="Cari Nama Transporter"
           onChange={(e) => doSearch(e)}
-        />
+        /> */}
         <Table
           style={{ marginTop: 20 }}
           columns={columns}

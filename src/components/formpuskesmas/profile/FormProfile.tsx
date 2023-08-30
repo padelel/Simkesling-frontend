@@ -17,6 +17,9 @@ import type { DatePickerProps, RangePickerProps } from "antd/es/date-picker";
 import { RcFile, UploadChangeParam } from "antd/es/upload";
 import { useUserLoginStore } from "@/stores/userLoginStore";
 import { useGlobalStore } from "@/stores/globalStore";
+import { MUser, User } from "@/models/MUser";
+import apifile from "@/utils/HttpRequestFile";
+import Notif from "@/utils/Notif";
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -48,7 +51,8 @@ const FormProfile = () => {
   const [fileTps, setFileTps] = useState<UploadFile[]>([]);
   const [fileIpal, setFileIpal] = useState<UploadFile[]>([]);
   const [uploading, setUploading] = useState(false);
-  const [form, setForm] = useState({
+
+  let tmpForm = {
     nama: "",
     noizin: "",
     id_kecamatan: "",
@@ -56,7 +60,12 @@ const FormProfile = () => {
     alamat: "",
     telp: "",
     email: "",
-  });
+    level: "",
+    username: "",
+    password: "",
+    oldid: "",
+  };
+  const [form, setForm] = useState(tmpForm);
 
   const beforeUploadFileDynamic = (file: RcFile) => {
     return false;
@@ -149,61 +158,221 @@ const FormProfile = () => {
     });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     console.log(form);
     console.log(fileTps);
     console.log(fileIpal);
+
+    let dataForm: any = new FormData();
+    dataForm.append("oldid", form.oldid);
+    dataForm.append("nama_user", form.nama);
+    dataForm.append("username", form.username);
+    dataForm.append("password", form.password);
+    dataForm.append("noreg_tempat", form.noizin);
+    dataForm.append("level", form.level);
+    dataForm.append("id_kecamatan", form.id_kecamatan);
+    dataForm.append("id_kelurahan", form.id_kelurahan);
+    dataForm.append("alamat_tempat", form.alamat);
+    dataForm.append("notlp", form.telp);
+    dataForm.append("email", form.email);
+
+    if (fileTps.length > 0) {
+      let file = fileTps[0];
+      if (file.hasOwnProperty("blob")) {
+        // @ts-ignore
+        dataForm.append("file_izin_tps", file.blob);
+      } else {
+        dataForm.append("file_izin_tps", file.originFileObj);
+      }
+    }
+    if (fileIpal.length > 0) {
+      let file = fileIpal[0];
+      if (file.hasOwnProperty("blob")) {
+        // @ts-ignore
+        dataForm.append("file_izin_ipal", file.blob);
+      } else {
+        dataForm.append("file_izin_ipal", file.originFileObj);
+      }
+    }
+
+    let url = "/user/puskesmas-rumahsakit/update";
+    try {
+      if (globalStore.setLoading) globalStore.setLoading(true);
+      let responsenya = await api.post(url, dataForm);
+      Notif("success", "Success.!", "Berhasil Update Profil");
+      getDataProfile();
+    } catch (e) {
+      console.error(e);
+    } finally {
+      if (globalStore.setLoading) globalStore.setLoading(false);
+    }
   };
 
+  const getFile = async (file: any) => {
+    try {
+      if (globalStore.setLoading) globalStore.setLoading(true);
+      if (file == null) return null;
+      let arrname = file.split("/");
+      let filename = arrname[arrname.length - 1];
+      const resp = await apifile.get(
+        `${file}?${Math.random().toString().replaceAll(".", "")}`,
+        {
+          responseType: "arraybuffer",
+        }
+      ); // Set responseType to 'arraybuffer'
+      const filenya = resp.data;
+      const typefile = resp.headers["content-type"];
+
+      // Create a Blob from the response data
+      const blob = new Blob([filenya], { type: typefile });
+
+      // Create a Blob URL
+      const blobUrl = URL.createObjectURL(blob);
+      return {
+        uid: new Date().toISOString(),
+        name: filename,
+        status: "done",
+        url: blobUrl,
+        blob: blob,
+      };
+    } catch (error) {
+      console.error("-- error in getfile --");
+      console.error("Error fetching or processing data:", error);
+    } finally {
+      if (globalStore.setLoading) globalStore.setLoading(false);
+    }
+  };
   const [formInstance] = Form.useForm();
-
-  useEffect(() => {
-    getKecamatanData();
-
-    // console.log("nin");
-    // console.log(userLoginStore.user);
+  const getDataProfile = async () => {
+    await getKecamatanData();
+    const resp = await api.post("/user/puskesmas-rumahsakit/data-profile");
+    const user: User = resp.data.data.data;
+    console.log(user);
     setForm({
       ...form,
-      nama: userLoginStore.user?.nama_user ?? "",
-      noizin: userLoginStore.user?.noreg_tempat ?? "",
-      id_kecamatan: userLoginStore.user?.id_kecamatan?.toString() ?? "",
-      id_kelurahan: userLoginStore.user?.id_kelurahan?.toString() ?? "",
-      alamat: userLoginStore.user?.alamat_tempat ?? "",
-      telp: userLoginStore.user?.notlp ?? "",
-      email: userLoginStore.user?.email ?? "",
+      oldid: user.id_user?.toString() ?? "",
+      username: user.username?.toString() ?? "",
+      password: "",
+      level: user.level?.toString() ?? "",
+      nama: user.nama_user ?? "",
+      noizin: user?.noreg_tempat ?? "",
+      id_kecamatan: user?.id_kecamatan?.toString() ?? "",
+      id_kelurahan: user?.id_kelurahan?.toString() ?? "",
+      alamat: user?.alamat_tempat ?? "",
+      telp: user?.notlp ?? "",
+      email: user?.email ?? "",
     });
+    const fileTps = await getFile(user?.izin_tps);
+    const fileIpal = await getFile(user?.izin_ipal);
+    if (fileTps) {
+      setFileTps([fileTps] as any[]);
+      formInstance.setFieldsValue({
+        listFileTps: [fileTps],
+      });
+    }
+    if (fileIpal) {
+      setFileIpal([fileIpal] as any[]);
+      formInstance.setFieldsValue({
+        listFileIpal: [fileIpal],
+      });
+    }
+    console.log(fileTps);
+
+    console.log(fileIpal);
+    //     listFileTps
+    // listFileIpal
+    // setFileTps(user?.izin_tps ?? [])
+    // setFileIpal(user?.izin_ipal ?? [])
     formInstance.setFieldsValue({
-      form_nama: userLoginStore.user?.nama_user ?? "",
-      form_noIzin: userLoginStore.user?.noreg_tempat ?? "",
-      form_kecamatan: userLoginStore.user?.id_kecamatan ?? "",
-      form_kelurahan: userLoginStore.user?.id_kelurahan ?? "",
-      form_alamat: userLoginStore.user?.alamat_tempat ?? "",
-      form_notelp: userLoginStore.user?.notlp ?? "",
-      form_email: userLoginStore.user?.email ?? "",
+      form_username: user?.username ?? "",
+      form_password: "",
+      form_nama: user?.nama_user ?? "",
+      form_noIzin: user?.noreg_tempat ?? "",
+      form_kecamatan: user?.id_kecamatan?.toString() ?? "",
+      form_kelurahan: user?.id_kelurahan?.toString() ?? "",
+      form_alamat: user?.alamat_tempat ?? "",
+      form_notelp: user?.notlp ?? "",
+      form_email: user?.email ?? "",
     });
-    getKelurahanData(parseInt(userLoginStore.user?.id_kecamatan ?? "0"));
+    let id_kec = user?.id_kecamatan ?? 0;
+    getKelurahanData(parseInt(id_kec.toString()));
+  };
+
+  useEffect(() => {
+    console.log("profile");
+    console.log(userLoginStore.user);
+
+    getDataProfile();
+
+    // setForm({
+    //   ...form,
+    //   nama: userLoginStore.user?.nama_user ?? "",
+    //   noizin: userLoginStore.user?.noreg_tempat ?? "",
+    //   id_kecamatan: userLoginStore.user?.id_kecamatan?.toString() ?? "",
+    //   id_kelurahan: userLoginStore.user?.id_kelurahan?.toString() ?? "",
+    //   alamat: userLoginStore.user?.alamat_tempat ?? "",
+    //   telp: userLoginStore.user?.notlp ?? "",
+    //   email: userLoginStore.user?.email ?? "",
+    // });
+    // formInstance.setFieldsValue({
+    //   form_nama: userLoginStore.user?.nama_user ?? "",
+    //   form_noIzin: userLoginStore.user?.noreg_tempat ?? "",
+    //   form_kecamatan: userLoginStore.user?.id_kecamatan ?? "",
+    //   form_kelurahan: userLoginStore.user?.id_kelurahan ?? "",
+    //   form_alamat: userLoginStore.user?.alamat_tempat ?? "",
+    //   form_notelp: userLoginStore.user?.notlp ?? "",
+    //   form_email: userLoginStore.user?.email ?? "",
+    // });
+    // let id_kec = userLoginStore.user?.id_kecamatan ?? 0;
+    // getKelurahanData(parseInt(id_kec.toString()));
   }, []);
   return (
     <>
       <div style={{ display: "flex", justifyContent: "center" }}>
         <h2>Profile Saya</h2>
+        {/* <Button onClick={() => getDataProfile()}>GetProfile</Button> */}
       </div>
       <div style={{ justifyContent: "center" }}>
         <Form
           form={formInstance}
           onFinish={handleSubmit}
           {...layout}
-          name="control-hooks">
+          name="control-hooks"
+        >
+          <Form.Item
+            name="form_username"
+            label="Username"
+            rules={[{ required: true }]}
+          >
+            <Input
+              onChange={handleChangeInput}
+              value={form.username}
+              name="username"
+            />
+          </Form.Item>
+          <Form.Item
+            name="password"
+            label="Password (silahkan isi jika ingin mengganti password)"
+            rules={[]}
+          >
+            <Input.Password
+              onChange={handleChangeInput}
+              value={form.password}
+              name="password"
+            />
+          </Form.Item>
           <Form.Item
             name="form_nama"
             label="Nama Puskemas/RS"
-            rules={[{ required: true }]}>
+            rules={[{ required: true }]}
+          >
             <Input onChange={handleChangeInput} value={form.nama} name="nama" />
           </Form.Item>
           <Form.Item
             name="form_noIzin"
             label="Nomor Izin"
-            rules={[{ required: true }]}>
+            rules={[{ required: true }]}
+          >
             <Input
               onChange={handleChangeInput}
               value={form.noizin}
@@ -214,7 +383,8 @@ const FormProfile = () => {
             name="form_kecamatan"
             label="Kecamatan"
             initialValue={form.id_kecamatan}
-            rules={[{ required: true }]}>
+            rules={[{ required: true }]}
+          >
             <Select
               style={{ width: 250 }}
               showSearch
@@ -231,7 +401,8 @@ const FormProfile = () => {
             name="form_kelurahan"
             label="Kelurahan"
             initialValue={form.id_kelurahan}
-            rules={[{ required: true }]}>
+            rules={[{ required: true }]}
+          >
             <Select
               style={{ width: 250 }}
               showSearch
@@ -248,7 +419,8 @@ const FormProfile = () => {
           <Form.Item
             name="form_alamat"
             label="Alamat"
-            rules={[{ required: true }]}>
+            rules={[{ required: true }]}
+          >
             <TextArea
               name="alamat"
               showCount
@@ -260,13 +432,15 @@ const FormProfile = () => {
           <Form.Item
             name="form_notelp"
             label="Nomor Telepon"
-            rules={[{ required: true }]}>
+            rules={[{ required: true }]}
+          >
             <Input onChange={handleChangeInput} value={form.telp} name="telp" />
           </Form.Item>
           <Form.Item
             name="form_email"
             label="Email"
-            rules={[{ required: true }]}>
+            rules={[{ required: true }]}
+          >
             <Input
               onChange={handleChangeInput}
               value={form.email}
@@ -278,17 +452,20 @@ const FormProfile = () => {
             name="listFileTps"
             rules={[
               {
-                required: true,
+                required: false,
                 message: "Upload File TPS",
               },
             ]}
-            label="Upload TPS">
+            label="Upload TPS"
+            initialValue={fileTps}
+          >
             <div>
               <Upload
-                beforeUpload={(file) => beforeUploadFileDynamic(file)}
+                beforeUpload={(file: any) => beforeUploadFileDynamic(file)}
                 fileList={fileTps}
                 maxCount={1}
-                onChange={(file) => setFileTps(file.fileList)}>
+                onChange={(file: any) => setFileTps(file.fileList)}
+              >
                 <Button icon={<UploadOutlined />}>Klik Untuk Upload TPS</Button>
               </Upload>
             </div>
@@ -298,17 +475,20 @@ const FormProfile = () => {
             name="listFileIpal"
             rules={[
               {
-                required: true,
+                required: false,
                 message: "Upload File IPAL",
               },
             ]}
-            label="Upload IPAL">
+            label="Upload IPAL"
+            initialValue={fileIpal}
+          >
             <div>
               <Upload
-                beforeUpload={(file) => beforeUploadFileDynamic(file)}
+                beforeUpload={(file: any) => beforeUploadFileDynamic(file)}
                 fileList={fileIpal}
                 maxCount={1}
-                onChange={(file) => setFileIpal(file.fileList)}>
+                onChange={(file: any) => setFileIpal(file.fileList)}
+              >
                 <Button icon={<UploadOutlined />}>
                   Klik Untuk Upload IPAL
                 </Button>

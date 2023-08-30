@@ -14,12 +14,14 @@ type NotificationType = "success" | "info" | "warning" | "error";
 
 const Notif = (
   type: NotificationType,
-  message: string = "",
-  description: string = ""
+  message: any = "",
+  description: any = "",
+  duration: number = 5
 ) => {
   notification[type]({
     message,
     description,
+    duration,
   });
 };
 export default Notif;

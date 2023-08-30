@@ -1,5 +1,5 @@
 import MainLayout from "@/components/MainLayout";
-import { Button, Space, Modal } from "antd";
+import { Button, Space, Modal, Tag } from "antd";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { Table } from "antd";
@@ -16,6 +16,7 @@ import { MPengajuanTransporter } from "../../../../models/MPengajuanTransporter"
 import { usePengajuanTransporterStore } from "@/stores/pengajuanTransporterStore";
 import { useRouter } from "next/router";
 import ModalValidasiTransporter from "@/components/admin/validasi/ModalValidasiTransporter";
+import { parsingDate } from "@/utils/common";
 
 interface DataType {
   status: any;
@@ -42,10 +43,10 @@ interface DataType {
 // ];
 
 const onChange: TableProps<DataType>["onChange"] = (
-  pagination,
-  filters,
-  sorter,
-  extra
+  pagination: any,
+  filters: any,
+  sorter: any,
+  extra: any
 ) => {
   console.log("params", pagination, filters, sorter, extra);
 };
@@ -76,16 +77,24 @@ const Index: React.FC = () => {
 
   const columns: ColumnsType<DataType> = [
     {
+      title: "Nama Puskesmas",
+      dataIndex: "namaPuskesmas",
+      defaultSortOrder: "ascend",
+      sorter: (a: any, b: any) =>
+        a.namaPuskesmas.length - b.namaPuskesmas.length,
+    },
+    {
       title: "Nama Transporter",
       dataIndex: "namaTransporter",
       defaultSortOrder: "descend",
-      sorter: (a, b) => a.namaTransporter - b.namaTransporter,
+      sorter: (a: any, b: any) => a.namaTransporter - b.namaTransporter,
     },
     {
       title: "Tanggal Pengajuan",
       dataIndex: "tanggalPengajuan",
       defaultSortOrder: "descend",
-      sorter: (a, b) => a.tanggalPengajuan.localeCompare(b.tanggalPengajuan),
+      sorter: (a: any, b: any) =>
+        a.tanggalPengajuan.localeCompare(b.tanggalPengajuan),
     },
     {
       title: "Status Pengajuan",
@@ -102,45 +111,38 @@ const Index: React.FC = () => {
       ],
       // specify the condition of filtering result
       // here is that finding the name started with `value`
-      render: (status: string) => {
-        if (status === "1") {
-          return "Menunggu";
-        } else if (status === "0") {
-          return "Ditolak";
-        } else if (status === "2") {
-          return "Aktif";
+      render: (status: any) => {
+        let sts = "-- ups --";
+        let color = "-";
+        if (status == 1) {
+          color = "geekblue";
+          sts = "Menunggu";
         }
-        return "Unknown"; // Handle other cases if needed
+        if (status == 2) {
+          color = "green";
+          sts = "Diterima";
+        }
+        if (status == 0) {
+          color = "volcano";
+          sts = "Ditolak";
+        }
+        return (
+          <>
+            <Tag color={color}>{sts.toUpperCase()}</Tag>
+          </>
+        );
       },
-      sorter: (a, b) => a.status.localeCompare(b.status),
     },
-
-    // {
-    //   title: "Action",
-    //   key: "action",
-    //   render: (_, record: MPengajuanTransporter) => {
-    //     // console.log(record);
-
-    //     const toFormPage = (param: MPengajuanTransporter) => {
-    //       if (pengajuanTransporterStore.simpenSementara) {
-    //         pengajuanTransporterStore.simpenSementara(param);
-    //         router.push(
-    //           "/dashboard/admin/manajemen/transporter/PengajuanTransporter"
-    //         );
-    //       }
-    //     };
-    //     return (
-    //       <Space size="middle">
-    //         <ModalValidasiTransporter />
-    //       </Space>
-    //     );
-    //   },
-    // },
-
+    {
+      title: "Catatan",
+      dataIndex: "catatan",
+      defaultSortOrder: "ascend",
+      sorter: (a: any, b: any) => a.catatan.length - b.catatan.length,
+    },
     {
       title: "Action",
       key: "action",
-      render: (_, record: MPengajuanTransporter) => {
+      render: (_: any, record: MPengajuanTransporter) => {
         // console.log(record);
 
         const toFormPage = (param: MPengajuanTransporter) => {
@@ -156,7 +158,8 @@ const Index: React.FC = () => {
             <Button
               onClick={() => toFormPage(record)}
               icon={<EditOutlined />}
-              style={{ backgroundColor: "yellow" }}>
+              style={{ backgroundColor: "yellow" }}
+            >
               Validasi
             </Button>
           </Space>
@@ -173,9 +176,11 @@ const Index: React.FC = () => {
 
       const transformedData = responseData.map((item: any) => ({
         ...item,
-        namaTransporter: item.catatan,
-        tanggalPengajuan: item.created_at,
+        namaPuskesmas: item.user.nama_user,
+        namaTransporter: item.nama_transporter,
+        tanggalPengajuan: parsingDate(item.created_at),
         status: item.status_transporter_tmp,
+        catatan: item.catatan,
         key: item.id_transporter_tmp.toString(),
       }));
 

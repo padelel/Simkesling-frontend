@@ -43,10 +43,10 @@ interface DataType {
 // ];
 
 const onChange: TableProps<DataType>["onChange"] = (
-  pagination,
-  filters,
-  sorter,
-  extra
+  pagination: any,
+  filters: any,
+  sorter: any,
+  extra: any
 ) => {
   console.log("params", pagination, filters, sorter, extra);
 };
@@ -81,25 +81,27 @@ const Index: React.FC = () => {
       title: "Nama Transporter",
       dataIndex: "namaTransporter",
       defaultSortOrder: "descend",
-      sorter: (a, b) => a.namaTransporter - b.namaTransporter,
+      sorter: (a: any, b: any) => a.namaTransporter - b.namaTransporter,
     },
     {
       title: "Tanggal Pengajuan",
       dataIndex: "tanggalPengajuan",
       defaultSortOrder: "descend",
-      sorter: (a, b) => a.tanggalPengajuan.localeCompare(b.tanggalPengajuan),
+      sorter: (a: any, b: any) =>
+        a.tanggalPengajuan.localeCompare(b.tanggalPengajuan),
     },
     {
       title: "Tanggal Berakhir",
       dataIndex: "tanggalBerakhir",
       defaultSortOrder: "descend",
-      sorter: (a, b) => a.tanggalBerakhir.localeCompare(b.tanggalBerakhir),
+      sorter: (a: any, b: any) =>
+        a.tanggalBerakhir.localeCompare(b.tanggalBerakhir),
     },
 
     {
       title: "Action",
       key: "action",
-      render: (_, record: MPengajuanTransporter) => {
+      render: (_: any, record: MPengajuanTransporter) => {
         // console.log(record);
 
         const toFormPage = (param: MPengajuanTransporter) => {
@@ -115,7 +117,8 @@ const Index: React.FC = () => {
             <Button
               onClick={() => toFormPage(record)}
               icon={<EditOutlined />}
-              style={{ backgroundColor: "yellow" }}>
+              style={{ backgroundColor: "yellow" }}
+            >
               Edit
             </Button>
             <Button icon={<EyeOutlined />} type="primary">
@@ -125,7 +128,8 @@ const Index: React.FC = () => {
               onClick={showDeleteConfirm}
               icon={<DeleteOutlined />}
               type="primary"
-              danger>
+              danger
+            >
               Delete
             </Button>
           </Space>
@@ -163,13 +167,13 @@ const Index: React.FC = () => {
 
   return (
     <MainLayout title="Pengajuan Transporter">
-      <div>
+      {/* <div>
         <Link
           href="/dashboard/user/pengajuantransporter/PagePengajuanTransporter"
           passHref>
           <Button type="primary">Tambah Transporter</Button>
         </Link>
-      </div>
+      </div> */}
 
       <div style={{ marginTop: "20px" }}>
         <Table columns={columns} dataSource={data} onChange={onChange} />;
