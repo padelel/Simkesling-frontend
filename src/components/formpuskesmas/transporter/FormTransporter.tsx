@@ -26,7 +26,7 @@ import type { Dayjs } from "dayjs";
 import { DatePicker, Space } from "antd";
 import { RcFile, UploadChangeParam } from "antd/es/upload";
 import api from "@/utils/HttpRequest";
-import { usePengajuanTransporterStore } from "@/stores/pengajuanTransporterStore";
+import { useTransporterStore } from "@/stores/transporterStore";
 import apifile from "@/utils/HttpRequestFile";
 import axios from "axios";
 import { fileTypeFromStream } from "file-type";
@@ -67,21 +67,19 @@ const FormPengajuanTransporter: React.FC = () => {
   const openNotificationCreate = (type: NotificationType) => {
     apimessageCreate[type]({
       message: "Tambah Transporter",
-      description:
-        "Transporter Berhasil Ditambahkan, silahkan tunggu validasi Admin",
+      description: "Transporter Berhasil Ditambahkan",
     });
   };
 
   const openNotificationUpdate = (type: NotificationType) => {
     apimessageUpdate[type]({
       message: "Update Transporter",
-      description:
-        "Transporter Berhasil Diupdate, silahkan tunggu validasi Admin",
+      description: "Transporter Berhasil Diupdate",
     });
   };
 
   const [formListKey, setFormListKey] = useState(new Date().toISOString());
-  const pengajuanTransporterStore = usePengajuanTransporterStore();
+  const transporterStore = useTransporterStore();
   const [kecamatanOptions, setKecamatanOptions] = useState<
     { value: string; label: string; id_kecamatan: number }[]
   >([]);
@@ -344,9 +342,9 @@ const FormPengajuanTransporter: React.FC = () => {
       }
     });
 
-    let url = "/user/pengajuan-transporter/create";
+    let url = "/user/transporter/create";
     if (router.query.action == "edit") {
-      url = "/user/pengajuan-transporter/update";
+      url = "/user/transporter/update";
     }
 
     if (router.query.action == "validasi") {
@@ -364,7 +362,7 @@ const FormPengajuanTransporter: React.FC = () => {
       } else {
         openNotificationCreate("success");
       }
-      router.push("/dashboard/user/pengajuantransporter");
+      router.push("/dashboard/user/transporter");
     } catch (e) {
       console.error(e);
     } finally {
@@ -425,12 +423,12 @@ const FormPengajuanTransporter: React.FC = () => {
     }
   };
   const getFilesHere = async () => {
-    let lengthfile = pengajuanTransporterStore.files?.length ?? 0;
+    let lengthfile = transporterStore.files?.length ?? 0;
     let arrfile = [];
     for (let index = 0; index < lengthfile; index++) {
       // const element = array[index];
-      if (pengajuanTransporterStore.files) {
-        let val = pengajuanTransporterStore.files[index];
+      if (transporterStore.files) {
+        let val = transporterStore.files[index];
         let tmpfile = await getFile(val.file1);
         // let tmpawal = await setDateRangeList(val.tgl_mulai);
         arrfile.push([tmpfile]);
@@ -448,12 +446,12 @@ const FormPengajuanTransporter: React.FC = () => {
     getDatesHere();
   };
   const getDatesHere = async () => {
-    let lengthdate = pengajuanTransporterStore.files?.length ?? 0;
+    let lengthdate = transporterStore.files?.length ?? 0;
     let arrdate = [];
     for (let index = 0; index < lengthdate; index++) {
       // const element = array[index];
-      if (pengajuanTransporterStore.files) {
-        let val = pengajuanTransporterStore.files[index];
+      if (transporterStore.files) {
+        let val = transporterStore.files[index];
         // let tmpfile = await getFile(val.file1);
         // arrdate.push([tmpfile]);
         // console.log(val);
@@ -486,42 +484,48 @@ const FormPengajuanTransporter: React.FC = () => {
   useLayoutEffect(() => {
     getKecamatanData();
     console.log(router.query);
-    console.log(Object.values(pengajuanTransporterStore));
-    console.log(pengajuanTransporterStore);
+    console.log(Object.values(transporterStore));
+    console.log(transporterStore);
 
     // jika create
     formInstance.resetFields();
     setForm(cloneDeep(tmpForm));
 
     if (router.query.action === "edit") {
+      if (
+        transporterStore.id_transporter == null ||
+        transporterStore.id_transporter == 0
+      ) {
+        router.push("/dashboard/user/transporter");
+        return;
+      }
       // jika edit set valuenya
       setForm({
         status_transporter:
-          pengajuanTransporterStore.status_transporter_tmp?.toString() ?? "",
-        oldid: pengajuanTransporterStore.id_transporter_tmp?.toString() ?? "",
-        namatransporter:
-          pengajuanTransporterStore.nama_transporter?.toString() ?? "",
-        npwp: pengajuanTransporterStore.npwp_transporter?.toString() ?? "",
-        id_kecamatan: pengajuanTransporterStore.id_kecamatan?.toString() ?? "",
-        id_kelurahan: pengajuanTransporterStore.id_kelurahan?.toString() ?? "",
-        alamat: pengajuanTransporterStore.alamat_transporter?.toString() ?? "",
-        telp: pengajuanTransporterStore.nohp?.toString() ?? "",
-        email: pengajuanTransporterStore.email?.toString() ?? "",
-        catatan: pengajuanTransporterStore.catatan?.toString() ?? "",
+          transporterStore.status_transporter?.toString() ?? "",
+        oldid: transporterStore.id_transporter?.toString() ?? "",
+        namatransporter: transporterStore.nama_transporter?.toString() ?? "",
+        npwp: transporterStore.npwp_transporter?.toString() ?? "",
+        id_kecamatan: transporterStore.id_kecamatan?.toString() ?? "",
+        id_kelurahan: transporterStore.id_kelurahan?.toString() ?? "",
+        alamat: transporterStore.alamat_transporter?.toString() ?? "",
+        telp: transporterStore.nohp?.toString() ?? "",
+        email: transporterStore.email?.toString() ?? "",
+        catatan: transporterStore.catatan?.toString() ?? "",
       });
 
       formInstance.setFieldsValue({
-        form_namatransporter: pengajuanTransporterStore.nama_transporter,
-        form_npwp: pengajuanTransporterStore.npwp_transporter,
-        form_kecamatan: pengajuanTransporterStore.id_kecamatan,
-        form_kelurahan: pengajuanTransporterStore.id_kelurahan,
-        form_alamat: pengajuanTransporterStore.alamat_transporter,
-        form_nohp: pengajuanTransporterStore.notlp,
-        form_email: pengajuanTransporterStore.email,
+        form_namatransporter: transporterStore.nama_transporter,
+        form_npwp: transporterStore.npwp_transporter,
+        form_kecamatan: transporterStore.id_kecamatan,
+        form_kelurahan: transporterStore.id_kelurahan,
+        form_alamat: transporterStore.alamat_transporter,
+        form_nohp: transporterStore.notlp,
+        form_email: transporterStore.email,
       });
 
-      getKelurahanData(parseInt(pengajuanTransporterStore.id_kecamatan ?? "0"));
-      // getFile(pengajuanTransporterStore.files);
+      getKelurahanData(parseInt(transporterStore.id_kecamatan ?? "0"));
+      // getFile(transporterStore.files);
       getFilesHere();
     }
   }, []);

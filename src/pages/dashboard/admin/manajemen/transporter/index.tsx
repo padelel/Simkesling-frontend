@@ -15,6 +15,7 @@ import {
 import { MPengajuanTransporter } from "../../../../../models/MPengajuanTransporter";
 import { usePengajuanTransporterStore } from "@/stores/pengajuanTransporterStore";
 import { useRouter } from "next/router";
+import { parsingDate } from "@/utils/common";
 
 interface DataType {
   status: any;
@@ -41,10 +42,10 @@ interface DataType {
 // ];
 
 const onChange: TableProps<DataType>["onChange"] = (
-  pagination,
-  filters,
-  sorter,
-  extra
+  pagination: any,
+  filters: any,
+  sorter: any,
+  extra: any
 ) => {
   console.log("params", pagination, filters, sorter, extra);
 };
@@ -78,50 +79,37 @@ const Index: React.FC = () => {
       title: "Nama Transporter",
       dataIndex: "namaTransporter",
       defaultSortOrder: "descend",
-      sorter: (a, b) => a.namaTransporter - b.namaTransporter,
+      sorter: (a: any, b: any) => a.namaTransporter - b.namaTransporter,
     },
     {
-      title: "Tanggal Pengajuan",
-      dataIndex: "tanggalPengajuan",
+      title: "Nama Puskesmas/RS",
+      dataIndex: "namaTempat",
       defaultSortOrder: "descend",
-      sorter: (a, b) => a.tanggalPengajuan.localeCompare(b.tanggalPengajuan),
+      sorter: (a: any, b: any) => a.namaTempat - b.namaTempat,
     },
     {
-      title: "Status Pengajuan",
-      dataIndex: "status",
-      filters: [
-        {
-          text: "Menunggu",
-          value: "1",
-        },
-        {
-          text: "Ditolak",
-          value: "0",
-        },
-        {
-          text: "Aktif",
-          value: "2",
-        },
-      ],
-      // specify the condition of filtering result
-      // here is that finding the name started with `value`
-      render: (status: string) => {
-        if (status === "1") {
-          return "Menunggu";
-        } else if (status === "0") {
-          return "Ditolak";
-        } else if (status === "2") {
-          return "Aktif";
-        }
-        return "Unknown"; // Handle other cases if needed
+      title: "Created at",
+      dataIndex: "created_at",
+      defaultSortOrder: "descend",
+      sorter: (a: any, b: any) => a.created_at - b.created_at,
+      render: (_: any, record: MPengajuanTransporter) => {
+        return parsingDate(record.created_at);
       },
-      sorter: (a, b) => a.status.localeCompare(b.status),
+    },
+    {
+      title: "Updated at",
+      dataIndex: "updated_at",
+      defaultSortOrder: "descend",
+      sorter: (a: any, b: any) => a.updated_at - b.updated_at,
+      render: (_: any, record: MPengajuanTransporter) => {
+        return parsingDate(record.updated_at);
+      },
     },
 
     {
       title: "Action",
       key: "action",
-      render: (_, record: MPengajuanTransporter) => {
+      render: (_: any, record: MPengajuanTransporter) => {
         // console.log(record);
 
         const toFormPage = (param: MPengajuanTransporter) => {
@@ -137,7 +125,8 @@ const Index: React.FC = () => {
             <Button
               onClick={() => toFormPage(record)}
               icon={<EditOutlined />}
-              style={{ backgroundColor: "yellow" }}>
+              style={{ backgroundColor: "yellow" }}
+            >
               Edit
             </Button>
             <Button icon={<EyeOutlined />} type="primary">
@@ -147,7 +136,8 @@ const Index: React.FC = () => {
               onClick={showDeleteConfirm}
               icon={<DeleteOutlined />}
               type="primary"
-              danger>
+              danger
+            >
               Delete
             </Button>
           </Space>
@@ -164,7 +154,7 @@ const Index: React.FC = () => {
       const transformedData = responseData.map((item: any) => ({
         ...item,
         namaTransporter: item.nama_transporter,
-        tanggalPengajuan: item.created_at,
+        namaTempat: `${item.user.nama_user} (${item.user.tipe_tempat})`,
         status: item.status_transporter,
         key: item.id_transporter_tmp.toString(),
       }));
@@ -184,7 +174,8 @@ const Index: React.FC = () => {
       <div>
         <Link
           href="/dashboard/admin/manajemen/transporter/PengajuanTransporter"
-          passHref>
+          passHref
+        >
           <Button type="primary">Tambah Transporter</Button>
         </Link>
       </div>

@@ -66,9 +66,9 @@ const FormTambahAkun: React.FC = () => {
       setKecamatanOptions(
         responseData.map(
           (item: { nama_kecamatan: string; id_kecamatan: number }) => ({
-            value: item.id_kecamatan,
+            value: item.id_kecamatan.toString(),
             label: item.nama_kecamatan,
-            id_kecamatan: item.id_kecamatan,
+            id_kecamatan: item.id_kecamatan.toString(),
           })
         )
       );
@@ -90,9 +90,9 @@ const FormTambahAkun: React.FC = () => {
       setKelurahanOptions(
         responseData.map(
           (item: { nama_kelurahan: string; id_kelurahan: number }) => ({
-            value: item.id_kelurahan,
+            value: item.id_kelurahan.toString(),
             label: item.nama_kelurahan,
-            id_kelurahan: item.id_kelurahan,
+            id_kelurahan: item.id_kelurahan.toString(),
           })
         )
       );
@@ -215,8 +215,8 @@ const FormTambahAkun: React.FC = () => {
         form_username: tambahAkunStore.username,
         form_noreg: tambahAkunStore.noreg_tempat,
         level: tambahAkunStore.level,
-        form_kecamatan: tambahAkunStore.id_kecamatan,
-        form_kelurahan: tambahAkunStore.id_kelurahan,
+        form_kecamatan: tambahAkunStore.id_kecamatan.toString(),
+        form_kelurahan: tambahAkunStore.id_kelurahan.toString(),
         form_alamat: tambahAkunStore.alamat_tempat,
         form_nohp: tambahAkunStore.notlp,
         form_email: tambahAkunStore.email,

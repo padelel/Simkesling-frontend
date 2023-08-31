@@ -78,7 +78,7 @@ const Index: React.FC = () => {
       dataForm.append("oldid", idTransporter);
       let url = "/user/pengajuan-transporter/delete";
       let responsenya = await api.post(url, dataForm);
-      openNotificationWithIcon("error");
+      openNotificationWithIcon("success");
     } catch (error) {
       console.error("Error hapus Data:", error);
     } finally {
@@ -166,7 +166,8 @@ const Index: React.FC = () => {
             <Button
               onClick={() => toFormPage(record)}
               icon={<EditOutlined />}
-              style={{ backgroundColor: "yellow" }}>
+              style={{ backgroundColor: "yellow" }}
+            >
               Edit
             </Button>
             <Button
@@ -174,7 +175,8 @@ const Index: React.FC = () => {
               type="primary"
               onClick={() =>
                 handleViewClick(record.id_transporter_tmp?.toString() ?? "")
-              }>
+              }
+            >
               View
             </Button>
             <Popconfirm
@@ -183,7 +185,8 @@ const Index: React.FC = () => {
               onConfirm={() => {
                 // setForm({ oldid: record.id_transporter_tmp }) // Set oldid when delete button is clicked
                 handleDelete(record.id_transporter_tmp?.toString() ?? "");
-              }}>
+              }}
+            >
               <Button icon={<DeleteOutlined />} type="primary" danger>
                 Delete
               </Button>
@@ -238,13 +241,15 @@ const Index: React.FC = () => {
       <div>
         <Link
           href="/dashboard/user/pengajuantransporter/PagePengajuanTransporter"
-          passHref>
+          passHref
+        >
           <div style={{ display: "flex", justifyContent: "center" }}>
             <Button
               type="primary"
               size="large"
               icon={<PlusCircleOutlined />}
-              style={{ boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)" }}>
+              style={{ boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)" }}
+            >
               Tambah Transporter
             </Button>
           </div>
@@ -252,7 +257,8 @@ const Index: React.FC = () => {
       </div>
 
       <div
-        style={{ marginTop: "20px", marginBottom: "20px", overflowX: "auto" }}>
+        style={{ marginTop: "20px", marginBottom: "20px", overflowX: "auto" }}
+      >
         <Table
           style={{ minWidth: 800 }} // Set a minimum width to trigger horizontal scrolling
           columns={columns}

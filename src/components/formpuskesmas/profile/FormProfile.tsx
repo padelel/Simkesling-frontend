@@ -341,11 +341,13 @@ const FormProfile = () => {
           form={formInstance}
           onFinish={handleSubmit}
           {...layout}
-          name="control-hooks">
+          name="control-hooks"
+        >
           <Form.Item
             name="form_username"
             label="Username"
-            rules={[{ required: true }]}>
+            rules={[{ required: true }]}
+          >
             <Input
               onChange={handleChangeInput}
               value={form.username}
@@ -353,9 +355,10 @@ const FormProfile = () => {
             />
           </Form.Item>
           <Form.Item
-            name="password"
+            name="form_password"
             label="Password (silahkan isi jika ingin mengganti password)"
-            rules={[]}>
+            rules={[]}
+          >
             <Input.Password
               onChange={handleChangeInput}
               value={form.password}
@@ -365,13 +368,15 @@ const FormProfile = () => {
           <Form.Item
             name="form_nama"
             label="Nama Puskemas/RS"
-            rules={[{ required: true }]}>
+            rules={[{ required: true }]}
+          >
             <Input onChange={handleChangeInput} value={form.nama} name="nama" />
           </Form.Item>
           <Form.Item
             name="form_noIzin"
             label="Nomor Izin"
-            rules={[{ required: true }]}>
+            rules={[{ required: true }]}
+          >
             <Input
               onChange={handleChangeInput}
               value={form.noizin}
@@ -382,7 +387,8 @@ const FormProfile = () => {
             name="form_kecamatan"
             label="Kecamatan"
             initialValue={form.id_kecamatan}
-            rules={[{ required: true }]}>
+            rules={[{ required: true }]}
+          >
             <Select
               style={{ width: 250 }}
               showSearch
@@ -399,7 +405,8 @@ const FormProfile = () => {
             name="form_kelurahan"
             label="Kelurahan"
             initialValue={form.id_kelurahan}
-            rules={[{ required: true }]}>
+            rules={[{ required: true }]}
+          >
             <Select
               style={{ width: 250 }}
               showSearch
@@ -416,7 +423,8 @@ const FormProfile = () => {
           <Form.Item
             name="form_alamat"
             label="Alamat"
-            rules={[{ required: true }]}>
+            rules={[{ required: true }]}
+          >
             <TextArea
               name="alamat"
               showCount
@@ -428,13 +436,15 @@ const FormProfile = () => {
           <Form.Item
             name="form_notelp"
             label="Nomor Telepon"
-            rules={[{ required: true }]}>
+            rules={[{ required: true }]}
+          >
             <Input onChange={handleChangeInput} value={form.telp} name="telp" />
           </Form.Item>
           <Form.Item
             name="form_email"
             label="Email"
-            rules={[{ required: true }]}>
+            rules={[{ required: true }]}
+          >
             <Input
               onChange={handleChangeInput}
               value={form.email}
@@ -451,13 +461,15 @@ const FormProfile = () => {
               },
             ]}
             label="Upload TPS"
-            initialValue={fileTps}>
+            initialValue={fileTps}
+          >
             <div>
               <Upload
                 beforeUpload={(file: any) => beforeUploadFileDynamic(file)}
                 fileList={fileTps}
                 maxCount={1}
-                onChange={(file: any) => setFileTps(file.fileList)}>
+                onChange={(file: any) => setFileTps(file.fileList)}
+              >
                 <Button icon={<UploadOutlined />}>Klik Untuk Upload TPS</Button>
               </Upload>
             </div>
@@ -472,13 +484,15 @@ const FormProfile = () => {
               },
             ]}
             label="Upload IPAL"
-            initialValue={fileIpal}>
+            initialValue={fileIpal}
+          >
             <div>
               <Upload
                 beforeUpload={(file: any) => beforeUploadFileDynamic(file)}
                 fileList={fileIpal}
                 maxCount={1}
-                onChange={(file: any) => setFileIpal(file.fileList)}>
+                onChange={(file: any) => setFileIpal(file.fileList)}
+              >
                 <Button icon={<UploadOutlined />}>
                   Klik Untuk Upload IPAL
                 </Button>
@@ -491,7 +505,8 @@ const FormProfile = () => {
               type="primary"
               size="large"
               icon={<CheckCircleOutlined />}
-              htmlType="submit">
+              htmlType="submit"
+            >
               Submit
             </Button>
           </Form.Item>

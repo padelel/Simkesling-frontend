@@ -12,10 +12,11 @@ import {
   DeleteOutlined,
   ExclamationCircleFilled,
 } from "@ant-design/icons";
-import { MPengajuanTransporter } from "../../../../models/MPengajuanTransporter";
-import { usePengajuanTransporterStore } from "@/stores/pengajuanTransporterStore";
+import { MTransporter } from "../../../../models/MTransporter";
+import { useTransporterStore } from "@/stores/transporterStore";
 import { useRouter } from "next/router";
 import { useGlobalStore } from "@/stores/globalStore";
+import { parsingDate } from "@/utils/common";
 
 interface DataType {
   status: any;
@@ -55,9 +56,9 @@ const { confirm } = Modal;
 
 const showDeleteConfirm = () => {
   confirm({
-    title: "Are you sure delete this task?",
+    title: "Yakin Delete?",
     icon: <ExclamationCircleFilled />,
-    content: "Some descriptions",
+    content: "",
     okText: "Yes",
     okType: "danger",
     cancelText: "No",
@@ -73,7 +74,7 @@ const showDeleteConfirm = () => {
 const Index: React.FC = () => {
   const globalStore = useGlobalStore();
   const [data, setData] = useState<DataType[]>([]);
-  const pengajuanTransporterStore = usePengajuanTransporterStore();
+  const transporterStore = useTransporterStore();
   const router = useRouter();
 
   const columns: ColumnsType<DataType> = [
@@ -84,31 +85,49 @@ const Index: React.FC = () => {
       sorter: (a: any, b: any) => a.namaTransporter - b.namaTransporter,
     },
     {
-      title: "Tanggal Pengajuan",
-      dataIndex: "tanggalPengajuan",
+      title: "Created at",
+      dataIndex: "created_at",
       defaultSortOrder: "descend",
-      sorter: (a: any, b: any) =>
-        a.tanggalPengajuan.localeCompare(b.tanggalPengajuan),
+      sorter: (a: any, b: any) => a.created_at.localeCompare(b.created_at),
+      render: (_: any, record: MTransporter) => {
+        return parsingDate(record.created_at);
+      },
     },
     {
-      title: "Tanggal Berakhir",
-      dataIndex: "tanggalBerakhir",
+      title: "Updated at",
+      dataIndex: "updated_at",
       defaultSortOrder: "descend",
-      sorter: (a: any, b: any) =>
-        a.tanggalBerakhir.localeCompare(b.tanggalBerakhir),
+      sorter: (a: any, b: any) => a.updated_at.localeCompare(b.updated_at),
+      render: (_: any, record: MTransporter) => {
+        return parsingDate(record.updated_at);
+      },
     },
+    // {
+    //   title: "Tanggal Pengajuan",
+    //   dataIndex: "tanggalPengajuan",
+    //   defaultSortOrder: "descend",
+    //   sorter: (a: any, b: any) =>
+    //     a.tanggalPengajuan.localeCompare(b.tanggalPengajuan),
+    // },
+    // {
+    //   title: "Tanggal Berakhir",
+    //   dataIndex: "tanggalBerakhir",
+    //   defaultSortOrder: "descend",
+    //   sorter: (a: any, b: any) =>
+    //     a.tanggalBerakhir.localeCompare(b.tanggalBerakhir),
+    // },
 
     {
       title: "Action",
       key: "action",
-      render: (_: any, record: MPengajuanTransporter) => {
+      render: (_: any, record: MTransporter) => {
         // console.log(record);
 
-        const toFormPage = (param: MPengajuanTransporter) => {
-          if (pengajuanTransporterStore.simpenSementara) {
-            pengajuanTransporterStore.simpenSementara(param);
+        const toFormPage = (param: MTransporter) => {
+          if (transporterStore.simpenSementara) {
+            transporterStore.simpenSementara(param);
             router.push(
-              "/dashboard/user/pengajuantransporter/PagePengajuanTransporter?action=edit"
+              "/dashboard/user/transporter/form-transporter?action=edit&origin=transporter"
             );
           }
         };
@@ -117,7 +136,8 @@ const Index: React.FC = () => {
             <Button
               onClick={() => toFormPage(record)}
               icon={<EditOutlined />}
-              style={{ backgroundColor: "yellow" }}>
+              style={{ backgroundColor: "yellow" }}
+            >
               Edit
             </Button>
             <Button icon={<EyeOutlined />} type="primary">
@@ -127,7 +147,8 @@ const Index: React.FC = () => {
               onClick={showDeleteConfirm}
               icon={<DeleteOutlined />}
               type="primary"
-              danger>
+              danger
+            >
               Delete
             </Button>
           </Space>
@@ -164,7 +185,7 @@ const Index: React.FC = () => {
   }, []);
 
   return (
-    <MainLayout title="Pengajuan Transporter">
+    <MainLayout title="List Transporter">
       {/* <div>
         <Link
           href="/dashboard/user/pengajuantransporter/PagePengajuanTransporter"
@@ -174,7 +195,8 @@ const Index: React.FC = () => {
       </div> */}
 
       <div
-        style={{ marginTop: "20px", marginBottom: "20px", overflowX: "auto" }}>
+        style={{ marginTop: "20px", marginBottom: "20px", overflowX: "auto" }}
+      >
         <Table
           style={{ minWidth: 800 }} // Set a minimum width to trigger horizontal scrolling
           columns={columns}
