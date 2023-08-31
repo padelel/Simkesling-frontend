@@ -21,8 +21,8 @@ const onFinishFailed = (errorInfo: any) => {
 };
 
 const cardStyle = {
-  width: "360px",
-  height: "192px",
+  width: "500px",
+  height: "202px",
   borderRadius: "16px",
   marginRight: "24px",
   boxShadow: "5px 8px 24px 5px rgba(208, 216, 243, 0.6)",
@@ -79,53 +79,47 @@ const FormLogin = () => {
     }
   };
   return (
-    <Row justify="center">
-      <Card style={cardStyle}>
-        <Form
-          name="basic"
-          labelCol={{ span: 8 }}
-          wrapperCol={{ span: 16 }}
-          style={{ maxWidth: 600 }}
-          initialValues={{ remember: true }}
-          onFinish={onFinish}
-          onFinishFailed={onFinishFailed}
-          autoComplete="off">
-          <Form.Item
-            label="Username"
-            name="form_username"
-            rules={[
-              { required: true, message: "Please input your username!" },
-            ]}>
-            <Input
-              name="username"
-              onChange={handleChangeInput}
-              value={form.username}
-            />
-          </Form.Item>
+    <Form
+      name="basic"
+      initialValues={{ remember: true }}
+      onFinish={onFinish}
+      onFinishFailed={onFinishFailed}
+      autoComplete="off">
+      <Form.Item
+        label="Username"
+        name="form_username"
+        rules={[{ required: true, message: "Please input your username!" }]}>
+        <Input
+          name="username"
+          onChange={handleChangeInput}
+          value={form.username}
+        />
+      </Form.Item>
 
-          <Form.Item
-            label="Password"
-            name="form_password"
-            rules={[
-              { required: true, message: "Please input your password!" },
-            ]}>
-            <Input.Password
-              name="password"
-              onChange={handleChangeInput}
-              value={form.password}
-            />
-          </Form.Item>
+      <Form.Item
+        label="Password"
+        name="form_password"
+        rules={[{ required: true, message: "Please input your password!" }]}>
+        <Input.Password
+          name="password"
+          onChange={handleChangeInput}
+          value={form.password}
+        />
+      </Form.Item>
 
-          <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-            {/* <Link href="/dashboard/user" passHref> */}
-            <Button icon={<LoginOutlined />} type="primary" htmlType="submit">
-              Login
-            </Button>
-            {/* </Link> */}
-          </Form.Item>
-        </Form>
-      </Card>
-    </Row>
+      <Form.Item>
+        {/* <Link href="/dashboard/user" passHref> */}
+        <Button
+          size="large"
+          block
+          icon={<LoginOutlined />}
+          type="primary"
+          htmlType="submit">
+          Login
+        </Button>
+        {/* </Link> */}
+      </Form.Item>
+    </Form>
   );
 };
 
