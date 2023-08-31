@@ -16,7 +16,7 @@ const HeaderLanding = () => {
         <div>
           <Image
             width={60}
-            height={60}
+            height="auto"
             src="/icon-navbar/kotadepok.png"
             alt="icon-depok"
           />

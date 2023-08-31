@@ -135,8 +135,7 @@ const Index: React.FC = () => {
             <Button
               onClick={() => toFormPage(record)}
               icon={<EditOutlined />}
-              style={{ backgroundColor: "yellow" }}
-            >
+              style={{ backgroundColor: "yellow" }}>
               Edit
             </Button>
             <Button icon={<EyeOutlined />} type="primary">
@@ -192,25 +191,19 @@ const Index: React.FC = () => {
       <div>
         <Link
           href="/dashboard/user/limbah/PageTambahLimbah?action=create"
-          passHref
-        >
+          passHref>
           <Button type="primary">Tambah Pelaporan Limbah</Button>
         </Link>
       </div>
 
-      <div style={{ marginTop: "20px", marginBottom: "20px" }}>
-        {/* <Search
-          style={{ width: 300 }}
-          placeholder="Cari berdasarkasn Berat"
-          onChange={(e) => doSearch(e)}
-        /> */}
+      <div
+        style={{ marginTop: "20px", marginBottom: "20px", overflowX: "auto" }}>
         <Table
-          style={{ marginTop: 20 }}
+          style={{ minWidth: 800 }} // Set a minimum width to trigger horizontal scrolling
           columns={columns}
           dataSource={data}
           onChange={onChange}
         />
-        ;
       </div>
     </MainLayout>
   );

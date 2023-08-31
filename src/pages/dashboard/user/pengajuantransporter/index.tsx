@@ -18,7 +18,7 @@ import { useRouter } from "next/router";
 import { useGlobalStore } from "@/stores/globalStore";
 import cloneDeep from "clone-deep";
 import { url } from "inspector";
-// import Search from "antd/es/input/Search";
+// import Search from "antd/es/input/Search"
 import { parsingDate } from "@/utils/common";
 
 type NotificationType = "success" | "info" | "warning" | "error";
@@ -149,7 +149,7 @@ const Index: React.FC = () => {
       title: "Action",
       key: "action",
       render: (_: any, record: MPengajuanTransporter) => {
-        // console.log(record);
+        // console.log(record)
 
         const toFormPage = (param: MPengajuanTransporter) => {
           if (pengajuanTransporterStore.simpenSementara) {
@@ -164,8 +164,7 @@ const Index: React.FC = () => {
             <Button
               onClick={() => toFormPage(record)}
               icon={<EditOutlined />}
-              style={{ backgroundColor: "yellow" }}
-            >
+              style={{ backgroundColor: "yellow" }}>
               Edit
             </Button>
             <Button
@@ -173,18 +172,16 @@ const Index: React.FC = () => {
               type="primary"
               onClick={() =>
                 handleViewClick(record.id_transporter_tmp?.toString() ?? "")
-              }
-            >
+              }>
               View
             </Button>
             <Popconfirm
               title="Hapus Transporter"
               description="Apakah anda yakin untuk menghapus Transporter Anda?"
               onConfirm={() => {
-                // setForm({ oldid: record.id_transporter_tmp }); // Set oldid when delete button is clicked
+                // setForm({ oldid: record.id_transporter_tmp }) // Set oldid when delete button is clicked
                 handleDelete(record.id_transporter_tmp?.toString() ?? "");
-              }}
-            >
+              }}>
               <Button icon={<DeleteOutlined />} type="primary" danger>
                 Delete
               </Button>
@@ -220,9 +217,9 @@ const Index: React.FC = () => {
   };
 
   const doSearch = async (e: any) => {
-    // console.log(e.target.value);
+    // console.log(e.target.value)
     let tmpdata = dataSearch.filter((val) => {
-      // console.log(val);
+      // console.log(val)
       return val.namaTransporter.toString().includes(e.target.value);
     });
     console.log(tmpdata);
@@ -239,28 +236,19 @@ const Index: React.FC = () => {
       <div>
         <Link
           href="/dashboard/user/pengajuantransporter/PagePengajuanTransporter"
-          passHref
-        >
+          passHref>
           <Button type="primary">Tambah Transporter</Button>
         </Link>
-        <Button type="primary" onClick={() => getData()}>
-          Refress
-        </Button>
       </div>
 
-      <div style={{ marginTop: "20px" }}>
-        {/* <Search
-          style={{ width: 300 }}
-          placeholder="Cari Nama Transporter"
-          onChange={(e) => doSearch(e)}
-        /> */}
+      <div
+        style={{ marginTop: "20px", marginBottom: "20px", overflowX: "auto" }}>
         <Table
-          style={{ marginTop: 20 }}
+          style={{ minWidth: 800 }} // Set a minimum width to trigger horizontal scrolling
           columns={columns}
           dataSource={data}
           onChange={onChange}
         />
-        ;
       </div>
     </MainLayout>
   );

@@ -117,8 +117,7 @@ const Index: React.FC = () => {
             <Button
               onClick={() => toFormPage(record)}
               icon={<EditOutlined />}
-              style={{ backgroundColor: "yellow" }}
-            >
+              style={{ backgroundColor: "yellow" }}>
               Edit
             </Button>
             <Button icon={<EyeOutlined />} type="primary">
@@ -128,8 +127,7 @@ const Index: React.FC = () => {
               onClick={showDeleteConfirm}
               icon={<DeleteOutlined />}
               type="primary"
-              danger
-            >
+              danger>
               Delete
             </Button>
           </Space>
@@ -175,8 +173,14 @@ const Index: React.FC = () => {
         </Link>
       </div> */}
 
-      <div style={{ marginTop: "20px" }}>
-        <Table columns={columns} dataSource={data} onChange={onChange} />;
+      <div
+        style={{ marginTop: "20px", marginBottom: "20px", overflowX: "auto" }}>
+        <Table
+          style={{ minWidth: 800 }} // Set a minimum width to trigger horizontal scrolling
+          columns={columns}
+          dataSource={data}
+          onChange={onChange}
+        />
       </div>
     </MainLayout>
   );
