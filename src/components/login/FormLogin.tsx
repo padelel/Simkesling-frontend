@@ -90,6 +90,7 @@ const FormLogin = () => {
         name="form_username"
         rules={[{ required: true, message: "Please input your username!" }]}>
         <Input
+          placeholder="Masukan Username"
           name="username"
           onChange={handleChangeInput}
           value={form.username}
@@ -101,6 +102,7 @@ const FormLogin = () => {
         name="form_password"
         rules={[{ required: true, message: "Please input your password!" }]}>
         <Input.Password
+          placeholder="Masukan Password"
           name="password"
           onChange={handleChangeInput}
           value={form.password}

@@ -11,6 +11,7 @@ import {
   EyeOutlined,
   DeleteOutlined,
   ExclamationCircleFilled,
+  PlusCircleOutlined,
 } from "@ant-design/icons";
 import { MPengajuanTransporter } from "../../../../models/MPengajuanTransporter";
 import { usePengajuanTransporterStore } from "@/stores/pengajuanTransporterStore";
@@ -192,7 +193,15 @@ const Index: React.FC = () => {
         <Link
           href="/dashboard/user/limbah/PageTambahLimbah?action=create"
           passHref>
-          <Button type="primary">Tambah Pelaporan Limbah</Button>
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <Button
+              type="primary"
+              size="large"
+              icon={<PlusCircleOutlined />}
+              style={{ boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)" }}>
+              Tambah Laporan Limbah
+            </Button>
+          </div>
         </Link>
       </div>
 

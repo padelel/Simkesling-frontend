@@ -11,6 +11,8 @@ import {
   EyeOutlined,
   DeleteOutlined,
   ExclamationCircleFilled,
+  PlusSquareTwoTone,
+  PlusCircleOutlined,
 } from "@ant-design/icons";
 import { MPengajuanTransporter } from "../../../../models/MPengajuanTransporter";
 import { usePengajuanTransporterStore } from "@/stores/pengajuanTransporterStore";
@@ -237,7 +239,15 @@ const Index: React.FC = () => {
         <Link
           href="/dashboard/user/pengajuantransporter/PagePengajuanTransporter"
           passHref>
-          <Button type="primary">Tambah Transporter</Button>
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <Button
+              type="primary"
+              size="large"
+              icon={<PlusCircleOutlined />}
+              style={{ boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)" }}>
+              Tambah Transporter
+            </Button>
+          </div>
         </Link>
       </div>
 
