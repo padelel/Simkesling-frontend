@@ -81,13 +81,13 @@ const Index: React.FC = () => {
     {
       title: "Nama Transporter",
       dataIndex: "namaTransporter",
-      defaultSortOrder: "descend",
-      sorter: (a: any, b: any) => a.namaTransporter - b.namaTransporter,
+      defaultSortOrder: "ascend",
+      sorter: (a: any, b: any) => b.namaTransporter - a.namaTransporter,
     },
     {
       title: "Created at",
       dataIndex: "created_at",
-      defaultSortOrder: "descend",
+      // defaultSortOrder: "descend",
       sorter: (a: any, b: any) => a.created_at.localeCompare(b.created_at),
       render: (_: any, record: MTransporter) => {
         return parsingDate(record.created_at);
@@ -96,7 +96,7 @@ const Index: React.FC = () => {
     {
       title: "Updated at",
       dataIndex: "updated_at",
-      defaultSortOrder: "descend",
+      // defaultSortOrder: "descend",
       sorter: (a: any, b: any) => a.updated_at.localeCompare(b.updated_at),
       render: (_: any, record: MTransporter) => {
         return parsingDate(record.updated_at);
@@ -136,8 +136,7 @@ const Index: React.FC = () => {
             <Button
               onClick={() => toFormPage(record)}
               icon={<EditOutlined />}
-              style={{ backgroundColor: "yellow" }}
-            >
+              style={{ backgroundColor: "yellow" }}>
               Edit
             </Button>
             <Button icon={<EyeOutlined />} type="primary">
@@ -147,8 +146,7 @@ const Index: React.FC = () => {
               onClick={showDeleteConfirm}
               icon={<DeleteOutlined />}
               type="primary"
-              danger
-            >
+              danger>
               Delete
             </Button>
           </Space>
@@ -195,8 +193,7 @@ const Index: React.FC = () => {
       </div> */}
 
       <div
-        style={{ marginTop: "20px", marginBottom: "20px", overflowX: "auto" }}
-      >
+        style={{ marginTop: "20px", marginBottom: "20px", overflowX: "auto" }}>
         <Table
           style={{ minWidth: 800 }} // Set a minimum width to trigger horizontal scrolling
           columns={columns}

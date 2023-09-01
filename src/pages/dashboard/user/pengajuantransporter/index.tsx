@@ -90,30 +90,41 @@ const Index: React.FC = () => {
     {
       title: "Nama Transporter",
       dataIndex: "namaTransporter",
-      defaultSortOrder: "ascend",
+      // defaultSortOrder: "ascend",
       sorter: (a: any, b: any) =>
-        a.namaTransporter.length - b.namaTransporter.length,
+        b.namaTransporter.length - a.namaTransporter.length,
     },
     {
       title: "Tanggal Pengajuan",
       dataIndex: "tanggalPengajuan",
       // defaultSortOrder: "descend",
       sorter: (a: any, b: any) =>
-        a.tanggalPengajuan.localeCompare(b.tanggalPengajuan),
+        b.tanggalPengajuan.localeCompare(a.tanggalPengajuan),
     },
     {
       title: "Status Pengajuan",
       dataIndex: "status",
-      filters: [
-        {
-          text: "Menunggu",
-          value: "1",
-        },
-        {
-          text: "Ditolak",
-          value: "o",
-        },
-      ],
+      defaultSortOrder: "descend",
+      // filterSearch: true,
+      // onFilter: (value: boolean, record) => record.name.includes("1"),
+      // filters: [
+      //   {
+      //     text: "Menunggu",
+      //     value: "1",
+      //   },
+      //   {
+      //     text: "Ditolak",
+      //     value: "0",
+      //   },
+      //   {
+      //     text: "Menunggu",
+      //     value: "MENUNGGU",
+      //   },
+      //   {
+      //     text: "Ditolak",
+      //     value: "DITOLAK",
+      //   },
+      // ],
 
       // specify the condition of filtering result
       // here is that finding the name started with `value`
@@ -144,7 +155,7 @@ const Index: React.FC = () => {
       title: "Catatan",
       dataIndex: "catatan",
       defaultSortOrder: "ascend",
-      sorter: (a: any, b: any) => a.catatan.length - b.catatan.length,
+      // sorter: (a: any, b: any) => a.catatan.length - b.catatan.length,
     },
 
     {
@@ -166,8 +177,7 @@ const Index: React.FC = () => {
             <Button
               onClick={() => toFormPage(record)}
               icon={<EditOutlined />}
-              style={{ backgroundColor: "yellow" }}
-            >
+              style={{ backgroundColor: "yellow" }}>
               Edit
             </Button>
             <Button
@@ -175,8 +185,7 @@ const Index: React.FC = () => {
               type="primary"
               onClick={() =>
                 handleViewClick(record.id_transporter_tmp?.toString() ?? "")
-              }
-            >
+              }>
               View
             </Button>
             <Popconfirm
@@ -185,8 +194,7 @@ const Index: React.FC = () => {
               onConfirm={() => {
                 // setForm({ oldid: record.id_transporter_tmp }) // Set oldid when delete button is clicked
                 handleDelete(record.id_transporter_tmp?.toString() ?? "");
-              }}
-            >
+              }}>
               <Button icon={<DeleteOutlined />} type="primary" danger>
                 Delete
               </Button>
@@ -241,15 +249,13 @@ const Index: React.FC = () => {
       <div>
         <Link
           href="/dashboard/user/pengajuantransporter/PagePengajuanTransporter"
-          passHref
-        >
+          passHref>
           <div style={{ display: "flex", justifyContent: "center" }}>
             <Button
               type="primary"
               size="large"
               icon={<PlusCircleOutlined />}
-              style={{ boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)" }}
-            >
+              style={{ boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)" }}>
               Tambah Transporter
             </Button>
           </div>
@@ -257,8 +263,7 @@ const Index: React.FC = () => {
       </div>
 
       <div
-        style={{ marginTop: "20px", marginBottom: "20px", overflowX: "auto" }}
-      >
+        style={{ marginTop: "20px", marginBottom: "20px", overflowX: "auto" }}>
         <Table
           style={{ minWidth: 800 }} // Set a minimum width to trigger horizontal scrolling
           columns={columns}

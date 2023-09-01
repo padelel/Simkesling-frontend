@@ -81,6 +81,7 @@ const FormLogin = () => {
   return (
     <Form
       name="basic"
+      layout="vertical"
       initialValues={{ remember: true }}
       onFinish={onFinish}
       onFinishFailed={onFinishFailed}

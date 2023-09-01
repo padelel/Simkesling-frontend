@@ -84,39 +84,39 @@ const Index: React.FC = () => {
     {
       title: "Periode (Bulan)",
       dataIndex: "periode_nama",
-      defaultSortOrder: "descend",
-      sorter: (a: any, b: any) => a.periode_nama - b.periode_nama,
+      // defaultSortOrder: "descend",
+      // sorter: (a: any, b: any) => a.periode_nama - b.periode_nama,
     },
     {
       title: "Tahun",
       dataIndex: "tahun",
-      defaultSortOrder: "descend",
-      sorter: (a: any, b: any) => a.tahun - b.tahun,
+      // defaultSortOrder: "descend",
+      sorter: (a: any, b: any) => b.tahun - a.tahun,
     },
     {
       title: "Nama Transporter",
       dataIndex: "namaTransporter",
-      defaultSortOrder: "descend",
-      sorter: (a: any, b: any) => a.namaTransporter - b.namaTransporter,
+      // defaultSortOrder: "descend",
+      // sorter: (a: any, b: any) => a.namaTransporter - b.namaTransporter,
     },
     {
       title: "Berat Limbah Total",
       dataIndex: "beratLimbahTotal",
-      defaultSortOrder: "descend",
+      // defaultSortOrder: "descend",
       sorter: (a: any, b: any) =>
-        a.beratLimbahTotal.localeCompare(b.beratLimbahTotal),
+        b.beratLimbahTotal.localeCompare(a.beratLimbahTotal),
     },
     {
       title: "Tanggal Dibuat",
       dataIndex: "created_at",
       defaultSortOrder: "descend",
-      sorter: (a: any, b: any) => a.created_at - b.created_at,
+      sorter: (a: any, b: any) => b.created_at.localeCompare(a.created_at),
     },
     {
       title: "Tanggal Diubah",
       dataIndex: "updated_at",
       defaultSortOrder: "descend",
-      sorter: (a: any, b: any) => a.updated_at - b.updated_at,
+      sorter: (a: any, b: any) => b.updated_at.localeCompare(a.updated_at),
     },
 
     {

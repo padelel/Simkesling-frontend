@@ -364,7 +364,7 @@ const FormPengajuanTransporter: React.FC = () => {
       } else {
         openNotificationCreate("success");
       }
-      router.push("/dashboard/user/pengajuantransporter");
+      // router.push("/dashboard/user/pengajuantransporter");
     } catch (e) {
       console.error(e);
     } finally {
@@ -533,13 +533,11 @@ const FormPengajuanTransporter: React.FC = () => {
         {...layout}
         name="control-hooks"
         style={{ maxWidth: 600 }}
-        form={formInstance}
-      >
+        form={formInstance}>
         <Form.Item
           name="form_namatransporter"
           label="Nama Transporter"
-          rules={[{ required: true }]}
-        >
+          rules={[{ required: true }]}>
           <Input
             onChange={handleChangeInput}
             value={form.namatransporter}
@@ -553,8 +551,7 @@ const FormPengajuanTransporter: React.FC = () => {
           name="form_kecamatan"
           label="Kecamatan"
           initialValue={form.id_kecamatan}
-          rules={[{ required: true }]}
-        >
+          rules={[{ required: true }]}>
           <Select
             style={{ width: 250 }}
             showSearch
@@ -571,8 +568,7 @@ const FormPengajuanTransporter: React.FC = () => {
           name="form_kelurahan"
           label="Kelurahan"
           initialValue={form.id_kelurahan}
-          rules={[{ required: true }]}
-        >
+          rules={[{ required: true }]}>
           <Select
             style={{ width: 250 }}
             showSearch
@@ -588,8 +584,7 @@ const FormPengajuanTransporter: React.FC = () => {
         <Form.Item
           name="form_alamat"
           label="Alamat"
-          rules={[{ required: true }]}
-        >
+          rules={[{ required: true }]}>
           <TextArea
             style={{ width: 250 }}
             showCount
@@ -602,8 +597,7 @@ const FormPengajuanTransporter: React.FC = () => {
         <Form.Item
           name="form_nohp"
           label="Nomor Handphone"
-          rules={[{ required: true }]}
-        >
+          rules={[{ required: true }]}>
           <Input onChange={handleChangeInput} value={form.telp} name="telp" />
         </Form.Item>
         <Form.Item name="form_email" label="Email" rules={[{ required: true }]}>
@@ -615,8 +609,7 @@ const FormPengajuanTransporter: React.FC = () => {
         <Form.List
           name="listMouDynamic"
           initialValue={fileListList}
-          key={formListKey}
-        >
+          key={formListKey}>
           {(fields, { add, remove }) => (
             <>
               {fields.map(({ key, name, ...restField }) => (
@@ -624,8 +617,7 @@ const FormPengajuanTransporter: React.FC = () => {
                   direction="vertical"
                   size="middle"
                   key={"spaceKey" + key}
-                  style={{ display: "flex", justifyContent: "center" }}
-                >
+                  style={{ display: "flex", justifyContent: "center" }}>
                   <MinusCircleOutlined
                     onClick={() => handleRemoveRowDynamic(remove, name, key)}
                   />
@@ -641,8 +633,7 @@ const FormPengajuanTransporter: React.FC = () => {
                     ]}
                     label="Upload MOU"
                     name={"fileMOU" + key}
-                    key={"fileMOUKey" + key}
-                  >
+                    key={"fileMOUKey" + key}>
                     <div>
                       <Upload
                         beforeUpload={(file: any) =>
@@ -653,8 +644,7 @@ const FormPengajuanTransporter: React.FC = () => {
                         fileList={fileListList[name]}
                         maxCount={1}
                         name={"upload" + key}
-                        key={"uploadKey" + key}
-                      >
+                        key={"uploadKey" + key}>
                         <Button icon={<UploadOutlined />}>
                           Klik Untuk Upload MOU Transporter
                         </Button>
@@ -673,8 +663,7 @@ const FormPengajuanTransporter: React.FC = () => {
                     initialValue={dateRangeList[name]}
                     label="Masa Berlaku MOU"
                     name={"masaBerlaku" + key}
-                    key={"masaBerlakuKey" + key}
-                  >
+                    key={"masaBerlakuKey" + key}>
                     <div>
                       <RangePicker
                         format="YYYY-MM-DD"
@@ -702,8 +691,7 @@ const FormPengajuanTransporter: React.FC = () => {
                     borderColor: "#FFFF00", // You might also want to set the border color
                     color: "black", // Adjust text color for better visibility
                     boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
-                  }}
-                >
+                  }}>
                   Klik Untuk Menambahkan MOU Transporter
                 </Button>
               </Form.Item>
@@ -717,8 +705,7 @@ const FormPengajuanTransporter: React.FC = () => {
             size="large"
             icon={<CheckCircleOutlined />}
             onClick={() => handleSubmit()}
-            style={{ boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)" }}
-          >
+            style={{ boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)" }}>
             Submit
           </Button>
         </Form.Item>
