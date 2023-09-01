@@ -22,6 +22,7 @@ import cloneDeep from "clone-deep";
 import { url } from "inspector";
 // import Search from "antd/es/input/Search"
 import { parsingDate } from "@/utils/common";
+import Search from "antd/es/input/Search";
 
 type NotificationType = "success" | "info" | "warning" | "error";
 
@@ -230,11 +231,15 @@ const Index: React.FC = () => {
   };
 
   const doSearch = async (e: any) => {
-    // console.log(e.target.value)
+    const searchTerm = e.target.value.toLowerCase(); // Konversi ke huruf kecil
+
     let tmpdata = dataSearch.filter((val) => {
-      // console.log(val)
-      return val.namaTransporter.toString().includes(e.target.value);
+      const namaTransporterLowerCase = val.namaTransporter
+        .toString()
+        .toLowerCase(); // Konversi ke huruf kecil
+      return namaTransporterLowerCase.includes(searchTerm);
     });
+
     console.log(tmpdata);
     setData(cloneDeep(tmpdata));
   };
@@ -263,7 +268,17 @@ const Index: React.FC = () => {
       </div>
 
       <div
-        style={{ marginTop: "20px", marginBottom: "20px", overflowX: "auto" }}>
+        style={{
+          overflowX: "auto",
+        }}>
+        <Search
+          style={{
+            width: 300,
+            marginBottom: 20,
+          }}
+          placeholder="Cari Nama Transporter"
+          onChange={(e) => doSearch(e)}
+        />
         <Table
           style={{ minWidth: 800 }} // Set a minimum width to trigger horizontal scrolling
           columns={columns}

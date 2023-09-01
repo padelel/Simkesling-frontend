@@ -73,6 +73,7 @@ const showDeleteConfirm = () => {
 
 const Index: React.FC = () => {
   const globalStore = useGlobalStore();
+  const [dataSearch, setDataSearch] = useState<DataType[]>([]);
   const [data, setData] = useState<DataType[]>([]);
   const transporterStore = useTransporterStore();
   const router = useRouter();
