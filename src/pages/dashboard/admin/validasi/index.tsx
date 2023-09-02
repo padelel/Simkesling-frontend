@@ -86,29 +86,21 @@ const Index: React.FC = () => {
     {
       title: "Nama Transporter",
       dataIndex: "namaTransporter",
-      defaultSortOrder: "descend",
-      sorter: (a: any, b: any) => a.namaTransporter - b.namaTransporter,
+      // defaultSortOrder: "descend",
+      sorter: (a: any, b: any) =>
+        a.namaTransporter.length - b.namaTransporter.length,
     },
     {
       title: "Tanggal Pengajuan",
       dataIndex: "tanggalPengajuan",
-      defaultSortOrder: "descend",
+      // defaultSortOrder: "descend",
       sorter: (a: any, b: any) =>
         a.tanggalPengajuan.localeCompare(b.tanggalPengajuan),
     },
     {
       title: "Status Pengajuan",
       dataIndex: "status",
-      filters: [
-        {
-          text: "Menunggu",
-          value: "1",
-        },
-        {
-          text: "Ditolak",
-          value: "0",
-        },
-      ],
+
       // specify the condition of filtering result
       // here is that finding the name started with `value`
       render: (status: any) => {
@@ -136,8 +128,6 @@ const Index: React.FC = () => {
     {
       title: "Catatan",
       dataIndex: "catatan",
-      defaultSortOrder: "ascend",
-      sorter: (a: any, b: any) => a.catatan.length - b.catatan.length,
     },
     {
       title: "Action",
@@ -158,8 +148,7 @@ const Index: React.FC = () => {
             <Button
               onClick={() => toFormPage(record)}
               icon={<EditOutlined />}
-              style={{ backgroundColor: "yellow" }}
-            >
+              style={{ backgroundColor: "yellow" }}>
               Validasi
             </Button>
           </Space>
@@ -197,7 +186,12 @@ const Index: React.FC = () => {
   return (
     <MainLayout title="Pengajuan Transporter">
       <div style={{ marginTop: "20px" }}>
-        <Table columns={columns} dataSource={data} onChange={onChange} />
+        <Table
+          scroll={{ x: 800 }}
+          columns={columns}
+          dataSource={data}
+          onChange={onChange}
+        />
       </div>
     </MainLayout>
   );

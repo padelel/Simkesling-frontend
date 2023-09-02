@@ -68,9 +68,10 @@ const Index: React.FC = () => {
   const router = useRouter();
 
   const { confirm } = Modal;
-  const handleViewClick = (idTransporter: string) => {
-    console.log("View clicked for id_transporter:", idTransporter);
-  };
+  // const handleViewClick = (idTransporter: string) => {
+  //   // console.log("View clicked for id_transporter:", idTransporter);
+
+  // };
 
   const handleDelete = async (idTransporter: string) => {
     try {
@@ -93,7 +94,9 @@ const Index: React.FC = () => {
       dataIndex: "namaTransporter",
       // defaultSortOrder: "ascend",
       sorter: (a: any, b: any) =>
-        b.namaTransporter.length - a.namaTransporter.length,
+        a.namaTransporter
+          .toUpperCase()
+          .localeCompare(b.namaTransporter.toUpperCase()),
     },
     {
       title: "Tanggal Pengajuan",
@@ -162,7 +165,7 @@ const Index: React.FC = () => {
     {
       title: "Action",
       key: "action",
-      render: (_: any, record: MPengajuanTransporter) => {
+      render: (_: any, record: any) => {
         // console.log(record)
 
         const toFormPage = (param: MPengajuanTransporter) => {
@@ -173,20 +176,28 @@ const Index: React.FC = () => {
             );
           }
         };
+        const toViewPage = (param: MPengajuanTransporter) => {
+          if (pengajuanTransporterStore.simpenSementara) {
+            pengajuanTransporterStore.simpenSementara(param);
+            router.push(
+              "/dashboard/user/pengajuantransporter/view-pengajuan-transporter"
+            );
+          }
+        };
         return (
           <Space size="middle">
             <Button
               onClick={() => toFormPage(record)}
               icon={<EditOutlined />}
-              style={{ backgroundColor: "yellow" }}>
+              style={{ backgroundColor: "yellow" }}
+            >
               Edit
             </Button>
             <Button
+              onClick={() => toViewPage(record)}
               icon={<EyeOutlined />}
               type="primary"
-              onClick={() =>
-                handleViewClick(record.id_transporter_tmp?.toString() ?? "")
-              }>
+            >
               View
             </Button>
             <Popconfirm
@@ -195,7 +206,8 @@ const Index: React.FC = () => {
               onConfirm={() => {
                 // setForm({ oldid: record.id_transporter_tmp }) // Set oldid when delete button is clicked
                 handleDelete(record.id_transporter_tmp?.toString() ?? "");
-              }}>
+              }}
+            >
               <Button icon={<DeleteOutlined />} type="primary" danger>
                 Delete
               </Button>
@@ -250,17 +262,18 @@ const Index: React.FC = () => {
 
   return (
     <MainLayout title="Pengajuan Transporter">
-      {contextHolder}
       <div>
         <Link
           href="/dashboard/user/pengajuantransporter/PagePengajuanTransporter"
-          passHref>
+          passHref
+        >
           <div style={{ display: "flex", justifyContent: "center" }}>
             <Button
               type="primary"
               size="large"
               icon={<PlusCircleOutlined />}
-              style={{ boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)" }}>
+              style={{ boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)" }}
+            >
               Tambah Transporter
             </Button>
           </div>
@@ -270,17 +283,18 @@ const Index: React.FC = () => {
       <div
         style={{
           overflowX: "auto",
-        }}>
-        <Search
+        }}
+      >
+        {/* <Search
           style={{
             width: 300,
             marginBottom: 20,
           }}
           placeholder="Cari Nama Transporter"
           onChange={(e) => doSearch(e)}
-        />
+        /> */}
         <Table
-          style={{ minWidth: 800 }} // Set a minimum width to trigger horizontal scrolling
+          scroll={{ x: 800 }} // Set a minimum width to trigger horizontal scrolling
           columns={columns}
           dataSource={data}
           onChange={onChange}

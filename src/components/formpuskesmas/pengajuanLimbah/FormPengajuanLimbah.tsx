@@ -457,10 +457,21 @@ const FormPengajuanLimbah: React.FC = () => {
     console.log(transporterOptions);
     console.log(Object.values(laporanBulananStore));
     console.log(laporanBulananStore);
+    console.log(router.query.action);
 
     formInstance.resetFields();
     setForm(cloneDeep(tmpForm));
     setLimbahPadatList([]);
+
+    formInstance.setFieldsValue({
+      form_tahun: new Date().getFullYear(),
+      form_periode: new Date().getMonth() + 1,
+    });
+    setForm({
+      ...form,
+      periode: new Date().getFullYear().toString(),
+      tahun: (new Date().getMonth() + 1).toString(),
+    });
 
     if (router.query.action === "edit") {
       console.log("masuk sini? #1");
@@ -592,7 +603,8 @@ const FormPengajuanLimbah: React.FC = () => {
         onFinish={handleNextButton}
         {...layout}
         name="control-hooks"
-        style={{ maxWidth: 600 }}>
+        style={{ maxWidth: 600 }}
+      >
         <h2 style={{ display: "flex", justifyContent: "center" }}>
           Pencatatan Limbah Padat
         </h2>
@@ -600,18 +612,21 @@ const FormPengajuanLimbah: React.FC = () => {
           name="form_transporter"
           label="Pilih Transporter"
           initialValue={form.idtransporter}
-          rules={[{ required: true }]}>
+          rules={[{ required: true }]}
+        >
           <Select
             value={form.idtransporter}
             onChange={(v) => handleChangeSelect(v, "idtransporter", event)}
             placeholder="Select a option and change input text above"
             allowClear
-            options={transporterOptions}></Select>
+            options={transporterOptions}
+          ></Select>
         </Form.Item>
         <Form.Item
           name="form_namaPemusnah"
           label="Nama Pemusnah"
-          rules={[{ required: true }]}>
+          rules={[{ required: true }]}
+        >
           <Input
             onChange={handleChangeInput}
             value={form.namapemusnah}
@@ -621,7 +636,8 @@ const FormPengajuanLimbah: React.FC = () => {
         <Form.Item
           name="form_metodePemusnahan"
           label="Metode Pemusnahan"
-          rules={[{ required: true }]}>
+          rules={[{ required: true }]}
+        >
           <Input
             onChange={handleChangeInput}
             value={form.metodepemusnah}
@@ -634,7 +650,8 @@ const FormPengajuanLimbah: React.FC = () => {
             style={{ marginLeft: 10 }}
             checked={[1, "1"].includes(form.statustps)}
             name="form_statusTps"
-            onChange={handleCheckboxChange}>
+            onChange={handleCheckboxChange}
+          >
             Iya
           </Checkbox>
           <Input
@@ -652,7 +669,8 @@ const FormPengajuanLimbah: React.FC = () => {
             style={{ marginLeft: 10 }}
             value={form.statuspemusnah}
             name="form_statusPemusnah"
-            onChange={handleCheckboxChange1}>
+            onChange={handleCheckboxChange1}
+          >
             Iya
           </Checkbox>
           <Input
@@ -668,7 +686,8 @@ const FormPengajuanLimbah: React.FC = () => {
         <Form.Item
           name="form_beratLimbah"
           label="Total Limbah Padat(Kg)"
-          rules={[]}>
+          rules={[]}
+        >
           <InputNumber
             onChange={(v) => handleChangeSelect(v, "totallimbahpadat", event)}
             value={form.totallimbahpadat}
@@ -679,7 +698,8 @@ const FormPengajuanLimbah: React.FC = () => {
         <Form.Item
           name="form_beratLimbahNonCovid"
           label="Total Limbah NonCovid(Kg)"
-          rules={[]}>
+          rules={[]}
+        >
           <InputNumber
             onChange={(v) =>
               handleChangeSelect(v, "totallimbahnoncovid", event)
@@ -692,7 +712,8 @@ const FormPengajuanLimbah: React.FC = () => {
         <Form.Item
           name="form_beratLimbahCovid"
           label="Total Limbah Covid(Kg)"
-          rules={[]}>
+          rules={[]}
+        >
           <InputNumber
             onChange={(v) => handleChangeSelect(v, "totallimbahcovid", event)}
             value={form.totallimbahcovid}
@@ -705,14 +726,16 @@ const FormPengajuanLimbah: React.FC = () => {
         <Form.List
           name="detailLimbahDynamic"
           key={formListKey}
-          initialValue={limbahPadatList}>
+          initialValue={limbahPadatList}
+        >
           {(fields, { add, remove }) => (
             <>
               {fields.map(({ key, name, ...restField }) => (
                 <Space
                   key={key}
                   style={{ display: "flex", marginBottom: 8 }}
-                  align="baseline">
+                  align="baseline"
+                >
                   <Form.Item
                     {...restField}
                     name={[name, "form_kategoriLimbahPadat"]}
@@ -724,7 +747,8 @@ const FormPengajuanLimbah: React.FC = () => {
                       limbahPadatList[name]
                         ? limbahPadatList[name].kategori ?? ""
                         : ""
-                    }>
+                    }
+                  >
                     <Input
                       onChange={(v: any) =>
                         handleChangeLimbahPadatInput(v, key, name, "kategori")
@@ -749,7 +773,8 @@ const FormPengajuanLimbah: React.FC = () => {
                       limbahPadatList[name]
                         ? limbahPadatList[name].catatan ?? ""
                         : ""
-                    }>
+                    }
+                  >
                     <Input
                       onChange={(v: any) =>
                         handleChangeLimbahPadatInput(v, key, name, "catatan")
@@ -776,7 +801,8 @@ const FormPengajuanLimbah: React.FC = () => {
                       limbahPadatList[name]
                         ? limbahPadatList[name].berat ?? ""
                         : ""
-                    }>
+                    }
+                  >
                     <Input
                       onChange={(v: any) =>
                         handleChangeLimbahPadatInput(v, key, name, "berat")
@@ -809,7 +835,8 @@ const FormPengajuanLimbah: React.FC = () => {
                     borderColor: "#FFFF00", // You might also want to set the border color
                     color: "black", // Adjust text color for better visibility
                     boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
-                  }}>
+                  }}
+                >
                   Klik Untuk Menambahkan Detail Limbah Padat
                 </Button>
               </Form.Item>
@@ -821,13 +848,15 @@ const FormPengajuanLimbah: React.FC = () => {
         <Form.Item
           initialValue={fileManifest}
           name="form_manifest"
-          label="Upload Manifest">
+          label="Upload Manifest"
+        >
           <Upload
             name="manifest"
             multiple
             beforeUpload={(file: any) => beforeUploadFileDynamic(file)}
             fileList={fileManifest}
-            onChange={(file: any) => setFileManifest(file.fileList)}>
+            onChange={(file: any) => setFileManifest(file.fileList)}
+          >
             <Button icon={<UploadOutlined />}>
               Klik Untuk Upload Manifest
             </Button>
@@ -836,13 +865,15 @@ const FormPengajuanLimbah: React.FC = () => {
         <Form.Item
           initialValue={fileLogbook}
           name="form_logbook"
-          label="Upload Logbook">
+          label="Upload Logbook"
+        >
           <Upload
             name="logbook"
             multiple
             beforeUpload={(file: any) => beforeUploadFileDynamic(file)}
             fileList={fileLogbook}
-            onChange={(file: any) => setFileLogbook(file.fileList)}>
+            onChange={(file: any) => setFileLogbook(file.fileList)}
+          >
             <Button icon={<UploadOutlined />}>Klik Untuk Upload Logbook</Button>
           </Upload>
         </Form.Item>
@@ -852,7 +883,8 @@ const FormPengajuanLimbah: React.FC = () => {
             type="primary"
             htmlType="submit"
             icon={<RightCircleOutlined />}
-            style={{ boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)" }}>
+            style={{ boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)" }}
+          >
             Next
           </Button>
         </Form.Item>
@@ -864,7 +896,8 @@ const FormPengajuanLimbah: React.FC = () => {
         onFinish={handleSubmitButton}
         {...layout}
         name="control-hooks"
-        style={{ maxWidth: 600 }}>
+        style={{ maxWidth: 600 }}
+      >
         <h2 style={{ display: "flex", justifyContent: "center" }}>
           Pencatatan Limbah Cair
         </h2>
@@ -891,7 +924,8 @@ const FormPengajuanLimbah: React.FC = () => {
             style={{ marginLeft: 10 }}
             value={form.stastuslimbahcair}
             onChange={handleCheckboxChange2}
-            name="form_statussyaratipal">
+            name="form_statussyaratipal"
+          >
             Iya
           </Checkbox>
         </Form.Item>
@@ -917,7 +951,8 @@ const FormPengajuanLimbah: React.FC = () => {
                 borderColor: "#FFFF00", // You might also want to set the border color
                 color: "black", // Adjust text color for better visibility
                 boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
-              }}>
+              }}
+            >
               Halaman Sebelumnya
             </Button>
             <Button
@@ -927,7 +962,8 @@ const FormPengajuanLimbah: React.FC = () => {
               icon={<CheckCircleOutlined />}
               style={{
                 boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
-              }}>
+              }}
+            >
               Submit
             </Button>
           </Space>
@@ -945,7 +981,8 @@ const FormPengajuanLimbah: React.FC = () => {
             name="form_periode"
             initialValue={form.periode}
             rules={[{ required: true }]}
-            label="Periode">
+            label="Periode"
+          >
             <Select
               value={form.periode}
               placeholder="Pilih Bulan Periode"
@@ -971,7 +1008,8 @@ const FormPengajuanLimbah: React.FC = () => {
           <Form.Item
             name="form_tahun"
             label="Tahun"
-            rules={[{ required: true }]}>
+            rules={[{ required: true }]}
+          >
             <Input
               placeholder="Masukan Tahun"
               onChange={handleChangeInput}
@@ -985,7 +1023,8 @@ const FormPengajuanLimbah: React.FC = () => {
       <Card
         style={{ width: "100%" }}
         tabList={tabListNoTitle}
-        activeTabKey={activeTabKey2}>
+        activeTabKey={activeTabKey2}
+      >
         <div style={{ display: "flex", justifyContent: "center" }}>
           {contentListNoTitle[activeTabKey2]}
         </div>

@@ -11,7 +11,7 @@ const HeaderLanding = () => {
           display: "flex",
           justifyContent: "space-between",
           background: "white",
-          padding: 5,
+          padding: 0,
         }}>
         <div>
           <Image

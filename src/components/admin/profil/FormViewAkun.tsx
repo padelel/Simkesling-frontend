@@ -1,5 +1,5 @@
 import React, { useEffect, useLayoutEffect, useState } from "react";
-import { Button, Form, Input, Select } from "antd";
+import { Button, Form, Input, Select, Upload } from "antd";
 
 import dayjs from "dayjs";
 import type { Dayjs } from "dayjs";
@@ -8,6 +8,8 @@ import router from "next/router";
 import { useTambahAkunStore } from "@/stores/pengajuanAkunStore";
 import { useGlobalStore } from "@/stores/globalStore";
 import cloneDeep from "clone-deep";
+import { RcFile, UploadFile, UploadProps } from "antd/es/upload";
+import apifile from "@/utils/HttpRequestFile";
 
 const { TextArea } = Input;
 
@@ -37,6 +39,16 @@ const FormTambahAkun: React.FC = () => {
     null
   );
 
+  const [fileList, setFileList] = useState<UploadFile[]>([
+    {
+      uid: "",
+      name: "",
+      status: "done",
+      url: "",
+    },
+  ]);
+  const [fileListList, setFileListList] = useState<UploadFile[][]>([]);
+
   const [getPassword, setPassword] = useState({
     required: true,
   });
@@ -53,6 +65,10 @@ const FormTambahAkun: React.FC = () => {
     email: "",
     username: "",
     password: "",
+    izin_ipal: "",
+    izin_tps: "",
+    file_izin_ipal: [] as any[],
+    file_izin_tps: [] as any[],
   };
 
   const [form, setForm] = useState(cloneDeep(tmpForm));
@@ -66,8 +82,8 @@ const FormTambahAkun: React.FC = () => {
       setKecamatanOptions(
         responseData.map(
           (item: { nama_kecamatan: string; id_kecamatan: number }) => ({
-            value: item.id_kecamatan.toString(),
             label: item.nama_kecamatan,
+            value: item.id_kecamatan.toString(),
             id_kecamatan: item.id_kecamatan.toString(),
           })
         )
@@ -179,7 +195,76 @@ const FormTambahAkun: React.FC = () => {
     });
   };
 
+  const getFile = async (file: any) => {
+    try {
+      if (globalStore.setLoading) globalStore.setLoading(true);
+      let arrname = file.split("/");
+      let filename = arrname[arrname.length - 1];
+      const resp = await apifile.get(
+        `${file}?${Math.random().toString().replaceAll(".", "")}`,
+        {
+          responseType: "arraybuffer",
+        }
+      ); // Set responseType to 'arraybuffer'
+      const filenya = resp.data;
+      const typefile = resp.headers["content-type"];
+
+      // Create a Blob from the response data
+      const blob = new Blob([filenya], { type: typefile });
+
+      // Create a Blob URL
+      const blobUrl = URL.createObjectURL(blob);
+      // fileListList.push([
+      //   {
+      //     uid: new Date().toISOString(),
+      //     name: filename,
+      //     status: "done",
+      //     url: blobUrl,
+      //   },
+      // ]);
+      return {
+        uid: new Date().toISOString(),
+        name: filename,
+        status: "done",
+        url: blobUrl,
+        blob: blob,
+      };
+
+      // Open the Blob URL in a new tab
+      // window.open(blobUrl, "_blank");
+
+      // Release the Blob URL when done to avoid memory leaks
+      // URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+      console.error("-- error in getfile --");
+      console.error("Error fetching or processing data:", error);
+    } finally {
+      if (globalStore.setLoading) globalStore.setLoading(false);
+    }
+  };
+
+  const getFiles = async () => {
+    let fileTps = await getFile(form.izin_tps);
+    let fileIpal = await getFile(form.izin_ipal);
+
+    setForm({
+      ...form,
+      file_izin_tps: [fileTps],
+      file_izin_ipal: [fileIpal],
+    });
+    // file_izin_ipal;
+    // file_izin_tps;
+    // ;
+  };
+
   useLayoutEffect(() => {
+    // jika idnya kosong (dia melakukan refresh) balikin ke table
+    if (tambahAkunStore.id_user == null || tambahAkunStore.id_user == 0) {
+      router.push("/dashboard/admin/manajemen/profil");
+      return;
+    }
+    let newFileList = [fileList];
+
     getKecamatanData();
     console.log(router.query);
     console.log(Object.values(tambahAkunStore));
@@ -189,50 +274,64 @@ const FormTambahAkun: React.FC = () => {
     formInstance.resetFields();
     setForm(cloneDeep(tmpForm));
 
-    if (router.query.action === "edit") {
-      // jika edit set valuenya
+    setPassword({
+      required: false,
+    });
 
-      setPassword({
-        required: false,
-      });
+    setForm({
+      ...form,
+      oldid: tambahAkunStore.id_user?.toString() ?? "",
+      nama_user: tambahAkunStore.nama_user?.toString() ?? "",
+      username: tambahAkunStore.username?.toString() ?? "",
+      noreg_tempat: tambahAkunStore.noreg_tempat?.toString() ?? "",
+      level: tambahAkunStore.level?.toString() ?? "",
+      id_kecamatan: tambahAkunStore.id_kecamatan?.toString() ?? "",
+      id_kelurahan: tambahAkunStore.id_kelurahan?.toString() ?? "",
+      alamat_tempat: tambahAkunStore.alamat_tempat?.toString() ?? "",
+      notelp: tambahAkunStore.nohp?.toString() ?? "",
+      email: tambahAkunStore.email?.toString() ?? "",
+      password: tambahAkunStore.email?.toString() ?? "",
+      izin_ipal: tambahAkunStore.email?.toString() ?? "",
+      izin_tps: tambahAkunStore.email?.toString() ?? "",
+    });
 
-      setForm({
-        oldid: tambahAkunStore.id_user?.toString() ?? "",
-        nama_user: tambahAkunStore.nama_user?.toString() ?? "",
-        username: tambahAkunStore.username?.toString() ?? "",
-        noreg_tempat: tambahAkunStore.noreg_tempat?.toString() ?? "",
-        level: tambahAkunStore.level?.toString() ?? "",
-        id_kecamatan: tambahAkunStore.id_kecamatan?.toString() ?? "",
-        id_kelurahan: tambahAkunStore.id_kelurahan?.toString() ?? "",
-        alamat_tempat: tambahAkunStore.alamat_tempat?.toString() ?? "",
-        notelp: tambahAkunStore.nohp?.toString() ?? "",
-        email: tambahAkunStore.email?.toString() ?? "",
-        password: tambahAkunStore.email?.toString() ?? "",
-      });
+    formInstance.setFieldsValue({
+      form_namauser: tambahAkunStore.nama_user,
+      form_username: tambahAkunStore.username,
+      form_noreg: tambahAkunStore.noreg_tempat,
+      level: tambahAkunStore.level,
+      form_kecamatan: tambahAkunStore.id_kecamatan.toString(),
+      form_kelurahan: tambahAkunStore.id_kelurahan.toString(),
+      form_alamat: tambahAkunStore.alamat_tempat,
+      form_nohp: tambahAkunStore.notlp,
+      form_email: tambahAkunStore.email,
+    });
 
-      formInstance.setFieldsValue({
-        form_namauser: tambahAkunStore.nama_user,
-        form_username: tambahAkunStore.username,
-        form_noreg: tambahAkunStore.noreg_tempat,
-        level: tambahAkunStore.level,
-        form_kecamatan: tambahAkunStore.id_kecamatan,
-        form_kelurahan: tambahAkunStore.id_kelurahan,
-        form_alamat: tambahAkunStore.alamat_tempat,
-        form_nohp: tambahAkunStore.notlp,
-        form_email: tambahAkunStore.email,
-      });
-
-      getKelurahanData(tambahAkunStore.id_kecamatan ?? "0");
-
-      // jika idnya kosong (dia melakukan refresh) balikin ke table
-      if (tambahAkunStore.id_user == null || tambahAkunStore.id_user == 0) {
-        router.push("/dashboard/admin/manajemen/profil");
-        return;
-      }
-      // getFile(pengajuanTransporterStore.files);
-      // getFilesHere();
-    }
+    getKelurahanData(tambahAkunStore.id_kecamatan ?? "0");
+    getFiles();
   }, []);
+
+  const props: UploadProps = {
+    showUploadList: {
+      showRemoveIcon: false,
+    },
+    onRemove: (file: any) => {
+      const index = fileList.indexOf(file);
+      const newFileList = fileList.slice();
+      newFileList.splice(index, 1);
+      setFileList(newFileList);
+    },
+    beforeUpload: (file: any) => {
+      setFileList([...fileList, file]);
+
+      return false;
+    },
+    fileList,
+  };
+
+  const beforeUploadFileDynamic = (file: RcFile, key: number) => {
+    return false;
+  };
 
   // -- onSubmit
   const handleSubmit = async () => {
@@ -269,7 +368,98 @@ const FormTambahAkun: React.FC = () => {
   };
   return (
     <>
-      <Form
+      <table>
+        <tr>
+          <td>Nama Instansi</td>
+          <td>:</td>
+          <td>
+            <b>{form.nama_user}</b>
+          </td>
+        </tr>
+        <tr>
+          <td>Username</td>
+          <td>:</td>
+          <td>
+            <b>{form.username}</b>
+          </td>
+        </tr>
+        <tr>
+          <td>Nomor Registrasi / Nomor Izin Rumah Sakit</td>
+          <td>:</td>
+          <td>
+            <b>{form.noreg_tempat}</b>
+          </td>
+        </tr>
+        <tr>
+          <td>Jenis Instansi</td>
+          <td>:</td>
+          <td>
+            <b>{form.level.toString() == "2" ? "Rumah Sakit" : "Puskesmas"}</b>
+          </td>
+        </tr>
+        <tr>
+          <td>Kecamatan</td>
+          <td>:</td>
+          <td>
+            <b>
+              {/* {kecamatanOptions.length > 0 &&
+                kecamatanOptions[0].id_kecamatan.toString()} */}
+              {kecamatanOptions.length > 0 &&
+                (kecamatanOptions.find(
+                  (v) =>
+                    v.id_kecamatan.toString() == form.id_kecamatan.toString()
+                )?.label ??
+                  "")}
+            </b>
+          </td>
+        </tr>
+        <tr>
+          <td>Kelurahan</td>
+          <td>:</td>
+          <td>
+            <b>
+              {/* {form.id_kelurahan.toString()}
+              {kelurahanOptions.length > 0 &&
+                kelurahanOptions[2].id_kelurahan.toString()} */}
+              {kelurahanOptions.length > 0 &&
+                (kelurahanOptions.find(
+                  (v) =>
+                    v.id_kelurahan.toString() == form.id_kelurahan.toString()
+                )?.label ??
+                  "")}
+            </b>
+          </td>
+        </tr>
+        <tr>
+          <td>Nomor Hp</td>
+          <td>:</td>
+          <td>
+            <b>{form.notelp}</b>
+          </td>
+        </tr>
+        <tr>
+          <td>Email</td>
+          <td>:</td>
+          <td>
+            <b>{form.email}</b>
+          </td>
+        </tr>
+        <tr>
+          <td>Izin Ipal</td>
+          <td>:</td>
+          <td>
+            <b>A</b>
+          </td>
+        </tr>
+        <tr>
+          <td>Izin TPS</td>
+          <td>:</td>
+          <td>
+            <b>A</b>
+          </td>
+        </tr>
+      </table>
+      {/* <Form
         {...layout}
         onFinish={handleSubmit}
         name="control-hooks"
@@ -296,13 +486,6 @@ const FormTambahAkun: React.FC = () => {
             onChange={handleChangeInput}
             value={form.username}
             name="username"
-          />
-        </Form.Item>
-        <Form.Item name="password" label="Password" rules={[getPassword]}>
-          <Input.Password
-            onChange={handleChangeInput}
-            value={form.password}
-            name="password"
           />
         </Form.Item>
         <Form.Item
@@ -402,13 +585,7 @@ const FormTambahAkun: React.FC = () => {
         >
           <Input onChange={handleChangeInput} value={form.email} name="email" />
         </Form.Item>
-
-        <Form.Item {...tailLayoutUpload}>
-          <Button type="primary" htmlType="submit">
-            Submit
-          </Button>
-        </Form.Item>
-      </Form>
+      </Form> */}
     </>
   );
 };

@@ -5,14 +5,15 @@ import React from "react";
 
 const PagePengajuanTransporter = () => {
   let labelTitle = "Pengajuan Transporter";
-  if (router.query.origin == "transporter") {
+  if (typeof window !== "undefined" && router.query.origin === "transporter") {
     labelTitle = "Form Transporter";
   }
+
   return (
     <MainLayout title="Pengajuan Transporter">
       <h2 style={{ textAlign: "center" }}>Form Pengajuan Transporter</h2>
       <div style={{ display: "flex", justifyContent: "center" }}>
-        <FormPengajuanTransporter />;
+        <FormPengajuanTransporter />
       </div>
     </MainLayout>
   );

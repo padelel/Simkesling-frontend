@@ -115,7 +115,7 @@ const Index: React.FC = () => {
     {
       title: "Tanggal Diubah",
       dataIndex: "updated_at",
-      defaultSortOrder: "descend",
+      // defaultSortOrder: "descend",
       sorter: (a: any, b: any) => b.updated_at.localeCompare(a.updated_at),
     },
 
@@ -131,15 +131,26 @@ const Index: React.FC = () => {
             router.push("/dashboard/user/limbah/PageTambahLimbah?action=edit");
           }
         };
+        const toViewPage = (param: MLaporanBulanan) => {
+          if (laporanBulananStore.simpenSementara) {
+            laporanBulananStore.simpenSementara(param);
+            router.push("/dashboard/user/limbah/PageViewLimbah?action=view");
+          }
+        };
         return (
           <Space size="middle">
             <Button
               onClick={() => toFormPage(record)}
               icon={<EditOutlined />}
-              style={{ backgroundColor: "yellow" }}>
+              style={{ backgroundColor: "yellow" }}
+            >
               Edit
             </Button>
-            <Button icon={<EyeOutlined />} type="primary">
+            <Button
+              onClick={() => toViewPage(record)}
+              icon={<EyeOutlined />}
+              type="primary"
+            >
               View
             </Button>
           </Space>
@@ -192,13 +203,15 @@ const Index: React.FC = () => {
       <div>
         <Link
           href="/dashboard/user/limbah/PageTambahLimbah?action=create"
-          passHref>
+          passHref
+        >
           <div style={{ display: "flex", justifyContent: "center" }}>
             <Button
               type="primary"
               size="large"
               icon={<PlusCircleOutlined />}
-              style={{ boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)" }}>
+              style={{ boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)" }}
+            >
               Tambah Laporan Limbah
             </Button>
           </div>
@@ -206,9 +219,10 @@ const Index: React.FC = () => {
       </div>
 
       <div
-        style={{ marginTop: "20px", marginBottom: "20px", overflowX: "auto" }}>
+        style={{ marginTop: "20px", marginBottom: "20px", overflowX: "auto" }}
+      >
         <Table
-          style={{ minWidth: 800 }} // Set a minimum width to trigger horizontal scrolling
+          scroll={{ x: 800 }} // Set a minimum width to trigger horizontal scrolling
           columns={columns}
           dataSource={data}
           onChange={onChange}

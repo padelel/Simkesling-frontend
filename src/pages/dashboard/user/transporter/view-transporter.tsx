@@ -1,17 +1,18 @@
 import MainLayout from "@/components/MainLayout";
 import FormTransporter from "@/components/formpuskesmas/transporter/FormTransporter";
+import ViewTransporter from "@/components/formpuskesmas/transporter/ViewTransporter";
 import router from "next/router";
 import React from "react";
 
-const PagePengajuanTransporter = () => {
+const PageViewTransporter = () => {
   return (
-    <MainLayout title={"Transporter"}>
-      <h2 style={{ textAlign: "center" }}>{"Form Transporter"}</h2>
+    <MainLayout title={"View Transporter"}>
+      <h2 style={{ textAlign: "center" }}>{"View Transporter"}</h2>
       <div style={{ display: "flex", justifyContent: "center" }}>
-        <FormTransporter />
+        <ViewTransporter />
       </div>
     </MainLayout>
   );
 };
 
-export default PagePengajuanTransporter;
+export default PageViewTransporter;

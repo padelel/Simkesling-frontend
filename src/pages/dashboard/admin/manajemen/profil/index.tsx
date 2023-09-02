@@ -1,10 +1,11 @@
 import MainLayout from "@/components/MainLayout";
-import { Button, Space, Modal } from "antd";
+import { Button, Space, Modal, Popconfirm, notification } from "antd";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { Table } from "antd";
 import type { ColumnsType, TableProps } from "antd/es/table";
 import api from "@/utils/HttpRequest";
+import { useGlobalStore } from "@/stores/globalStore";
 import {
   LoginOutlined,
   EditOutlined,
@@ -20,25 +21,11 @@ import { MUser } from "@/models/MTambahAkun";
 interface DataType {
   namaUser: any;
   noregTempat: any;
-  tipeTempat: any;
+  tipeTempat: string;
   alamat: any;
   kecamatan: any;
   kelurahan: any;
 }
-
-// const data = [
-//   {
-//     namaTransporter: {{nama_transporter}},
-//     tanggalPengajuan: {{created_at}},
-//     status: {{statusactive_transporter_tmp}},
-//   },
-//   {
-//     namaTransporter: {{nama_transporter}},
-//     tanggalPengajuan: {{created_at}},
-//     status: {{statusactive_transporter_tmp}},
-//   },
-
-// ];
 
 const onChange: TableProps<DataType>["onChange"] = (
   pagination,
@@ -68,52 +55,86 @@ const showDeleteConfirm = () => {
   });
 };
 
+type NotificationType = "success" | "info" | "warning" | "error";
+
 const Index: React.FC = () => {
+  const globalStore = useGlobalStore();
+  const [apicontext, contextHolder] = notification.useNotification();
   const [data, setData] = useState<DataType[]>([]);
   const tambahAkunStore = useTambahAkunStore();
   const router = useRouter();
+  const openNotificationWithIcon = (type: NotificationType) => {
+    apicontext[type]({
+      message: "Akun Berhasil Dihapus",
+      description: "Akun Telah Berhasil Dihapus",
+      duration: 3,
+    });
+  };
+
+  const handleDelete = async (idAkun: string) => {
+    try {
+      let dataForm: any = new FormData();
+      console.log(idAkun);
+      dataForm.append("oldid", idAkun);
+      let url = "/user/puskesmas-rumahsakit/delete";
+      let responsenya = await api.post(url, dataForm);
+      openNotificationWithIcon("success");
+    } catch (error) {
+      console.error("Error hapus Data:", error);
+    } finally {
+      getData();
+    }
+  };
 
   const columns: ColumnsType<DataType> = [
     {
       title: "Nama Puskesmas / Rumah Sakit",
       dataIndex: "namaUser",
-      defaultSortOrder: "descend",
-      sorter: (a, b) => a.namaUser - b.namaUser,
+      defaultSortOrder: "ascend",
+      sorter: (a: any, b: any) =>
+        a.namaUser.toUpperCase().localeCompare(b.namaUser.toUpperCase()),
     },
-    {
-      title: "Nomor Registrasi / Nomor Izin RS",
-      dataIndex: "noregTempat",
-      defaultSortOrder: "descend",
-      sorter: (a, b) => a.noregTempat - b.noregTempat,
-    },
+    // {
+    //   title: "Nomor Registrasi / Nomor Izin RS",
+    //   dataIndex: "noregTempat",
+    //   defaultSortOrder: "descend",
+    //   sorter: (a, b) => a.noregTempat - b.noregTempat,
+    // },
     {
       title: "Tipe Instansi",
       dataIndex: "tipeTempat",
-      defaultSortOrder: "descend",
-      sorter: (a, b) => a.tipeTempat - b.tipeTempat,
+      // defaultSortOrder: "descend",
+      sorter: (a: any, b: any) =>
+        a.tipeTempat.toUpperCase().localeCompare(b.tipeTempat.toUpperCase()),
+      onFilter: (value: string, record) => record.tipeTempat.startsWith(value),
+      filters: [
+        { text: "Rumah Sakit", value: "Rumah Sakit" },
+        { text: "Puskesmas", value: "Puskesmas" },
+      ],
     },
-    {
-      title: "Alamat",
-      dataIndex: "alamat",
-      defaultSortOrder: "descend",
-      sorter: (a, b) => a.alamat - b.alamat,
-    },
+    // {
+    //   title: "Alamat",
+    //   dataIndex: "alamat",
+    //   defaultSortOrder: "descend",
+    //   sorter: (a, b) => a.alamat - b.alamat,
+    // },
     {
       title: "Kecamatan",
       dataIndex: "kecamatan",
-      defaultSortOrder: "descend",
-      sorter: (a, b) => a.kecamatan - b.kecamatan,
+      // defaultSortOrder: "descend",
+      // sorter: (a, b) => a.kecamatan.length - b.kecamatan.length,
     },
     {
       title: "Kelurahan",
       dataIndex: "kelurahan",
-      defaultSortOrder: "descend",
-      sorter: (a, b) => a.kelurahan - b.kelurahan,
+      // defaultSortOrder: "descend",
+      // sorter: (a, b) => a.kelurahan.length - b.kelurahan.length,
     },
 
     {
       title: "Action",
       key: "action",
+      // fixed: "right",
       render: (_, record: MPengajuanTransporter) => {
         // console.log(record);
 
@@ -125,24 +146,40 @@ const Index: React.FC = () => {
             );
           }
         };
+        const toViewPage = (param: MPengajuanTransporter) => {
+          if (tambahAkunStore.simpenBentaran) {
+            tambahAkunStore.simpenBentaran(param);
+            router.push("/dashboard/admin/manajemen/profil/ViewAkun");
+          }
+        };
         return (
           <Space size="middle">
             <Button
               onClick={() => toFormPage(record)}
               icon={<EditOutlined />}
-              style={{ backgroundColor: "yellow" }}>
+              style={{ backgroundColor: "yellow" }}
+            >
               Edit
             </Button>
-            <Button icon={<EyeOutlined />} type="primary">
+            <Button
+              onClick={() => toViewPage(record)}
+              icon={<EyeOutlined />}
+              type="primary"
+            >
               View
             </Button>
-            <Button
-              onClick={showDeleteConfirm}
-              icon={<DeleteOutlined />}
-              type="primary"
-              danger>
-              Delete
-            </Button>
+            <Popconfirm
+              title="Hapus Transporter"
+              description="Apakah anda yakin untuk menghapus Transporter Anda?"
+              onConfirm={() => {
+                // setForm({ oldid: record.id_transporter_tmp }) // Set oldid when delete button is clicked
+                handleDelete(record.id_user?.toString() ?? "");
+              }}
+            >
+              <Button icon={<DeleteOutlined />} type="primary" danger>
+                Delete
+              </Button>
+            </Popconfirm>
           </Space>
         );
       },
@@ -151,6 +188,7 @@ const Index: React.FC = () => {
 
   const getData = async () => {
     try {
+      if (globalStore.setLoading) globalStore.setLoading(true);
       const response = await api.post("/user/puskesmas-rumahsakit/data");
       const responseData = response.data.data.values;
 
@@ -168,6 +206,8 @@ const Index: React.FC = () => {
       setData(transformedData);
     } catch (error) {
       console.error("Error fetching data:", error);
+    } finally {
+      if (globalStore.setLoading) globalStore.setLoading(false);
     }
   };
 
@@ -184,7 +224,13 @@ const Index: React.FC = () => {
       </div>
 
       <div style={{ marginTop: "20px" }}>
-        <Table columns={columns} dataSource={data} onChange={onChange} />
+        <Table
+          // style={{ minWidth: 800 }}
+          columns={columns}
+          scroll={{ x: 800 }}
+          dataSource={data}
+          onChange={onChange}
+        />
       </div>
     </MainLayout>
   );

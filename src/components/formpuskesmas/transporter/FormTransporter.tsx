@@ -517,8 +517,8 @@ const FormPengajuanTransporter: React.FC = () => {
       formInstance.setFieldsValue({
         form_namatransporter: transporterStore.nama_transporter,
         form_npwp: transporterStore.npwp_transporter,
-        form_kecamatan: transporterStore.id_kecamatan,
-        form_kelurahan: transporterStore.id_kelurahan,
+        form_kecamatan: transporterStore.id_kecamatan?.toString(),
+        form_kelurahan: transporterStore.id_kelurahan?.toString(),
         form_alamat: transporterStore.alamat_transporter,
         form_nohp: transporterStore.notlp,
         form_email: transporterStore.email,

@@ -1,5 +1,5 @@
 import MainLayout from "@/components/MainLayout";
-import { Button, Space, Modal } from "antd";
+import { Button, Space, Modal, Tag } from "antd";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { Table } from "antd";
@@ -83,14 +83,43 @@ const Index: React.FC = () => {
       title: "Nama Transporter",
       dataIndex: "namaTransporter",
       defaultSortOrder: "ascend",
-      sorter: (a: any, b: any) => b.namaTransporter - a.namaTransporter,
+      sorter: (a: any, b: any) =>
+        a.namaTransporter
+          .toUpperCase()
+          .localeCompare(b.namaTransporter.toUpperCase()),
+    },
+    {
+      title: "Masa Berlaku MOU Akhir",
+      dataIndex: "masaBerlakuBerakhir",
+    },
+    {
+      title: "Status MOU",
+      dataIndex: "statusBerlaku",
+      render: (status: any) => {
+        let sts = "-- ups --";
+        let color = "-";
+        if (status == true) {
+          color = "volcano";
+          sts = "Kadaluarsa";
+        }
+        if (status == false) {
+          color = "green";
+          sts = "Berlaku";
+        }
+
+        return (
+          <>
+            <Tag color={color}>{sts.toUpperCase()}</Tag>
+          </>
+        );
+      },
     },
     {
       title: "Created at",
       dataIndex: "created_at",
       // defaultSortOrder: "descend",
       sorter: (a: any, b: any) => a.created_at.localeCompare(b.created_at),
-      render: (_: any, record: MTransporter) => {
+      render: (_: any, record: any) => {
         return parsingDate(record.created_at);
       },
     },
@@ -99,7 +128,7 @@ const Index: React.FC = () => {
       dataIndex: "updated_at",
       // defaultSortOrder: "descend",
       sorter: (a: any, b: any) => a.updated_at.localeCompare(b.updated_at),
-      render: (_: any, record: MTransporter) => {
+      render: (_: any, record: any) => {
         return parsingDate(record.updated_at);
       },
     },
@@ -121,7 +150,7 @@ const Index: React.FC = () => {
     {
       title: "Action",
       key: "action",
-      render: (_: any, record: MTransporter) => {
+      render: (_: any, record: any) => {
         // console.log(record);
 
         const toFormPage = (param: MTransporter) => {
@@ -132,6 +161,12 @@ const Index: React.FC = () => {
             );
           }
         };
+        const toViewPage = (param: MTransporter) => {
+          if (transporterStore.simpenSementara) {
+            transporterStore.simpenSementara(param);
+            router.push("/dashboard/user/transporter/view-transporter");
+          }
+        };
         return (
           <Space size="middle">
             <Button
@@ -140,7 +175,10 @@ const Index: React.FC = () => {
               style={{ backgroundColor: "yellow" }}>
               Edit
             </Button>
-            <Button icon={<EyeOutlined />} type="primary">
+            <Button
+              onClick={() => toViewPage(record)}
+              icon={<EyeOutlined />}
+              type="primary">
               View
             </Button>
             <Button
@@ -165,8 +203,10 @@ const Index: React.FC = () => {
       const transformedData = responseData.map((item: any) => ({
         ...item,
         namaTransporter: item.nama_transporter,
+        masaBerlakuBerakhir: item.masa_berlaku_terakhir,
         tanggalPengajuan: item.created_at,
         tanggalBerakhir: item.tgl_akhir,
+        statusBerlaku: item.masa_berlaku_sudah_berakhir,
 
         key: item.id_transporter_tmp.toString(),
       }));
@@ -196,7 +236,7 @@ const Index: React.FC = () => {
       <div
         style={{ marginTop: "20px", marginBottom: "20px", overflowX: "auto" }}>
         <Table
-          style={{ minWidth: 800 }} // Set a minimum width to trigger horizontal scrolling
+          scroll={{ x: 800 }} // Set a minimum width to trigger horizontal scrolling
           columns={columns}
           dataSource={data}
           onChange={onChange}

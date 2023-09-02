@@ -1,10 +1,11 @@
 import MainLayout from "@/components/MainLayout";
-import { Button, Space, Modal } from "antd";
+import { Button, Space, Modal, Tag } from "antd";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { Table } from "antd";
 import type { ColumnsType, TableProps } from "antd/es/table";
 import api from "@/utils/HttpRequest";
+import { useGlobalStore } from "@/stores/globalStore";
 import {
   LoginOutlined,
   EditOutlined,
@@ -70,6 +71,7 @@ const showDeleteConfirm = () => {
 };
 
 const Index: React.FC = () => {
+  const globalStore = useGlobalStore();
   const [data, setData] = useState<DataType[]>([]);
   const pengajuanTransporterStore = usePengajuanTransporterStore();
   const router = useRouter();
@@ -79,19 +81,50 @@ const Index: React.FC = () => {
       title: "Nama Transporter",
       dataIndex: "namaTransporter",
       defaultSortOrder: "descend",
-      sorter: (a: any, b: any) => a.namaTransporter - b.namaTransporter,
+      sorter: (a: any, b: any) =>
+        b.namaTransporter.length - a.namaTransporter.length,
     },
     {
       title: "Nama Puskesmas/RS",
       dataIndex: "namaTempat",
-      defaultSortOrder: "descend",
-      sorter: (a: any, b: any) => a.namaTempat - b.namaTempat,
+      // defaultSortOrder: "descend",
+      sorter: (a: any, b: any) => a.namaTempat.length - b.namaTempat.length,
+    },
+    {
+      title: "Masa Berlaku MOU",
+      dataIndex: "masaBerlakuBerakhir",
+      // defaultSortOrder: "descend",
+      // sorter: (a: any, b: any) => a.namaTempat.length - b.namaTempat.length,
+    },
+    {
+      title: "Status MOU",
+      dataIndex: "statusBerlaku",
+      // defaultSortOrder: "descend",
+      // sorter: (a: any, b: any) => a.namaTempat.length - b.namaTempat.length,
+      render: (status: any) => {
+        let sts = "-- ups --";
+        let color = "-";
+        if (status == true) {
+          color = "volcano";
+          sts = "Kadaluarsa";
+        }
+        if (status == false) {
+          color = "green";
+          sts = "Berlaku";
+        }
+
+        return (
+          <>
+            <Tag color={color}>{sts.toUpperCase()}</Tag>
+          </>
+        );
+      },
     },
     {
       title: "Created at",
       dataIndex: "created_at",
-      defaultSortOrder: "descend",
-      sorter: (a: any, b: any) => a.created_at - b.created_at,
+      // defaultSortOrder: "descend",
+      sorter: (a: any, b: any) => a.created_at.localeCompare(b.created_at),
       render: (_: any, record: MPengajuanTransporter) => {
         return parsingDate(record.created_at);
       },
@@ -99,8 +132,8 @@ const Index: React.FC = () => {
     {
       title: "Updated at",
       dataIndex: "updated_at",
-      defaultSortOrder: "descend",
-      sorter: (a: any, b: any) => a.updated_at - b.updated_at,
+      // defaultSortOrder: "descend",
+      sorter: (a: any, b: any) => a.updated_at.localeCompare(b.updated_at),
       render: (_: any, record: MPengajuanTransporter) => {
         return parsingDate(record.updated_at);
       },
@@ -120,26 +153,36 @@ const Index: React.FC = () => {
             );
           }
         };
+        const toViewPage = (param: MPengajuanTransporter) => {
+          if (pengajuanTransporterStore.simpenSementara) {
+            pengajuanTransporterStore.simpenSementara(param);
+            router.push(
+              "/dashboard/admin/manajemen/transporter/ViewPengajuanTransporter"
+            );
+          }
+        };
         return (
           <Space size="middle">
             <Button
               onClick={() => toFormPage(record)}
               icon={<EditOutlined />}
-              style={{ backgroundColor: "yellow" }}
-            >
+              style={{ backgroundColor: "yellow" }}>
               Edit
             </Button>
-            <Button icon={<EyeOutlined />} type="primary">
+            <Button
+              onClick={() => toViewPage(record)}
+              icon={<EyeOutlined />}
+              type="primary">
               View
             </Button>
-            <Button
+            {/* <Button
               onClick={showDeleteConfirm}
               icon={<DeleteOutlined />}
               type="primary"
               danger
             >
               Delete
-            </Button>
+            </Button> */}
           </Space>
         );
       },
@@ -147,6 +190,7 @@ const Index: React.FC = () => {
   ];
 
   const getData = async () => {
+    if (globalStore.setLoading) globalStore.setLoading(true);
     try {
       const response = await api.post("/user/transporter/data");
       const responseData = response.data.data.values;
@@ -156,12 +200,17 @@ const Index: React.FC = () => {
         namaTransporter: item.nama_transporter,
         namaTempat: `${item.user.nama_user} (${item.user.tipe_tempat})`,
         status: item.status_transporter,
+        tanggalBerakhir: item.tgl_akhir,
+        statusBerlaku: item.masa_berlaku_sudah_berakhir,
+        masaBerlakuBerakhir: item.masa_berlaku_terakhir,
         key: item.id_transporter_tmp.toString(),
       }));
 
       setData(transformedData);
     } catch (error) {
       console.error("Error fetching data:", error);
+    } finally {
+      if (globalStore.setLoading) globalStore.setLoading(false);
     }
   };
 
@@ -170,18 +219,22 @@ const Index: React.FC = () => {
   }, []);
 
   return (
-    <MainLayout title="Pengajuan Transporter">
+    <MainLayout title="Manajemen Transporter">
       <div>
         <Link
           href="/dashboard/admin/manajemen/transporter/PengajuanTransporter"
-          passHref
-        >
+          passHref>
           <Button type="primary">Tambah Transporter</Button>
         </Link>
       </div>
 
       <div style={{ marginTop: "20px" }}>
-        <Table columns={columns} dataSource={data} onChange={onChange} />
+        <Table
+          scroll={{ x: 800 }}
+          columns={columns}
+          dataSource={data}
+          onChange={onChange}
+        />
       </div>
     </MainLayout>
   );

@@ -6,6 +6,8 @@ import { useRouter } from "next/router";
 import { useUserLoginStore } from "@/stores/userLoginStore";
 import jwt_decode from "jwt-decode";
 import Cookies from "js-cookie";
+import Head from "next/head";
+import "../styles/globals.css";
 
 const App = ({ Component, pageProps }: AppProps) => {
   const router = useRouter();
@@ -31,6 +33,12 @@ const App = ({ Component, pageProps }: AppProps) => {
 
   return (
     <ConfigProvider theme={theme}>
+      <Head>
+        <link
+          href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
+          rel="stylesheet"
+        />
+      </Head>
       <Component {...pageProps} />
     </ConfigProvider>
   );

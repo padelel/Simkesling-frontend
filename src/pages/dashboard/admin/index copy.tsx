@@ -17,12 +17,11 @@ import dynamic from "next/dynamic";
 import cloneDeep from "clone-deep";
 import api from "@/utils/HttpRequest";
 
-const DashboardPage: React.FC = () => {
+const DashboardPageCopy: React.FC = () => {
   const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
   const userLoginStore = useUserLoginStore();
   const messageLimbah = "Anda belum mengisi data limbah periode";
   const [pesan, setPesan] = useState("");
-  const [judulChart, setJudulChart] = useState("");
   const [lapor, setLapor] = useState(false);
 
   const [formInstance] = Form.useForm();
@@ -35,8 +34,6 @@ const DashboardPage: React.FC = () => {
   ];
 
   const [series, setSeries] = useState(cloneDeep(tmpSeries));
-  const [chartWidth, setChartWidth] = useState(700);
-  const [chartHeight, setChartHeight] = useState(400);
   const options = {
     chart: {
       id: "simple-bar",
@@ -56,15 +53,6 @@ const DashboardPage: React.FC = () => {
         "November",
         "Desember",
       ],
-    },
-    yaxis: {
-      title: {
-        text: "Berat Limbah (Kg)",
-      },
-    },
-    title: {
-      text: judulChart, // Judul chart "Berat Total Limbah"
-      align: "center",
     },
   };
 
@@ -105,21 +93,14 @@ const DashboardPage: React.FC = () => {
     tmpData[0].data = responsenya.data.data.values.total_limbah_chart_year;
     setSeries(tmpData);
     let tmpPesan = "";
-    let tmpJudulChart = "";
     if (responsenya.data.data.values.sudah_lapor) {
       tmpPesan = `Anda Sudah Mengisi Laporan Pada Periode ${responsenya.data.data.values.laporan_periode_nama} ${responsenya.data.data.values.laporan_periode_tahun}`;
-      tmpJudulChart = `Berat Total Limbah Tahun ${responsenya.data.data.values.laporan_periode_tahun}
-       ${userLoginStore.user?.nama_user}`;
     } else {
       tmpPesan = `Anda Belum Mengisi Laporan Pada Periode ${responsenya.data.data.values.laporan_periode_nama} ${responsenya.data.data.values.laporan_periode_tahun}`;
-      tmpJudulChart = `Berat Total Limbah Tahun ${responsenya.data.data.values.laporan_periode_tahun}
-       ${userLoginStore.user?.nama_user}`;
     }
     setPesan(tmpPesan);
-    setJudulChart(tmpJudulChart);
     setLapor(responsenya.data.data.values.sudah_lapor);
     console.log(responsenya);
-    console.log(tmpJudulChart);
   };
 
   // Gaya khusus untuk card peringatan (warning)
@@ -140,31 +121,13 @@ const DashboardPage: React.FC = () => {
 
   useEffect(() => {
     hitDashboard();
-    const handleResize = () => {
-      // Periksa lebar layar dan atur lebar chart sesuai dengan kondisi tertentu
-      if (window.innerWidth < 700) {
-        setChartWidth(300);
-        setChartHeight(400);
-      } else {
-        setChartWidth(700);
-      }
-    };
-
-    // Tambahkan event listener untuk mengikuti perubahan ukuran layar
-    window.addEventListener("resize", handleResize);
-
-    // Panggil handleResize saat komponen pertama kali dimuat
-    handleResize();
-
-    // Hapus event listener saat komponen dibongkar
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
   }, []);
 
   return (
     <MainLayout title={"Dashboard"}>
-      <h2>Laporan Limbah</h2>
+      <h1>Dashboard {userLoginStore.user?.nama_user}</h1>
+
+      <h2>Total Laporan Sepanjang Tahun</h2>
 
       <Form form={formInstance}>
         <br />
@@ -205,11 +168,7 @@ const DashboardPage: React.FC = () => {
               name="tahun"
             />
           </Form.Item>
-          <Form.Item>
-            <Button type="primary" onClick={hitDashboard}>
-              Filter
-            </Button>
-          </Form.Item>
+          <Button onClick={hitDashboard}>Hit</Button>
         </Space>
       </Form>
 
@@ -230,23 +189,15 @@ const DashboardPage: React.FC = () => {
         />
       )}
 
-      <div style={{ marginTop: 30, display: "flex", justifyContent: "center" }}>
-        <Row>
-          <Col>
-            {typeof window !== undefined && (
-              <Chart
-                options={options}
-                type="bar"
-                width={chartWidth}
-                height={chartHeight}
-                series={series}
-              />
-            )}
-          </Col>
-        </Row>
-      </div>
+      <Row>
+        <Col>
+          {typeof window !== undefined && (
+            <Chart options={options} type="bar" width={700} series={series} />
+          )}
+        </Col>
+      </Row>
     </MainLayout>
   );
 };
 
-export default DashboardPage;
+export default DashboardPageCopy;
