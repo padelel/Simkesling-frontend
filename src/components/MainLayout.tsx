@@ -18,6 +18,8 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import { useUserLoginStore } from "@/stores/userLoginStore";
 import { useGlobalStore } from "@/stores/globalStore";
+import cookie from "js-cookie";
+import jwt_decode from "jwt-decode";
 
 const { Title } = Typography;
 interface MainLayoutProps {
@@ -36,56 +38,68 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
   const userLoginStore = useUserLoginStore();
   const globalStore = useGlobalStore();
 
-  const items = [
+  const [items, setItems] = useState([]);
+
+  const tmpItems = [
     {
       icon: <DashboardOutlined />,
       label: "Dashboard",
       path: "/dashboard/user",
+      level: "user",
     },
     {
       icon: <CarOutlined />,
       label: "Pengajuan Transporter",
       path: "/dashboard/user/pengajuantransporter",
+      level: "user",
     },
     {
       icon: <OrderedListOutlined />,
       label: "List Transporter",
       path: "/dashboard/user/transporter",
+      level: "user",
     },
     {
       icon: <BarChartOutlined />,
       label: "Laporan Limbah",
       path: "/dashboard/user/limbah",
+      level: "user",
     },
     {
       icon: <ProfileOutlined />,
       label: "Profil Saya",
       path: "/dashboard/user/profile",
+      level: "user",
     },
     {
       icon: <HomeOutlined />,
       label: "Dashboard",
       path: "/dashboard/admin",
+      level: "admin",
     },
     {
       icon: <TableOutlined />,
       label: "Manajemen Puskesmas / Rumah Sakit",
       path: "/dashboard/admin/manajemen/profil",
+      level: "admin",
     },
     {
       icon: <TableOutlined />,
       label: "Manajemen Transporter",
       path: "/dashboard/admin/manajemen/transporter",
+      level: "admin",
     },
     {
       icon: <SafetyCertificateOutlined />,
       label: "Validasi Pengajuan Transporter",
       path: "/dashboard/admin/validasi",
+      level: "admin",
     },
     {
       icon: <TableOutlined />,
       label: "Manajemen Laporan",
       path: "/dashboard/admin/manajemen/laporan",
+      level: "admin",
     },
     {
       icon: <LogoutOutlined />,
@@ -109,6 +123,33 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
     }
   };
 
+  useEffect(() => {
+    // const cookieStore = cookies();
+    let token = cookie.get("token");
+    let user = token ? jwt_decode(token) : null;
+    let level = user.level;
+    console.log(level);
+    console.log(user);
+    console.log(token);
+
+    let menu = tmpItems.filter((val) => {
+      if (val.level == undefined || val.level == null) return true;
+      let cekAdmin = level == "1" && val.level == "admin";
+      let cekUser = level != "1" && val.level != "admin";
+      console.log("--cekAdmin");
+      console.log(cekAdmin);
+      console.log("--cekUser");
+      console.log(cekUser);
+      if (cekAdmin) return true;
+      if (cekUser) return true;
+      // else return true;
+      // return level === "1" && val.level == "admin";
+      // return level !== "1" && val.level == "user";
+    });
+
+    setItems(menu);
+  }, []);
+
   return (
     <Layout style={{ minHeight: "100vh" }}>
       {/* STYLING */}
@@ -129,8 +170,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
         collapsible
         collapsed={collapsed}
         onCollapse={(value: any) => setCollapsed(value)}
-        style={{ background: colorBgContainer }}
-      >
+        style={{ background: colorBgContainer }}>
         {/* <Sider
         breakpoint="lg"
         collapsedWidth="0"
@@ -149,8 +189,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
             justifyContent: "center",
             display: "flex",
             marginTop: "30px",
-          }}
-        >
+          }}>
           <Image
             src="/icon-navbar/kotadepok.png"
             alt="Vercel Logo"
@@ -191,8 +230,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
               style={{
                 padding: 8,
                 background: colorBgContainer,
-              }}
-            >
+              }}>
               {/* Lorem ipsum dolor sit amet consectetur adipisicing elit. Officia */}
               {children}
             </div>

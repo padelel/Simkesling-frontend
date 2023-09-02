@@ -3,12 +3,12 @@ import type { NextRequest } from "next/server";
 import jwt_decode from "jwt-decode";
 
 export function middleware(request: NextRequest) {
-  return NextResponse.next();
+  // return NextResponse.next();
 
   // jika tidak include dashboard abaikan
   if (!request.nextUrl.pathname.toLowerCase().includes("dashboard"))
     return NextResponse.next();
-  //  jika pathnya pendek /login atau /about/me abaikan
+  //  jika pathnya pendek / atau /about/me abaikan
   let pathnya = request.nextUrl.pathname.split("/");
   if (pathnya.length < 3) return NextResponse.next();
 
@@ -23,19 +23,19 @@ export function middleware(request: NextRequest) {
     user = token?.value ? jwt_decode(token.value) : null;
     level = user.level;
   } catch (e) {
-    // jika cookienya kosong buang ke login
+    // jika cookienya kosong buang ke
     if (e instanceof TypeError) {
-      return NextResponse.redirect(request.nextUrl.origin + "/login");
+      return NextResponse.redirect(request.nextUrl.origin + "/");
     }
   }
 
   console.log(pathAccess);
   // jika (puskesmas or rs) TIDAK mengakses path user buang
   if (["3", "2"].includes(level) && pathAccess != "user") {
-    return NextResponse.redirect(request.nextUrl.origin + "/login");
+    return NextResponse.redirect(request.nextUrl.origin + "/");
   }
   if (["1"].includes(level) && pathAccess != "admin") {
-    return NextResponse.redirect(request.nextUrl.origin + "/login");
+    return NextResponse.redirect(request.nextUrl.origin + "/");
   }
   // console.log(user);
   // console.log(request.nextUrl.pathname);

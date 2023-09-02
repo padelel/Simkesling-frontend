@@ -12,9 +12,10 @@ import api from "@/utils/HttpRequest";
 
 const DashboardPage: React.FC = () => {
   const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
+  const [tahunChart, setTahunChart] = useState("");
   const [periode, setPeriode] = useState("");
   const [formInstance] = Form.useForm();
-  const [chartWidth, setChartWidth] = useState(700);
+  const [chartWidth, setChartWidth] = useState(800);
   const [chartHeight, setChartHeight] = useState(400);
   const [judulChart, setJudulChart] = useState("");
   const options = {
@@ -44,15 +45,15 @@ const DashboardPage: React.FC = () => {
       },
     },
     title: {
-      text: judulChart, // Judul chart "Berat Total Limbah"
+      text: `Grafik Pelaporan Limbah Puskesmas & RS ${judulChart}`, // Judul chart "Berat Total Limbah"
       align: "center",
     },
   };
 
   let tmp_form = {
-    laporan_periode: 0,
+    laporan_periode: "",
     laporan_periode_nama: "",
-    laporan_periode_tahun: 0,
+    laporan_periode_tahun: "",
     total_laporan_perperiode: 0,
     total_puskesmas_rs_belum_lapor: 0,
     total_puskesmas_rs_sudah_lapor: 0,
@@ -111,6 +112,9 @@ const DashboardPage: React.FC = () => {
     tmpData[0].data =
       responsenya.data.data.values.total_chart_puskesmas_rs_belum_lapor;
     setSeries(tmpData);
+    let tahun = responsenya.data.data.values.laporan_periode_tahun;
+    setJudulChart(tahun);
+    console.log(tahunChart);
     setForm({
       laporan_periode: responsenya.data.data.values.laporan_periode,
       laporan_periode_nama: responsenya.data.data.values.laporan_periode_nama,
@@ -127,13 +131,14 @@ const DashboardPage: React.FC = () => {
   };
   useEffect(() => {
     hitDashboard();
+
     const handleResize = () => {
       // Periksa lebar layar dan atur lebar chart sesuai dengan kondisi tertentu
       if (window.innerWidth < 700) {
         setChartWidth(300);
         setChartHeight(400);
       } else {
-        setChartWidth(700);
+        setChartWidth(800);
       }
     };
 
@@ -217,19 +222,21 @@ const DashboardPage: React.FC = () => {
             </Card>
           </Col>
         </Row>
-        <Row>
-          <Col>
-            {typeof window !== undefined && (
-              <Chart
-                options={options}
-                type="bar"
-                width={chartWidth}
-                height={chartHeight}
-                series={series}
-              />
-            )}
-          </Col>
-        </Row>
+        <div style={{ display: "flex", justifyContent: "center" }}>
+          <Row>
+            <Col>
+              {typeof window !== undefined && (
+                <Chart
+                  options={options}
+                  type="bar"
+                  width={chartWidth}
+                  height={chartHeight}
+                  series={series}
+                />
+              )}
+            </Col>
+          </Row>
+        </div>
       </Space>
     </MainLayout>
   );

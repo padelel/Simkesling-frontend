@@ -42,7 +42,7 @@ const FormLogin = () => {
   const handleChangeInput = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    console.log(event);
+    // console.log(event);
     setForm({
       ...form,
       [event.target.name]: event.target.value,

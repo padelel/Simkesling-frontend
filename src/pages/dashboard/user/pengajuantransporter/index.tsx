@@ -189,15 +189,13 @@ const Index: React.FC = () => {
             <Button
               onClick={() => toFormPage(record)}
               icon={<EditOutlined />}
-              style={{ backgroundColor: "yellow" }}
-            >
+              style={{ backgroundColor: "yellow" }}>
               Edit
             </Button>
             <Button
               onClick={() => toViewPage(record)}
               icon={<EyeOutlined />}
-              type="primary"
-            >
+              type="primary">
               View
             </Button>
             <Popconfirm
@@ -206,8 +204,7 @@ const Index: React.FC = () => {
               onConfirm={() => {
                 // setForm({ oldid: record.id_transporter_tmp }) // Set oldid when delete button is clicked
                 handleDelete(record.id_transporter_tmp?.toString() ?? "");
-              }}
-            >
+              }}>
               <Button icon={<DeleteOutlined />} type="primary" danger>
                 Delete
               </Button>
@@ -265,15 +262,13 @@ const Index: React.FC = () => {
       <div>
         <Link
           href="/dashboard/user/pengajuantransporter/PagePengajuanTransporter"
-          passHref
-        >
+          passHref>
           <div style={{ display: "flex", justifyContent: "center" }}>
             <Button
               type="primary"
               size="large"
               icon={<PlusCircleOutlined />}
-              style={{ boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)" }}
-            >
+              style={{ boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)" }}>
               Tambah Transporter
             </Button>
           </div>
@@ -283,8 +278,7 @@ const Index: React.FC = () => {
       <div
         style={{
           overflowX: "auto",
-        }}
-      >
+        }}>
         {/* <Search
           style={{
             width: 300,
