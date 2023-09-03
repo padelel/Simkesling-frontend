@@ -2,16 +2,35 @@ import React, { useEffect, useState } from "react";
 // import Chart from "react-apexcharts";
 import MainLayout from "@/components/MainLayout";
 import Diagram from "@/components/admin/dashboard/Diagram";
-import { Button, Card, Col, Form, Input, Row, Select, Space } from "antd";
+import {
+  Button,
+  Card,
+  Col,
+  Form,
+  Input,
+  Row,
+  Select,
+  Space,
+  Table,
+  TableProps,
+  Tag,
+} from "antd";
 import TabelNotifikasi from "@/components/admin/dashboard/TabelNotifikasi";
 import CardTahunan from "@/components/admin/dashboard/CardTahunan";
 import CardBulanan from "@/components/admin/dashboard/Cardbulanan";
 import dynamic from "next/dynamic";
 import cloneDeep from "clone-deep";
 import api from "@/utils/HttpRequest";
+import { useGlobalStore } from "@/stores/globalStore";
+
+const onChange = (pagination: any, filters: any, sorter: any, extra: any) => {
+  console.log("params", pagination, filters, sorter, extra);
+};
 
 const DashboardPage: React.FC = () => {
   const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
+  const globalStore = useGlobalStore();
+  const [data, setData] = useState<any[]>([]);
   const [tahunChart, setTahunChart] = useState("");
   const [periode, setPeriode] = useState("");
   const [formInstance] = Form.useForm();
@@ -129,7 +148,86 @@ const DashboardPage: React.FC = () => {
       total_puskesmas_rs: responsenya.data.data.values.total_puskesmas_rs,
     });
   };
+
+  const columns: any = [
+    {
+      title: "Nama Tempat",
+      dataIndex: "namaUser",
+      // defaultSortOrder: "descend",
+      sorter: (a: any, b: any) =>
+        a.namaUser.toUpperCase().localeCompare(b.namaUser.toUpperCase()),
+    },
+    {
+      title: "Jenis Instansi",
+      dataIndex: "namaTempat",
+      // defaultSortOrder: "descend",
+      sorter: (a: any, b: any) =>
+        a.namaTempat.toUpperCase().localeCompare(b.namaTempat.toUpperCase()),
+    },
+    {
+      title: "Kecamatan",
+      dataIndex: "kec",
+      // defaultSortOrder: "descend",
+      sorter: (a: any, b: any) =>
+        a.kec.toUpperCase().localeCompare(b.kec.toUpperCase()),
+    },
+    {
+      title: "Kelurahan",
+      dataIndex: "kel",
+      // defaultSortOrder: "descend",
+      sorter: (a: any, b: any) =>
+        a.kel.toUpperCase().localeCompare(b.kel.toUpperCase()),
+    },
+    {
+      title: "Status Laporan",
+      dataIndex: "sudahLapor",
+      render: (status: any) => {
+        let sts = "-- ups --";
+        let color = "-";
+        if (status == true) {
+          color = "volcano";
+          sts = "Kadaluarsa";
+        }
+        if (status == false) {
+          color = "green";
+          sts = "Berlaku";
+        }
+
+        return (
+          <>
+            <Tag color={color}>{sts.toUpperCase()}</Tag>
+          </>
+        );
+      },
+    },
+  ];
+
+  const getData = async () => {
+    if (globalStore.setLoading) globalStore.setLoading(true);
+    try {
+      const response = await api.post("/user/dashboard-admin/data");
+      const responseData = response.data.data.values.notif_user_laporan_bulanan;
+
+      const transformedData = responseData.map((item: any) => ({
+        ...item,
+        namaUser: item.nama_user,
+        namaTempat: item.tipe_tempat,
+        kec: item.kecamatan,
+        kel: item.kelurahan,
+        sudahLapor: item.sudah_lapor,
+      }));
+
+      setData(transformedData);
+      console.log(transformedData);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      if (globalStore.setLoading) globalStore.setLoading(false);
+    }
+  };
+
   useEffect(() => {
+    getData();
     hitDashboard();
 
     const handleResize = () => {
@@ -236,6 +334,27 @@ const DashboardPage: React.FC = () => {
               )}
             </Col>
           </Row>
+        </div>
+        <div style={{ display: "flex", justifyContent: "center" }}>
+          <table>
+            <tr>
+              <td>
+                <h4 style={{ display: "flex", justifyContent: "center" }}>
+                  Notifikasi Laporan Limbah
+                </h4>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <Table
+                  scroll={{ x: 800 }}
+                  columns={columns}
+                  dataSource={data}
+                  onChange={onChange}
+                />
+              </td>
+            </tr>
+          </table>
         </div>
       </Space>
     </MainLayout>
