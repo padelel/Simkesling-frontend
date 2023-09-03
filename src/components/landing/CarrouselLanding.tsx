@@ -3,7 +3,7 @@ import { Button, Modal, Space } from "antd";
 import { LoginOutlined } from "@ant-design/icons";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import bg from "../../../public/gambar-carousel/Balaikota-Depok.jpg";
-import bg2 from "../../../public/gambar-carousel/Balaikota-Depok2.jpg";
+import bg2 from "../../../public/gambar-carousel/limbah-ilustration.jpg";
 import { SizeType } from "antd/es/config-provider/SizeContext";
 import { SpaceSize } from "antd/es/space";
 import Link from "next/link";
@@ -46,40 +46,53 @@ const CarrouselLanding = () => {
         color: "#fff",
         width: "100%",
         textAlign: "center",
-        paddingTop: 100,
-        paddingBottom: 100,
         backgroundImage: `url(${bgImage})`,
         backgroundPosition: "center",
         backgroundSize: "cover",
         backgroundRepeat: "no-repeat",
-      }}>
-      <h2 style={{ fontFamily: "Roboto" }}>
-        SISTEM INFORMASI MANAJEMEN KESEHATAN LINGKUNGAN
-        <br />
-        Kota Depok - Jawa Barat
-      </h2>
-      <Space size={size}>
-        <Button
-          type="primary"
-          icon={<LoginOutlined />}
-          onClick={showModal}
-          size={sizeButton}>
-          Login
-        </Button>
+        position: "relative", // Add this line
+      }}
+    >
+      <div
+        style={{
+          backgroundColor: "rgba(0,0,0, 0.60)",
+          top: 0,
+          paddingTop: 100,
+          paddingBottom: 100,
+          left: 0,
+          height: "100%",
+        }}
+      >
+        <h2 style={{ fontFamily: "Roboto" }}>
+          SISTEM INFORMASI MANAJEMEN KESEHATAN LINGKUNGAN
+          <br />
+          Kota Depok - Jawa Barat
+        </h2>
+        <Space size={size}>
+          <Button
+            type="primary"
+            icon={<LoginOutlined />}
+            onClick={showModal}
+            size={sizeButton}
+          >
+            Login
+          </Button>
 
-        {/* <Button type="primary" icon={<InfoCircleOutlined />} size={sizeButton}>
+          {/* <Button type="primary" icon={<InfoCircleOutlined />} size={sizeButton}>
           Tentang Kami
         </Button> */}
-      </Space>
+        </Space>
 
-      <Modal
-        open={isModalOpen}
-        onOk={handleOk}
-        onCancel={handleCancel}
-        footer={null}>
-        <h2 style={{ textAlign: "center" }}>Login Simkesling</h2>
-        <FormLogin />
-      </Modal>
+        <Modal
+          open={isModalOpen}
+          onOk={handleOk}
+          onCancel={handleCancel}
+          footer={null}
+        >
+          <h2 style={{ textAlign: "center" }}>Login Simkesling</h2>
+          <FormLogin />
+        </Modal>
+      </div>
     </div>
   );
 };

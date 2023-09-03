@@ -170,7 +170,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
         collapsible
         collapsed={collapsed}
         onCollapse={(value: any) => setCollapsed(value)}
-        style={{ background: colorBgContainer }}>
+        style={{ background: colorBgContainer }}
+      >
         {/* <Sider
         breakpoint="lg"
         collapsedWidth="0"
@@ -189,14 +190,22 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
             justifyContent: "center",
             display: "flex",
             marginTop: "30px",
-          }}>
+          }}
+        >
           <Image
+            preview={false}
             src="/icon-navbar/kotadepok.png"
-            alt="Vercel Logo"
+            alt="Logo"
+            width={75}
+            height={85}
+          />
+          {/* <Image
+            src="/icon-navbar/kotadepok.png"
+            alt="Logo"
             width={75}
             height={85}
             priority
-          />
+          /> */}
           <br />
         </div>
         <h4 style={{ textAlign: "center" }}>
@@ -230,15 +239,14 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
               style={{
                 padding: 8,
                 background: colorBgContainer,
-              }}>
+              }}
+            >
               {/* Lorem ipsum dolor sit amet consectetur adipisicing elit. Officia */}
               {children}
             </div>
           </Content>
         </Spin>
-        <Footer style={{ textAlign: "center" }}>
-          SIMKESLING ©2023 Created by Keluarga Berencana
-        </Footer>
+        <Footer style={{ textAlign: "center" }}>SIMKESLING ©2023</Footer>
       </Layout>
     </Layout>
   );

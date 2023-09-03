@@ -184,13 +184,13 @@ const DashboardPage: React.FC = () => {
       render: (status: any) => {
         let sts = "-- ups --";
         let color = "-";
-        if (status == true) {
-          color = "volcano";
-          sts = "Kadaluarsa";
-        }
         if (status == false) {
+          color = "volcano";
+          sts = "Belum lapor";
+        }
+        if (status == true) {
           color = "green";
-          sts = "Berlaku";
+          sts = "Sudah Lapor";
         }
 
         return (
@@ -298,24 +298,36 @@ const DashboardPage: React.FC = () => {
         </Space>
       </Form>
       <Space direction="vertical" size={16}>
-        <Row>
+        <Row style={{ display: "flex", justifyContent: "space-between" }}>
           <Col>
-            <Card title="Total Instansi Kesehatan" style={{ width: 300 }}>
+            <Card
+              title="Total Instansi Kesehatan"
+              style={{ width: 300, backgroundColor: "burlywood" }}
+            >
               <h1>{form.total_puskesmas_rs}</h1>
             </Card>
           </Col>
           <Col>
-            <Card title="Total Instansi Sudah Lapor" style={{ width: 300 }}>
+            <Card
+              title="Total Instansi Sudah Lapor"
+              style={{ width: 300, backgroundColor: "coral" }}
+            >
               <h1>{form.total_puskesmas_rs_sudah_lapor}</h1>
             </Card>
           </Col>
           <Col>
-            <Card title="Total Instansi Belum Lapor" style={{ width: 300 }}>
+            <Card
+              title="Total Instansi Belum Lapor"
+              style={{ width: 300, backgroundColor: "salmon" }}
+            >
               <h1>{form.total_puskesmas_rs_belum_lapor}</h1>
             </Card>
           </Col>
           <Col>
-            <Card title="Total Transporter" style={{ width: 300 }}>
+            <Card
+              title="Total Transporter"
+              style={{ width: 300, backgroundColor: "hotpink" }}
+            >
               <h1>{form.total_transporter}</h1>
             </Card>
           </Col>

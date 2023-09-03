@@ -166,13 +166,15 @@ const Index: React.FC = () => {
             <Button
               onClick={() => toFormPage(record)}
               icon={<EditOutlined />}
-              style={{ backgroundColor: "yellow" }}>
+              style={{ backgroundColor: "yellow" }}
+            >
               Edit
             </Button>
             <Button
               onClick={() => toViewPage(record)}
               icon={<EyeOutlined />}
-              type="primary">
+              type="primary"
+            >
               View
             </Button>
             {/* <Button
@@ -220,10 +222,11 @@ const Index: React.FC = () => {
 
   return (
     <MainLayout title="Manajemen Transporter">
-      <div>
+      <div style={{ display: "flex", justifyContent: "center" }}>
         <Link
           href="/dashboard/admin/manajemen/transporter/PengajuanTransporter"
-          passHref>
+          passHref
+        >
           <Button type="primary">Tambah Transporter</Button>
         </Link>
       </div>

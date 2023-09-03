@@ -6,7 +6,7 @@ const apifile = axios.create({
   // baseURL: "http://localhost:8000/api/v1", // Your API base URL
   // baseURL: "http://localhost:8009", // Your API base URL
   baseURL: "https://be-simkesling.lalapan-depok.com", // Your API base URL
-  // baseURL: "http://192.168.47.190:8009/", //
+  // baseURL: "http://192.168.228.190:8009/", //
   timeout: 30000, // Request timeout in milliseconds
   headers: {
     // "Content-Type": "application/json",

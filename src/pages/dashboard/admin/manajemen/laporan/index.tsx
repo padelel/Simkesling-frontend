@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import MainLayout from "@/components/MainLayout";
-import { Button, Space, Modal } from "antd";
+import { Button, Space, Modal, Col, Row, Form, Select, Input } from "antd";
 import { Table } from "antd";
 import type { ColumnsType, TableProps } from "antd/es/table";
 import { Excel } from "antd-table-saveas-excel";
@@ -19,6 +19,7 @@ import {
   ExclamationCircleFilled,
 } from "@ant-design/icons";
 import { parsingDate } from "@/utils/common";
+import { useGlobalStore } from "@/stores/globalStore";
 
 // interface DataType {
 //   idUser: any;
@@ -80,10 +81,18 @@ const onChange = (pagination: any, filters: any, sorter: any, extra: any) => {
 };
 
 const Index: React.FC = () => {
+  const globalStore = useGlobalStore();
   const laporanBulananStore = useLaporanBulananStore();
   const [data, setData] = useState<any[]>([]);
   const [datacsv, setDatacsv] = useState<any[]>([]);
   const router = useRouter();
+  const [formInstance] = Form.useForm();
+  let tmpForm = {
+    periode: "",
+    tahun: "",
+  };
+
+  const [form, setForm] = useState(cloneDeep(tmpForm));
 
   const handleGenerateCsv = () => {
     // const excel = new Excel();
@@ -214,7 +223,8 @@ const Index: React.FC = () => {
             <Button
               onClick={() => toViewPage(record)}
               icon={<EyeOutlined />}
-              type="primary">
+              type="primary"
+            >
               View
             </Button>
           </Space>
@@ -225,8 +235,13 @@ const Index: React.FC = () => {
 
   const getData = async () => {
     try {
-      const response = await api.post("/user/laporan-bulanan/data");
+      if (globalStore.setLoading) globalStore.setLoading(true);
+      let dataForm: any = new FormData();
+      dataForm.append("periode", form.periode);
+      dataForm.append("tahun", form.tahun);
+      const response = await api.post("/user/laporan-bulanan/data", dataForm);
       const responseData = response.data.data.values;
+      console.log(responseData);
 
       const transformedData = responseData.map((item: any) => ({
         ...item,
@@ -254,7 +269,33 @@ const Index: React.FC = () => {
       setData(transformedData);
     } catch (error) {
       console.error("Error fetching data:", error);
+    } finally {
+      if (globalStore.setLoading) globalStore.setLoading(false);
     }
+  };
+
+  const handleChangePeriode = (val: any, name: string, event: any) => {
+    const periode = parseInt(val);
+    console.log(val);
+    console.log(periode);
+    setForm({
+      ...form,
+      [name]: val,
+    });
+  };
+
+  const handleChangeInput = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    // console.log(event);
+    setForm({
+      ...form,
+      [event.target.name]: event.target.value,
+    });
+  };
+
+  const hitDashboard = async () => {
+    let dataForm: any = new FormData();
   };
 
   useEffect(() => {
@@ -263,25 +304,84 @@ const Index: React.FC = () => {
 
   return (
     <MainLayout title="Tabel Laporan">
-      <div>
-        {/* <Button type="primary" onClick={handleGenerateCsv}>
+      <>
+        <table>
+          <tr>
+            <td>
+              {" "}
+              <Form form={formInstance}>
+                <br />
+                <Space wrap>
+                  <Form.Item name="form_periode" label="Periode">
+                    <Select
+                      allowClear={true}
+                      onClear={() => handleChangePeriode("", "periode", event)}
+                      placeholder="Pilih Bulan Periode"
+                      onChange={(v) => handleChangePeriode(v, "periode", event)}
+                      style={{ width: 200 }}
+                      // onChange={handleChange}
+                      options={[
+                        { value: 1, label: "Januari" },
+                        { value: 2, label: "Februari" },
+                        { value: 3, label: "Maret" },
+                        { value: 4, label: "April" },
+                        { value: 5, label: "Mei" },
+                        { value: 6, label: "Juni" },
+                        { value: 7, label: "Juli" },
+                        { value: 8, label: "Agustus" },
+                        { value: 9, label: "September" },
+                        { value: 10, label: "Oktober" },
+                        { value: 11, label: "November" },
+                        { value: 12, label: "Desember" },
+                      ]}
+                    />
+                  </Form.Item>
+                  <Form.Item name="form_tahun" label="Tahun">
+                    <Input
+                      allowClear={true}
+                      placeholder="Masukan Tahun"
+                      onChange={handleChangeInput}
+                      maxLength={4}
+                      name="tahun"
+                    />
+                  </Form.Item>
+                  <Form.Item>
+                    <Button type="primary" onClick={getData}>
+                      Filter
+                    </Button>
+                  </Form.Item>
+                </Space>
+              </Form>
+            </td>
+            <td
+              style={{
+                paddingLeft: 10,
+              }}
+            >
+              <CSVLink
+                data={data}
+                asyncOnClick={true}
+                filename={`Laporan Limbah - ${new Date().toISOString()}.csv`}
+                onClick={async (event: any, done: () => void) => {
+                  await handleGenerateCsv();
+                  done();
+                }}
+              >
+                <Button>Export Excel</Button>
+              </CSVLink>
+            </td>
+          </tr>
+        </table>
+      </>
+      {/* <div>
+        <Button type="primary" onClick={handleGenerateCsv}>
           Export Excel
-        </Button> */}
-        {/* <CSVDownload data={datacsv} target="_blank" /> */}
-        <CSVLink
-          data={data}
-          asyncOnClick={true}
-          filename={`Laporan Limbah - ${new Date().toISOString()}.csv`}
-          onClick={async (event: any, done: () => void) => {
-            await handleGenerateCsv();
-            done();
-          }}>
-          Export Excel
-        </CSVLink>
-      </div>
-
+        </Button>
+        <CSVDownload data={datacsv} target="_blank" />
+      </div> */}
       <div style={{ marginTop: "20px" }}>
         <Table
+          key={new Date().toISOString().toString()}
           scroll={{ x: 800 }}
           columns={columns}
           dataSource={data}

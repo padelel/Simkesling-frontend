@@ -148,7 +148,8 @@ const Index: React.FC = () => {
             <Button
               onClick={() => toFormPage(record)}
               icon={<EditOutlined />}
-              style={{ backgroundColor: "yellow" }}>
+              style={{ backgroundColor: "yellow" }}
+            >
               Validasi
             </Button>
           </Space>
@@ -184,7 +185,7 @@ const Index: React.FC = () => {
   }, []);
 
   return (
-    <MainLayout title="Pengajuan Transporter">
+    <MainLayout title="Validasi Transporter">
       <div style={{ marginTop: "20px" }}>
         <Table
           scroll={{ x: 800 }}

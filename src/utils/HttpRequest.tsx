@@ -1,13 +1,14 @@
 import { useGlobalStore } from "@/stores/globalStore";
 import axios from "axios";
 import Notif from "./Notif";
-
+import Cookies from "js-cookie";
+import { useRouter } from "next/router";
 // Create an instance of Axios with custom configurations
 const api = axios.create({
   // baseURL: 'http://localhost:8000/api',
   // baseURL: "http://localhost:8000/api/v1", // Your API base URL
   baseURL: "https://be-simkesling.lalapan-depok.com/api/v1", // Your API base URL
-  // baseURL: "http://192.168.47.190:8000/api/v1", // Your API base URL
+  // baseURL: "http://192.168.228.190:8000/api/v1", // Your API base URL
   timeout: 30000, // Request timeout in milliseconds
   headers: {
     // "Content-Type": "application/json",
@@ -48,6 +49,16 @@ api.interceptors.response.use(
     if (error.response) {
       if (error.response.data) {
         Notif("error", "Problem: ", error.response.data.message.toString(), 7);
+        console.log(error.response.status);
+        if (error.response.status == 401) {
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          Cookies.remove("username");
+          Cookies.remove("token");
+          Cookies.remove("nama_user");
+          window.location.href = "/";
+          return Promise.reject(error);
+        }
         // console.log("disini ", error.response.data.data);
         try {
           if (Object.keys(error.response.data.data).length > 0) {

@@ -217,7 +217,7 @@ const Index: React.FC = () => {
 
   return (
     <MainLayout title="Manajemen Akun Puskesmas / Rumah Sakit">
-      <div>
+      <div style={{ display: "flex", justifyContent: "center" }}>
         <Link href="/dashboard/admin/manajemen/profil/TambahAkun" passHref>
           <Button type="primary">Tambah Akun Puskesmas / Rumah Sakit</Button>
         </Link>
