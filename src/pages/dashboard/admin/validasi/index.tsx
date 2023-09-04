@@ -77,13 +77,6 @@ const Index: React.FC = () => {
 
   const columns: ColumnsType<DataType> = [
     {
-      title: "Nama Puskesmas",
-      dataIndex: "namaPuskesmas",
-      defaultSortOrder: "ascend",
-      sorter: (a: any, b: any) =>
-        a.namaPuskesmas.length - b.namaPuskesmas.length,
-    },
-    {
       title: "Nama Transporter",
       dataIndex: "namaTransporter",
       // defaultSortOrder: "descend",
@@ -166,7 +159,6 @@ const Index: React.FC = () => {
 
       const transformedData = responseData.map((item: any) => ({
         ...item,
-        namaPuskesmas: item.user.nama_user,
         namaTransporter: item.nama_transporter,
         tanggalPengajuan: parsingDate(item.created_at),
         status: item.status_transporter_tmp,
