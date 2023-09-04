@@ -194,11 +194,18 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
         >
           <Image
             preview={false}
+            width={75}
+            height={85}
+            src="/icon-navbar/kotadepok.png"
+            alt="icon-depok"
+          />
+          {/* <Image
+            preview={false}
             src="/icon-navbar/kotadepok.png"
             alt="Logo"
             width={75}
             height={85}
-          />
+          /> */}
           {/* <Image
             src="/icon-navbar/kotadepok.png"
             alt="Logo"

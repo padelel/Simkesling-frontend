@@ -222,14 +222,14 @@ const Index: React.FC = () => {
 
   return (
     <MainLayout title="Manajemen Transporter">
-      <div style={{ display: "flex", justifyContent: "center" }}>
+      {/* <div style={{ display: "flex", justifyContent: "center" }}>
         <Link
           href="/dashboard/admin/manajemen/transporter/PengajuanTransporter"
           passHref
         >
           <Button type="primary">Tambah Transporter</Button>
         </Link>
-      </div>
+      </div> */}
 
       <div style={{ marginTop: "20px" }}>
         <Table

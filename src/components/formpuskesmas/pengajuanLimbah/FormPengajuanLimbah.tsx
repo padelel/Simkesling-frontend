@@ -112,9 +112,9 @@ const FormPengajuanLimbah: React.FC = () => {
       setTransporterOptions(
         responseData.map(
           (item: { nama_transporter: string; id_transporter: number }) => ({
-            value: item.id_transporter,
+            value: item.id_transporter.toString(),
             label: item.nama_transporter,
-            id_transporter: item.id_transporter,
+            id_transporter: item.id_transporter.toString(),
           })
         )
       );
@@ -143,7 +143,7 @@ const FormPengajuanLimbah: React.FC = () => {
     oldid: "",
     periode: "",
     tahun: "",
-    idtransporter: 0,
+    idtransporter: "" as string | number,
     namatransporter: "",
     namapemusnah: "",
     metodepemusnah: "",
