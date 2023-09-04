@@ -329,8 +329,8 @@ const FormTambahAkun: React.FC = () => {
             placeholder="Silahkan Pilih Tipe Instansi"
             allowClear
             options={[
-              { value: 3, label: "Puskesmas" },
-              { value: 2, label: "Rumah Sakit" },
+              { value: "3", label: "Puskesmas" },
+              { value: "2", label: "Rumah Sakit" },
             ]}
           />
         </Form.Item>
