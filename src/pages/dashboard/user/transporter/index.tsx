@@ -1,5 +1,5 @@
 import MainLayout from "@/components/MainLayout";
-import { Button, Space, Modal, Tag } from "antd";
+import { Button, Space, Modal, Tag, Input, Col, Row } from "antd";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { Table } from "antd";
@@ -19,6 +19,7 @@ import { useGlobalStore } from "@/stores/globalStore";
 import { parsingDate } from "@/utils/common";
 
 interface DataType {
+  statusBerlaku: any;
   status: any;
   namaTransporter: any;
   tanggalPengajuan: any;
@@ -172,20 +173,23 @@ const Index: React.FC = () => {
             <Button
               onClick={() => toFormPage(record)}
               icon={<EditOutlined />}
-              style={{ backgroundColor: "yellow" }}>
+              style={{ backgroundColor: "yellow" }}
+            >
               Edit
             </Button>
             <Button
               onClick={() => toViewPage(record)}
               icon={<EyeOutlined />}
-              type="primary">
+              type="primary"
+            >
               View
             </Button>
             <Button
               onClick={showDeleteConfirm}
               icon={<DeleteOutlined />}
               type="primary"
-              danger>
+              danger
+            >
               Delete
             </Button>
           </Space>
@@ -207,17 +211,47 @@ const Index: React.FC = () => {
         tanggalPengajuan: item.created_at,
         tanggalBerakhir: item.tgl_akhir,
         statusBerlaku: item.masa_berlaku_sudah_berakhir,
+        status: item.masa_berlaku_sudah_berakhir ? "KADALUARSA" : "BERLAKU",
 
         key: item.id_transporter_tmp.toString(),
       }));
 
       setData(transformedData);
+      setData2(transformedData);
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
       if (globalStore.setLoading) globalStore.setLoading(false);
     }
   };
+
+  // -- search -- \\
+  const [search, setSearch] = useState("");
+  const [data2, setData2] = useState<DataType[]>([]);
+  const handleChangeInput = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    console.log(event);
+    setSearch(event.target.value);
+  };
+  const doSearch = () => {
+    const tmpData = data2.filter((val) => {
+      if (
+        val.namaTransporter
+          .toString()
+          .toLowerCase()
+          .includes(search.toLowerCase()) ||
+        val.status.toString().toLowerCase().includes(search.toLowerCase())
+      ) {
+        return true;
+      }
+    });
+    setData(tmpData);
+  };
+
+  useEffect(() => {
+    doSearch();
+  }, [search]);
 
   useEffect(() => {
     getData();
@@ -232,9 +266,20 @@ const Index: React.FC = () => {
           <Button type="primary">Tambah Transporter</Button>
         </Link>
       </div> */}
+      <Row justify="end">
+        <Col span={6}>
+          <Input
+            onChange={handleChangeInput}
+            value={search}
+            name="search"
+            placeholder="Search"
+          />
+        </Col>
+      </Row>
 
       <div
-        style={{ marginTop: "20px", marginBottom: "20px", overflowX: "auto" }}>
+        style={{ marginTop: "20px", marginBottom: "20px", overflowX: "auto" }}
+      >
         <Table
           scroll={{ x: 800 }} // Set a minimum width to trigger horizontal scrolling
           columns={columns}

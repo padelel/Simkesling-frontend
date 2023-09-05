@@ -415,95 +415,96 @@ const FormPengajuanTransporter: React.FC = () => {
       {contextHolderCreate}
       {contextHolderUpdate}
       <table>
-        <tr>
-          <td>Nama Transporter</td>
-          <td>:</td>
-          <td>
-            <b>{form.namatransporter}</b>
-          </td>
-        </tr>
-        <tr>
-          <td>NPWP</td>
-          <td>:</td>
-          <td>
-            <b>{form.npwp}</b>
-          </td>
-        </tr>
-        <tr>
-          <td>Kecamatan</td>
-          <td>:</td>
-          <td>
-            <b>
-              {kecamatanOptions.length > 0 &&
-                (kecamatanOptions.find(
-                  (v) =>
-                    v.id_kecamatan.toString() == form.id_kecamatan.toString()
-                )?.label ??
-                  "")}
-            </b>
-          </td>
-        </tr>
-        <tr>
-          <td>Kelurahan</td>
-          <td>:</td>
-          <td>
-            <b>
-              {kelurahanOptions.length > 0 &&
-                (kelurahanOptions.find(
-                  (v) =>
-                    v.id_kelurahan.toString() == form.id_kelurahan.toString()
-                )?.label ??
-                  "")}
-            </b>
-          </td>
-        </tr>
-        <tr>
-          <td>Alamat</td>
-          <td>:</td>
-          <td>
-            <b>{form.alamat}</b>
-          </td>
-        </tr>
-        <tr>
-          <td>Nomor Handphone</td>
-          <td>:</td>
-          <td>
-            <b>{form.telp}</b>
-          </td>
-        </tr>
-        <tr>
-          <td>Email</td>
-          <td>:</td>
-          <td>
-            <b>{form.email}</b>
-          </td>
-        </tr>
-        <tr>
-          <td>File MOU</td>
-          <td>:</td>
-          <td>
-            <b>
-              {fileListList.map((val, index) => {
-                let item = val[0];
-                let dateAwalItem = dateRangeAwal[index][0];
-                let dateAkhirItem = dateRangeAkhir[index][0];
-                return (
-                  <>
-                    {dateAwalItem.format("DD MMMM YYYY").toString()}
-                    {" - "}
-                    {dateAkhirItem.format("DD MMMM YYYY").toString()}
-                    <br />
-                    <a target="_blank" href={item.url}>
-                      {item.name}
-                    </a>
-                    <hr />
-                  </>
-                );
-              })}
-            </b>
-          </td>
-        </tr>
-        {/* <tr>
+        <tbody>
+          <tr>
+            <td>Nama Transporter</td>
+            <td>:</td>
+            <td>
+              <b>{form.namatransporter}</b>
+            </td>
+          </tr>
+          <tr>
+            <td>NPWP</td>
+            <td>:</td>
+            <td>
+              <b>{form.npwp}</b>
+            </td>
+          </tr>
+          <tr>
+            <td>Kecamatan</td>
+            <td>:</td>
+            <td>
+              <b>
+                {kecamatanOptions.length > 0 &&
+                  (kecamatanOptions.find(
+                    (v) =>
+                      v.id_kecamatan.toString() == form.id_kecamatan.toString()
+                  )?.label ??
+                    "")}
+              </b>
+            </td>
+          </tr>
+          <tr>
+            <td>Kelurahan</td>
+            <td>:</td>
+            <td>
+              <b>
+                {kelurahanOptions.length > 0 &&
+                  (kelurahanOptions.find(
+                    (v) =>
+                      v.id_kelurahan.toString() == form.id_kelurahan.toString()
+                  )?.label ??
+                    "")}
+              </b>
+            </td>
+          </tr>
+          <tr>
+            <td>Alamat</td>
+            <td>:</td>
+            <td>
+              <b>{form.alamat}</b>
+            </td>
+          </tr>
+          <tr>
+            <td>Nomor Handphone</td>
+            <td>:</td>
+            <td>
+              <b>{form.telp}</b>
+            </td>
+          </tr>
+          <tr>
+            <td>Email</td>
+            <td>:</td>
+            <td>
+              <b>{form.email}</b>
+            </td>
+          </tr>
+          <tr>
+            <td>File MOU</td>
+            <td>:</td>
+            <td>
+              <b>
+                {fileListList.map((val, index) => {
+                  let item = val[0];
+                  let dateAwalItem = dateRangeAwal[index][0];
+                  let dateAkhirItem = dateRangeAkhir[index][0];
+                  return (
+                    <>
+                      {dateAwalItem.format("DD MMMM YYYY").toString()}
+                      {" - "}
+                      {dateAkhirItem.format("DD MMMM YYYY").toString()}
+                      <br />
+                      <a target="_blank" href={item.url}>
+                        {item.name}
+                      </a>
+                      <hr />
+                    </>
+                  );
+                })}
+              </b>
+            </td>
+          </tr>
+          {/* <tr>
           <td>Masa Berlaku</td>
           <td>:</td>
           <td>
@@ -524,6 +525,7 @@ const FormPengajuanTransporter: React.FC = () => {
             <b>{dateRangeAkhir.toString()}</b>
           </td>
         </tr> */}
+        </tbody>
       </table>
     </>
   );

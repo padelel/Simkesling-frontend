@@ -38,6 +38,7 @@ import router from "next/router";
 import { useGlobalStore } from "@/stores/globalStore";
 import apifile from "@/utils/HttpRequestFile";
 import Notif from "@/utils/Notif";
+import jwtDecode from "jwt-decode";
 
 const { RangePicker } = DatePicker;
 
@@ -427,7 +428,9 @@ const FormViewLaporan: React.FC = () => {
       if (laporanBulananStore.file_manifest) {
         let val = laporanBulananStore.file_manifest[index];
         let tmpfile = await getFile(val.file1);
-        arrfile.push(tmpfile);
+        if (tmpfile) {
+          arrfile.push(tmpfile);
+        }
       }
     }
     console.log(arrfile);
@@ -444,7 +447,9 @@ const FormViewLaporan: React.FC = () => {
       if (laporanBulananStore.file_logbook) {
         let val = laporanBulananStore.file_logbook[index];
         let tmpfile = await getFile(val.file1);
-        arrfile.push(tmpfile);
+        if (tmpfile) {
+          arrfile.push(tmpfile);
+        }
       }
     }
     console.log(arrfile);
@@ -455,6 +460,14 @@ const FormViewLaporan: React.FC = () => {
   };
 
   useLayoutEffect(() => {
+    let token = localStorage.getItem("token");
+    let user: any = jwtDecode(token ?? "");
+    if (!user) {
+      router.push("/");
+      return;
+    }
+    console.log(user);
+
     try {
       getTransporterData();
       console.log(transporterOptions);
@@ -482,7 +495,11 @@ const FormViewLaporan: React.FC = () => {
         laporanBulananStore.id_laporan_bulanan == 0
       ) {
         console.log("masuk sini? #2");
-        router.push("/dashboard/admin/manajemen/laporan/");
+        if (user.level == "1") {
+          router.push("/dashboard/admin/manajemen/laporan");
+        } else {
+          router.push("/dashboard/user/limbah");
+        }
         return;
       }
       // jika edit set valuenya
@@ -597,7 +614,12 @@ const FormViewLaporan: React.FC = () => {
       getListHere();
     } catch (error) {
       console.error(error);
-      router.push("/dashboard/admin/manajemen/laporan/");
+      if (user.level == "1") {
+        router.push("/dashboard/admin/manajemen/laporan");
+      } else {
+        router.push("/dashboard/user/limbah");
+      }
+      // router.push("/dashboard/user/limbah");
     }
   }, []);
 
@@ -606,46 +628,48 @@ const FormViewLaporan: React.FC = () => {
       <Row>
         <Col>
           <table>
-            <tr>
-              <td>Nama Transporter</td>
-              <td>:</td>
-              <td>{form.namatransporter}</td>
-            </tr>
-            <tr>
-              <td>Nama Pemusnah</td>
-              <td>:</td>
-              <td>{form.namapemusnah}</td>
-            </tr>
-            <tr>
-              <td>Metode Pemusnah</td>
-              <td>:</td>
-              <td>{form.metodepemusnah}</td>
-            </tr>
-            <tr>
-              <td>Ukuran TPS</td>
-              <td>:</td>
-              <td>{form.ukurantps}</td>
-            </tr>
-            <tr>
-              <td>Ukuran Pemusnah Mandiri</td>
-              <td>:</td>
-              <td>{form.ukuranpemusnah}</td>
-            </tr>
-            <tr>
-              <td>Total Limbah Padat</td>
-              <td>:</td>
-              <td>{form.totallimbahpadat}</td>
-            </tr>
-            <tr>
-              <td>Total Limbah Non Covid</td>
-              <td>:</td>
-              <td>{form.totallimbahnoncovid}</td>
-            </tr>
-            <tr>
-              <td>Total Limbah Covid</td>
-              <td>:</td>
-              <td>{form.totallimbahcovid}</td>
-            </tr>
+            <tbody>
+              <tr>
+                <td>Nama Transporter</td>
+                <td>:</td>
+                <td>{form.namatransporter}</td>
+              </tr>
+              <tr>
+                <td>Nama Pemusnah</td>
+                <td>:</td>
+                <td>{form.namapemusnah}</td>
+              </tr>
+              <tr>
+                <td>Metode Pemusnah</td>
+                <td>:</td>
+                <td>{form.metodepemusnah}</td>
+              </tr>
+              <tr>
+                <td>Ukuran TPS</td>
+                <td>:</td>
+                <td>{form.ukurantps}</td>
+              </tr>
+              <tr>
+                <td>Ukuran Pemusnah Mandiri</td>
+                <td>:</td>
+                <td>{form.ukuranpemusnah}</td>
+              </tr>
+              <tr>
+                <td>Total Limbah Padat</td>
+                <td>:</td>
+                <td>{form.totallimbahpadat}</td>
+              </tr>
+              <tr>
+                <td>Total Limbah Non Covid</td>
+                <td>:</td>
+                <td>{form.totallimbahnoncovid}</td>
+              </tr>
+              <tr>
+                <td>Total Limbah Covid</td>
+                <td>:</td>
+                <td>{form.totallimbahcovid}</td>
+              </tr>
+            </tbody>
           </table>
         </Col>
       </Row>
@@ -653,32 +677,34 @@ const FormViewLaporan: React.FC = () => {
       <Row>
         <Col>
           <table cellPadding={5} cellSpacing={0} border={1}>
-            <tr>
-              <th>Kategori</th>
-              <th>Catatan</th>
-              <th>Berat</th>
-            </tr>
-            {limbahPadatList.map((val) => {
-              let item = val;
-              return (
-                <>
-                  <tr>
-                    <td>
-                      {item.name}
-                      {item.kategori}
-                    </td>
-                    <td>
-                      {item.name}
-                      {item.catatan}
-                    </td>
-                    <td>
-                      {item.name}
-                      {item.berat}
-                    </td>
-                  </tr>
-                </>
-              );
-            })}
+            <tbody>
+              <tr>
+                <th>Kategori</th>
+                <th>Catatan</th>
+                <th>Berat</th>
+              </tr>
+              {limbahPadatList.map((val) => {
+                let item = val;
+                return (
+                  <>
+                    <tr>
+                      <td>
+                        {item.name}
+                        {item.kategori}
+                      </td>
+                      <td>
+                        {item.name}
+                        {item.catatan}
+                      </td>
+                      <td>
+                        {item.name}
+                        {item.berat}
+                      </td>
+                    </tr>
+                  </>
+                );
+              })}
+            </tbody>
           </table>
         </Col>
       </Row>
@@ -686,58 +712,69 @@ const FormViewLaporan: React.FC = () => {
       <Row>
         <Col>
           <table>
-            <tr>
-              <td>File Manifest</td>
-              <td>:</td>
-              <td>
-                <ul>
-                  {fileManifest.map((val) => {
-                    let item = val;
-                    return (
-                      <>
-                        <li>
-                          <a href={item.url}>{item.name}</a>
-                        </li>
-                      </>
-                    );
-                  })}
-                </ul>
-              </td>
-            </tr>
-            <tr>
-              <td>File Logbook</td>
-              <td>:</td>
-              <td>
-                <ul>
-                  {fileLogbook.map((val) => {
-                    let item = val;
-                    return (
-                      <>
-                        <li>
-                          <a href={item.url}>{item.name}</a>
-                        </li>
-                      </>
-                    );
-                  })}
-                </ul>
-              </td>
-            </tr>
-            <Divider />
-            <tr>
-              <td>Debit Limbah Cair</td>
-              <td>:</td>
-              <td>{form.debitlimbahcair}</td>
-            </tr>
-            <tr>
-              <td>Kapasitas Ipal</td>
-              <td>:</td>
-              <td>{form.kapasitasinpal}</td>
-            </tr>
-            <tr>
-              <td>Catatan Limbah Cair</td>
-              <td>:</td>
-              <td>{form.catatanlimbahcair}</td>
-            </tr>
+            <tbody>
+              <tr>
+                <td>File Manifest</td>
+                <td>:</td>
+                <td>
+                  <ul>
+                    {fileManifest.map((val) => {
+                      let item = val;
+                      return (
+                        <>
+                          <li>
+                            {item.hasOwnProperty('url') && (
+                              <a href={item.url} target="_blank">{item.name}</a>
+                            )}
+                          </li>
+                        </>
+                      );
+                    })}
+                  </ul>
+                </td>
+              </tr>
+              <tr>
+                <td>File Logbook</td>
+                <td>:</td>
+                <td>
+                  <ul>
+                    {fileLogbook.map((val) => {
+                      let item = val;
+                      return (
+                        <>
+                          <li>
+                            {item.hasOwnProperty("url") && (
+                              <a href={item.url} target="_blank">{item.name}</a>
+                            )}
+                          </li>
+                        </>
+                      );
+                    })}
+                  </ul>
+                </td>
+              </tr>
+              <tr>
+                <td colSpan={3}>
+                  <Divider />
+                </td>
+              </tr>
+
+              <tr>
+                <td>Debit Limbah Cair</td>
+                <td>:</td>
+                <td>{form.debitlimbahcair}</td>
+              </tr>
+              <tr>
+                <td>Kapasitas Ipal</td>
+                <td>:</td>
+                <td>{form.kapasitasinpal}</td>
+              </tr>
+              <tr>
+                <td>Catatan Limbah Cair</td>
+                <td>:</td>
+                <td>{form.catatanlimbahcair}</td>
+              </tr>
+            </tbody>
           </table>
         </Col>
       </Row>

@@ -491,14 +491,14 @@ const FormPengajuanTransporter: React.FC = () => {
     formInstance.resetFields();
     setForm(cloneDeep(tmpForm));
 
+    if (
+      transporterStore.id_transporter == null ||
+      transporterStore.id_transporter == 0
+    ) {
+      router.push("/dashboard/user/transporter");
+      return;
+    }
     if (router.query.action === "edit") {
-      if (
-        transporterStore.id_transporter == null ||
-        transporterStore.id_transporter == 0
-      ) {
-        router.push("/dashboard/user/transporter");
-        return;
-      }
       // jika edit set valuenya
       setForm({
         status_transporter:

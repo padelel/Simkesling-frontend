@@ -469,20 +469,20 @@ const FormPengajuanLimbah: React.FC = () => {
     });
     setForm({
       ...form,
-      periode: new Date().getFullYear().toString(),
-      tahun: (new Date().getMonth() + 1).toString(),
+      tahun: new Date().getFullYear().toString(),
+      periode: (new Date().getMonth() + 1).toString(),
     });
 
+    if (
+      laporanBulananStore.id_laporan_bulanan == null ||
+      laporanBulananStore.id_laporan_bulanan == 0
+    ) {
+      console.log("masuk sini? #2");
+      router.push("/dashboard/user/limbah");
+      return;
+    }
     if (router.query.action === "edit") {
       console.log("masuk sini? #1");
-      if (
-        laporanBulananStore.id_laporan_bulanan == null ||
-        laporanBulananStore.id_laporan_bulanan == 0
-      ) {
-        console.log("masuk sini? #2");
-        router.push("/dashboard/user/limbah");
-        return;
-      }
       // jika edit set valuenya
       // setForm({
       //   oldid: laporanBulananStore.id_laporan_bulanan?.toString() ?? "",
@@ -990,18 +990,18 @@ const FormPengajuanLimbah: React.FC = () => {
               style={{ width: 200 }}
               // onChange={handleChange}
               options={[
-                { value: 1, label: "Januari" },
-                { value: 2, label: "Februari" },
-                { value: 3, label: "Maret" },
-                { value: 4, label: "April" },
-                { value: 5, label: "Mei" },
-                { value: 6, label: "Juni" },
-                { value: 7, label: "Juli" },
-                { value: 8, label: "Agustus" },
-                { value: 9, label: "September" },
-                { value: 10, label: "Oktober" },
-                { value: 11, label: "November" },
-                { value: 12, label: "Desember" },
+                { value: "1", label: "Januari" },
+                { value: "2", label: "Februari" },
+                { value: "3", label: "Maret" },
+                { value: "4", label: "April" },
+                { value: "5", label: "Mei" },
+                { value: "6", label: "Juni" },
+                { value: "7", label: "Juli" },
+                { value: "8", label: "Agustus" },
+                { value: "9", label: "September" },
+                { value: "10", label: "Oktober" },
+                { value: "11", label: "November" },
+                { value: "12", label: "Desember" },
               ]}
             />
           </Form.Item>

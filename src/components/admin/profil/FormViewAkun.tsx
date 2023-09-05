@@ -60,6 +60,8 @@ const FormTambahAkun: React.FC = () => {
     level: "",
     id_kecamatan: "",
     id_kelurahan: "",
+    kecamatan: "",
+    kelurahan: "",
     alamat_tempat: "",
     notelp: "",
     email: "",
@@ -243,72 +245,123 @@ const FormTambahAkun: React.FC = () => {
     }
   };
 
-  const getFiles = async () => {
-    let fileTps = await getFile(form.izin_tps);
-    let fileIpal = await getFile(form.izin_ipal);
+  let tmpFileTps: any = [];
+  let tmpFileIpal: any = [];
 
+  const getFiles = async () => {
+    console.log("--form#1", form);
+    // console.log(form);
+    const tempForm = cloneDeep(tambahAkunStore);
+    console.log("--form#2", tempForm);
+    let tempForm2 = cloneDeep({ ...form });
+    let fileTps = await getFile(tempForm.izin_tps);
+    let fileIpal = await getFile(tempForm.izin_ipal);
+    console.log("--form#3", form);
+    // console.log(form);
+    console.log(tempForm);
+    let file_izin_tps: any[] = [];
+    let file_izin_ipal: any[] = [];
+    if (fileTps) {
+      file_izin_tps = [fileTps];
+      tmpFileTps = [fileTps];
+    }
+    //   setForm({
+    //     ...tempForm2,
+    //     file_izin_tps: [fileTps],
+    //   });
+    // }
+    if (fileIpal) {
+      file_izin_ipal = [fileIpal];
+      tmpFileIpal = [fileIpal];
+    }
+    //   setForm({
+    //     ...tempForm2,
+    //     file_izin_ipal: [fileIpal],
+    //   });
+    // }
+    // if (fileTps && fileIpal) {
+    // }
+    console.log(fileTps);
+    console.log(fileIpal);
+    console.log(file_izin_tps);
+    console.log(file_izin_ipal);
     setForm({
-      ...form,
-      file_izin_tps: [fileTps],
-      file_izin_ipal: [fileIpal],
+      ...tempForm2,
+      file_izin_tps: file_izin_tps,
+      file_izin_ipal: file_izin_ipal,
     });
+    console.log("-outform file");
+    console.log(form);
     // file_izin_ipal;
     // file_izin_tps;
     // ;
   };
 
-  useLayoutEffect(() => {
+  const setDataProfile = async () => {
+    const akunStore = cloneDeep(tambahAkunStore);
+
+    console.log(router.query);
+    console.log(Object.values(tambahAkunStore));
+    console.log(tambahAkunStore);
+
+    // jika create
+    // formInstance.resetFields();
+    // setForm(cloneDeep(tmpForm));
+
+    // setPassword({
+    //   required: false,
+    // });
+
+    console.log("#0", akunStore);
+    console.log("#1", form);
+
+    await getFiles();
+
+    setForm({
+      oldid: akunStore.id_user?.toString(),
+      nama_user: akunStore.nama_user?.toString(),
+      username: akunStore.username?.toString(),
+      noreg_tempat: akunStore.noreg_tempat?.toString(),
+      level: akunStore.level?.toString(),
+      id_kecamatan: akunStore.id_kecamatan?.toString(),
+      id_kelurahan: akunStore.id_kelurahan?.toString(),
+      kecamatan: akunStore.kecamatan?.toString(),
+      kelurahan: akunStore.kelurahan?.toString(),
+      alamat_tempat: akunStore.alamat_tempat?.toString(),
+      notelp: akunStore.nohp?.toString(),
+      email: akunStore.email?.toString(),
+      password: akunStore.email?.toString(),
+      izin_ipal: akunStore.izin_ipal?.toString(),
+      izin_tps: akunStore.izin_tps?.toString(),
+      file_izin_ipal: tmpFileTps,
+      file_izin_tps: tmpFileIpal,
+    });
+    console.log("#2", form);
+
+    // formInstance.setFieldsValue({
+    //   form_namauser: tambahAkunStore.nama_user,
+    //   form_username: tambahAkunStore.username,
+    //   form_noreg: tambahAkunStore.noreg_tempat,
+    //   level: tambahAkunStore.level,
+    //   form_kecamatan: tambahAkunStore.id_kecamatan?.toString(),
+    //   form_kelurahan: tambahAkunStore.id_kelurahan?.toString(),
+    //   form_alamat: tambahAkunStore.alamat_tempat,
+    //   form_nohp: tambahAkunStore.notlp,
+    //   form_email: tambahAkunStore.email,
+    // });
+    // getKecamatanData();
+    // getKelurahanData(akunStore.id_kecamatan ?? "0");
+    console.log("#3", form);
+  };
+
+  useEffect(() => {
     // jika idnya kosong (dia melakukan refresh) balikin ke table
     if (tambahAkunStore.id_user == null || tambahAkunStore.id_user == 0) {
       router.push("/dashboard/admin/manajemen/profil");
       return;
     }
     let newFileList = [fileList];
-
-    getKecamatanData();
-    console.log(router.query);
-    console.log(Object.values(tambahAkunStore));
-    console.log(tambahAkunStore);
-
-    // jika create
-    formInstance.resetFields();
-    setForm(cloneDeep(tmpForm));
-
-    setPassword({
-      required: false,
-    });
-
-    setForm({
-      ...form,
-      oldid: tambahAkunStore.id_user?.toString() ?? "",
-      nama_user: tambahAkunStore.nama_user?.toString() ?? "",
-      username: tambahAkunStore.username?.toString() ?? "",
-      noreg_tempat: tambahAkunStore.noreg_tempat?.toString() ?? "",
-      level: tambahAkunStore.level?.toString() ?? "",
-      id_kecamatan: tambahAkunStore.id_kecamatan?.toString() ?? "",
-      id_kelurahan: tambahAkunStore.id_kelurahan?.toString() ?? "",
-      alamat_tempat: tambahAkunStore.alamat_tempat?.toString() ?? "",
-      notelp: tambahAkunStore.nohp?.toString() ?? "",
-      email: tambahAkunStore.email?.toString() ?? "",
-      password: tambahAkunStore.email?.toString() ?? "",
-      izin_ipal: tambahAkunStore.email?.toString() ?? "",
-      izin_tps: tambahAkunStore.email?.toString() ?? "",
-    });
-
-    formInstance.setFieldsValue({
-      form_namauser: tambahAkunStore.nama_user,
-      form_username: tambahAkunStore.username,
-      form_noreg: tambahAkunStore.noreg_tempat,
-      level: tambahAkunStore.level,
-      form_kecamatan: tambahAkunStore.id_kecamatan.toString(),
-      form_kelurahan: tambahAkunStore.id_kelurahan.toString(),
-      form_alamat: tambahAkunStore.alamat_tempat,
-      form_nohp: tambahAkunStore.notlp,
-      form_email: tambahAkunStore.email,
-    });
-
-    getKelurahanData(tambahAkunStore.id_kecamatan ?? "0");
-    getFiles();
+    setDataProfile();
   }, []);
 
   const props: UploadProps = {
@@ -367,97 +420,111 @@ const FormTambahAkun: React.FC = () => {
     }
   };
   return (
-    <>
+    <div>
       <table>
-        <tr>
-          <td>Nama Instansi</td>
-          <td>:</td>
-          <td>
-            <b>{form.nama_user}</b>
-          </td>
-        </tr>
-        <tr>
-          <td>Username</td>
-          <td>:</td>
-          <td>
-            <b>{form.username}</b>
-          </td>
-        </tr>
-        <tr>
-          <td>Nomor Registrasi / Nomor Izin Rumah Sakit</td>
-          <td>:</td>
-          <td>
-            <b>{form.noreg_tempat}</b>
-          </td>
-        </tr>
-        <tr>
-          <td>Jenis Instansi</td>
-          <td>:</td>
-          <td>
-            <b>{form.level.toString() == "2" ? "Rumah Sakit" : "Puskesmas"}</b>
-          </td>
-        </tr>
-        <tr>
-          <td>Kecamatan</td>
-          <td>:</td>
-          <td>
-            <b>
-              {/* {kecamatanOptions.length > 0 &&
+        <tbody>
+          <tr>
+            <td>Nama Instansi</td>
+            <td>:</td>
+            <td>
+              <b>{form.nama_user}</b>
+            </td>
+          </tr>
+          <tr>
+            <td>Username</td>
+            <td>:</td>
+            <td>
+              <b>{form.username}</b>
+            </td>
+          </tr>
+          <tr>
+            <td>Nomor Registrasi / Nomor Izin Rumah Sakit</td>
+            <td>:</td>
+            <td>
+              <b>{form.noreg_tempat}</b>
+            </td>
+          </tr>
+          <tr>
+            <td>Jenis Instansi</td>
+            <td>:</td>
+            <td>
+              <b>
+                {form.level.toString() == "2" ? "Rumah Sakit" : "Puskesmas"}
+              </b>
+            </td>
+          </tr>
+          <tr>
+            <td>Kecamatan</td>
+            <td>:</td>
+            <td>
+              <b>
+                {/* {kecamatanOptions.length > 0 &&
                 kecamatanOptions[0].id_kecamatan.toString()} */}
-              {kecamatanOptions.length > 0 &&
-                (kecamatanOptions.find(
-                  (v) =>
-                    v.id_kecamatan.toString() == form.id_kecamatan.toString()
-                )?.label ??
-                  "")}
-            </b>
-          </td>
-        </tr>
-        <tr>
-          <td>Kelurahan</td>
-          <td>:</td>
-          <td>
-            <b>
-              {/* {form.id_kelurahan.toString()}
+                {/* {kecamatanOptions.length > 0 &&
+                  (kecamatanOptions.find(
+                    (v) =>
+                      v.id_kecamatan.toString() == form.id_kecamatan.toString()
+                  )?.label ??
+                    "")} */}
+                {form.kecamatan}
+              </b>
+            </td>
+          </tr>
+          <tr>
+            <td>Kelurahan</td>
+            <td>:</td>
+            <td>
+              <b>
+                {/* {form.id_kelurahan.toString()}
               {kelurahanOptions.length > 0 &&
                 kelurahanOptions[2].id_kelurahan.toString()} */}
-              {kelurahanOptions.length > 0 &&
-                (kelurahanOptions.find(
-                  (v) =>
-                    v.id_kelurahan.toString() == form.id_kelurahan.toString()
-                )?.label ??
-                  "")}
-            </b>
-          </td>
-        </tr>
-        <tr>
-          <td>Nomor Hp</td>
-          <td>:</td>
-          <td>
-            <b>{form.notelp}</b>
-          </td>
-        </tr>
-        <tr>
-          <td>Email</td>
-          <td>:</td>
-          <td>
-            <b>{form.email}</b>
-          </td>
-        </tr>
-        <tr>
-          <td>Izin Ipal</td>
-          <td>:</td>
-          <td>
-            <b>A</b>
-          </td>
-        </tr>
-        <tr>
-          <td>Izin TPS</td>
-          <td>:</td>
-          <td>
-            <b>A</b>
-          </td>
-        </tr>
+                {/* {kelurahanOptions.length > 0 &&
+                  (kelurahanOptions.find(
+                    (v) =>
+                      v.id_kelurahan.toString() == form.id_kelurahan.toString()
+                  )?.label ??
+                    "")} */}
+                {form.kelurahan}
+              </b>
+            </td>
+          </tr>
+          <tr>
+            <td>Nomor Hp</td>
+            <td>:</td>
+            <td>
+              <b>{form.notelp}</b>
+            </td>
+          </tr>
+          <tr>
+            <td>Email</td>
+            <td>:</td>
+            <td>
+              <b>{form.email}</b>
+            </td>
+          </tr>
+          <tr>
+            <td>Izin Ipal</td>
+            <td>:</td>
+            <td>
+              {form.file_izin_ipal.length > 0 && (
+                <a target="_blank" href={form.file_izin_ipal[0].url ?? "#"}>
+                  {form.file_izin_ipal[0].name ?? "-"}
+                </a>
+              )}
+            </td>
+          </tr>
+          <tr>
+            <td>Izin TPS</td>
+            <td>:</td>
+            <td>
+              {form.file_izin_tps.length > 0 && (
+                <a target="_blank" href={form.file_izin_tps[0].url ?? "#"}>
+                  {form.file_izin_tps[0].name ?? "-"}
+                </a>
+              )}
+            </td>
+          </tr>
+        </tbody>
       </table>
       {/* <Form
         {...layout}
@@ -586,7 +653,7 @@ const FormTambahAkun: React.FC = () => {
           <Input onChange={handleChangeInput} value={form.email} name="email" />
         </Form.Item>
       </Form> */}
-    </>
+    </div>
   );
 };
 

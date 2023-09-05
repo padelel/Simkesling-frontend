@@ -75,7 +75,9 @@ const FormLogin = () => {
           url = "/dashboard/admin";
         }
       }
-      router.push(url);
+      globalStore.setLoading(true);
+      await router.push(url);
+      globalStore.setLoading(false);
     }
   };
   return (

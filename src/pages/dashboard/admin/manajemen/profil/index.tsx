@@ -170,7 +170,7 @@ const Index: React.FC = () => {
             </Button>
             <Popconfirm
               title="Hapus Transporter"
-              description="Apakah anda yakin untuk menghapus Transporter Anda?"
+              description="Apakah anda yakin untuk menghapus ?"
               onConfirm={() => {
                 // setForm({ oldid: record.id_transporter_tmp }) // Set oldid when delete button is clicked
                 handleDelete(record.id_user?.toString() ?? "");

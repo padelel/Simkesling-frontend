@@ -573,15 +573,15 @@ const FormValidasiTransporter: React.FC = () => {
     formInstance.resetFields();
     setForm(cloneDeep(tmpForm));
 
+    if (
+      pengajuanTransporterStore.id_transporter_tmp == null ||
+      pengajuanTransporterStore.id_transporter_tmp == 0
+    ) {
+      router.push("/dashboard/admin/validasi");
+      return;
+    }
     // jika idnya kosong (dia melakukan refresh) balikin ke table
     if (router.query.action === "edit" || router.query.action === "validasi") {
-      if (
-        pengajuanTransporterStore.id_transporter_tmp == null ||
-        pengajuanTransporterStore.id_transporter_tmp == 0
-      ) {
-        router.push("/dashboard/admin/validasi");
-        return;
-      }
       // jika edit set valuenya
       setForm({
         status_transporter:

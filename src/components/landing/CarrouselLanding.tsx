@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Button, Modal, Space } from "antd";
+import { Button, Modal, Space, Spin } from "antd";
 import { LoginOutlined } from "@ant-design/icons";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import bg from "../../../public/gambar-carousel/Balaikota-Depok.jpg";
@@ -9,8 +9,10 @@ import { SpaceSize } from "antd/es/space";
 import Link from "next/link";
 import FormLogin from "../login/FormLogin";
 import { Roboto } from "next/font/google";
+import { useGlobalStore } from "@/stores/globalStore";
 
 const CarrouselLanding = () => {
+  const globalStore = useGlobalStore();
   const [sizeButton, setSizeButton] = useState<SizeType>("large"); // default is 'middle'
   const [size, setSize] = useState<SpaceSize | [SpaceSize, SpaceSize]>("small");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -90,7 +92,9 @@ const CarrouselLanding = () => {
           footer={null}
         >
           <h2 style={{ textAlign: "center" }}>Login Simkesling</h2>
+          <Spin spinning={globalStore.isloading}>
           <FormLogin />
+          </Spin>
         </Modal>
       </div>
     </div>

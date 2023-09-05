@@ -191,6 +191,11 @@ const FormTambahAkun: React.FC = () => {
 
     if (router.query.action === "edit") {
       // jika edit set valuenya
+      // jika idnya kosong (dia melakukan refresh) balikin ke table
+      if (tambahAkunStore.id_user == null || tambahAkunStore.id_user == 0) {
+        router.push("/dashboard/admin/manajemen/profil");
+        return;
+      }
 
       setPassword({
         required: false,
@@ -224,11 +229,6 @@ const FormTambahAkun: React.FC = () => {
 
       getKelurahanData(tambahAkunStore.id_kecamatan ?? "0");
 
-      // jika idnya kosong (dia melakukan refresh) balikin ke table
-      if (tambahAkunStore.id_user == null || tambahAkunStore.id_user == 0) {
-        router.push("/dashboard/admin/manajemen/profil");
-        return;
-      }
       // getFile(pengajuanTransporterStore.files);
       // getFilesHere();
     }
@@ -320,7 +320,7 @@ const FormTambahAkun: React.FC = () => {
           name="level"
           label="Jenis Instansi"
           initialValue={form.level}
-          rules={[{ required: false }]}
+          rules={[{ required: true }]}
         >
           <Select
             style={{ width: 250 }}
