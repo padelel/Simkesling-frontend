@@ -1,5 +1,5 @@
 import MainLayout from "@/components/MainLayout";
-import { Button, Space, Modal, Input } from "antd";
+import { Button, Space, Modal, Input, Row, Col } from "antd";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { Table } from "antd";
@@ -26,6 +26,7 @@ import { parsingDate } from "@/utils/common";
 interface DataType {
   namaTransporter: any;
   tanggalPelaporan: any;
+  periode_nama: any;
   beratLimbahTotal: any;
 
   key: React.Key;
@@ -177,6 +178,7 @@ const Index: React.FC = () => {
       }));
 
       setData(transformedData);
+      setData2(transformedData);
       setDataSearch(transformedData);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -184,15 +186,43 @@ const Index: React.FC = () => {
       if (globalStore.setLoading) globalStore.setLoading(false);
     }
   };
-  const doSearch = async (e: any) => {
-    // console.log(e.target.value);
-    let tmpdata = dataSearch.filter((val) => {
-      // console.log(val);
-      return val.beratLimbahTotal.toString().includes(e.target.value);
-    });
-    console.log(tmpdata);
-    setData(cloneDeep(tmpdata));
+  // const doSearch = async (e: any) => {
+  //   // console.log(e.target.value);
+  //   let tmpdata = dataSearch.filter((val) => {
+  //     // console.log(val);
+  //     return val.beratLimbahTotal.toString().includes(e.target.value);
+  //   });
+  //   console.log(tmpdata);
+  //   setData(cloneDeep(tmpdata));
+  // };
+
+  // -- search -- \\
+  const [search, setSearch] = useState("");
+  const [data2, setData2] = useState<DataType[]>([]);
+  const handleChangeInput = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    console.log(event);
+    setSearch(event.target.value);
   };
+  const doSearch = () => {
+    const tmpData = data2.filter((val) => {
+      if (
+        val.namaTransporter
+          .toString()
+          .toLowerCase()
+          .includes(search.toLowerCase()) ||
+        val.periode_nama.toString().toLowerCase().includes(search.toLowerCase())
+      ) {
+        return true;
+      }
+    });
+    setData(tmpData);
+  };
+
+  useEffect(() => {
+    doSearch();
+  }, [search]);
 
   useEffect(() => {
     getData();
@@ -200,6 +230,16 @@ const Index: React.FC = () => {
 
   return (
     <MainLayout title="Laporan Limbah">
+      <Row justify="end">
+        <Col span={6}>
+          <Input
+            onChange={handleChangeInput}
+            value={search}
+            name="search"
+            placeholder="Search"
+          />
+        </Col>
+      </Row>
       <div>
         <Link
           href="/dashboard/user/limbah/PageTambahLimbah?action=create"

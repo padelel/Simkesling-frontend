@@ -1,5 +1,15 @@
 import MainLayout from "@/components/MainLayout";
-import { Button, Space, Modal, Popconfirm, notification, Tag } from "antd";
+import {
+  Button,
+  Space,
+  Modal,
+  Popconfirm,
+  notification,
+  Tag,
+  Row,
+  Col,
+  Input,
+} from "antd";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { Table } from "antd";
@@ -189,13 +199,15 @@ const Index: React.FC = () => {
             <Button
               onClick={() => toFormPage(record)}
               icon={<EditOutlined />}
-              style={{ backgroundColor: "yellow" }}>
+              style={{ backgroundColor: "yellow" }}
+            >
               Edit
             </Button>
             <Button
               onClick={() => toViewPage(record)}
               icon={<EyeOutlined />}
-              type="primary">
+              type="primary"
+            >
               View
             </Button>
             <Popconfirm
@@ -204,7 +216,8 @@ const Index: React.FC = () => {
               onConfirm={() => {
                 // setForm({ oldid: record.id_transporter_tmp }) // Set oldid when delete button is clicked
                 handleDelete(record.id_transporter_tmp?.toString() ?? "");
-              }}>
+              }}
+            >
               <Button icon={<DeleteOutlined />} type="primary" danger>
                 Delete
               </Button>
@@ -231,6 +244,7 @@ const Index: React.FC = () => {
       }));
 
       setData(transformedData);
+      setData2(transformedData);
       setDataSearch(transformedData);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -239,19 +253,47 @@ const Index: React.FC = () => {
     }
   };
 
-  const doSearch = async (e: any) => {
-    const searchTerm = e.target.value.toLowerCase(); // Konversi ke huruf kecil
+  // const doSearch = async (e: any) => {
+  //   const searchTerm = e.target.value.toLowerCase(); // Konversi ke huruf kecil
 
-    let tmpdata = dataSearch.filter((val) => {
-      const namaTransporterLowerCase = val.namaTransporter
-        .toString()
-        .toLowerCase(); // Konversi ke huruf kecil
-      return namaTransporterLowerCase.includes(searchTerm);
-    });
+  //   let tmpdata = dataSearch.filter((val) => {
+  //     const namaTransporterLowerCase = val.namaTransporter
+  //       .toString()
+  //       .toLowerCase(); // Konversi ke huruf kecil
+  //     return namaTransporterLowerCase.includes(searchTerm);
+  //   });
 
-    console.log(tmpdata);
-    setData(cloneDeep(tmpdata));
+  //   console.log(tmpdata);
+  //   setData(cloneDeep(tmpdata));
+  // };
+
+  // -- search -- \\
+  const [search, setSearch] = useState("");
+  const [data2, setData2] = useState<DataType[]>([]);
+  const handleChangeInput = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    console.log(event);
+    setSearch(event.target.value);
   };
+  const doSearch = () => {
+    const tmpData = data2.filter((val) => {
+      if (
+        val.namaTransporter
+          .toString()
+          .toLowerCase()
+          .includes(search.toLowerCase()) ||
+        val.status.toString().toLowerCase().includes(search.toLowerCase())
+      ) {
+        return true;
+      }
+    });
+    setData(tmpData);
+  };
+
+  useEffect(() => {
+    doSearch();
+  }, [search]);
 
   useEffect(() => {
     getData();
@@ -259,16 +301,28 @@ const Index: React.FC = () => {
 
   return (
     <MainLayout title="Pengajuan Transporter">
+      <Row justify="end">
+        <Col span={6}>
+          <Input
+            onChange={handleChangeInput}
+            value={search}
+            name="search"
+            placeholder="Search"
+          />
+        </Col>
+      </Row>
       <div>
         <Link
           href="/dashboard/user/pengajuantransporter/PagePengajuanTransporter"
-          passHref>
+          passHref
+        >
           <div style={{ display: "flex", justifyContent: "center" }}>
             <Button
               type="primary"
               size="large"
               icon={<PlusCircleOutlined />}
-              style={{ boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)" }}>
+              style={{ boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)" }}
+            >
               Tambah Transporter
             </Button>
           </div>
@@ -278,7 +332,8 @@ const Index: React.FC = () => {
       <div
         style={{
           overflowX: "auto",
-        }}>
+        }}
+      >
         {/* <Search
           style={{
             width: 300,
