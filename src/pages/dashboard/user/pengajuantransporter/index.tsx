@@ -22,6 +22,7 @@ import {
   DeleteOutlined,
   ExclamationCircleFilled,
   PlusSquareTwoTone,
+  ReloadOutlined,
   PlusCircleOutlined,
 } from "@ant-design/icons";
 import { MPengajuanTransporter } from "../../../../models/MPengajuanTransporter";
@@ -309,6 +310,15 @@ const Index: React.FC = () => {
             name="search"
             placeholder="Search"
           />
+        </Col>
+        <Col>
+          <Button
+            icon={<ReloadOutlined />}
+            style={{ marginLeft: 15, backgroundColor: "orange" }}
+            onClick={getData}
+          >
+            Reload
+          </Button>
         </Col>
       </Row>
       <div>

@@ -21,6 +21,7 @@ import {
   EyeOutlined,
   DeleteOutlined,
   ExclamationCircleFilled,
+  ReloadOutlined,
 } from "@ant-design/icons";
 import { MPengajuanTransporter } from "../../../../../models/MPengajuanTransporter";
 import { useTambahAkunStore } from "@/stores/pengajuanAkunStore";
@@ -265,6 +266,15 @@ const Index: React.FC = () => {
             name="search"
             placeholder="Search"
           />
+        </Col>
+        <Col>
+          <Button
+            icon={<ReloadOutlined />}
+            style={{ marginLeft: 15, backgroundColor: "orange" }}
+            onClick={getData}
+          >
+            Reload
+          </Button>
         </Col>
       </Row>
       <div style={{ display: "flex", justifyContent: "center" }}>

@@ -11,12 +11,14 @@ import {
   EyeOutlined,
   DeleteOutlined,
   ExclamationCircleFilled,
+  ReloadOutlined,
 } from "@ant-design/icons";
 import { MPengajuanTransporter } from "../../../../models/MPengajuanTransporter";
 import { usePengajuanTransporterStore } from "@/stores/pengajuanTransporterStore";
 import { useRouter } from "next/router";
 import ModalValidasiTransporter from "@/components/admin/validasi/ModalValidasiTransporter";
 import { parsingDate } from "@/utils/common";
+import { useGlobalStore } from "@/stores/globalStore";
 
 interface DataType {
   status: any;
@@ -72,6 +74,7 @@ const showDeleteConfirm = () => {
 };
 
 const Index: React.FC = () => {
+  const globalStore = useGlobalStore();
   const [data, setData] = useState<DataType[]>([]);
   const pengajuanTransporterStore = usePengajuanTransporterStore();
   const router = useRouter();
@@ -160,6 +163,7 @@ const Index: React.FC = () => {
   ];
 
   const getData = async () => {
+    if (globalStore.setLoading) globalStore.setLoading(true);
     try {
       const response = await api.post("/user/pengajuan-transporter/data");
       const responseData = response.data.data.values;
@@ -179,6 +183,8 @@ const Index: React.FC = () => {
       setData2(transformedData);
     } catch (error) {
       console.error("Error fetching data:", error);
+    } finally {
+      if (globalStore.setLoading) globalStore.setLoading(false);
     }
   };
 
@@ -227,6 +233,15 @@ const Index: React.FC = () => {
             name="search"
             placeholder="Search"
           />
+        </Col>
+        <Col>
+          <Button
+            icon={<ReloadOutlined />}
+            style={{ marginLeft: 15, backgroundColor: "orange" }}
+            onClick={getData}
+          >
+            Reload
+          </Button>
         </Col>
       </Row>
       <div style={{ marginTop: "20px" }}>

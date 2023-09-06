@@ -17,6 +17,7 @@ import {
   EyeOutlined,
   DeleteOutlined,
   ExclamationCircleFilled,
+  ReloadOutlined,
 } from "@ant-design/icons";
 import { parsingDate } from "@/utils/common";
 import { useGlobalStore } from "@/stores/globalStore";
@@ -360,6 +361,15 @@ const Index: React.FC = () => {
               name="search"
               placeholder="Search"
             />
+          </Col>
+          <Col>
+            <Button
+              icon={<ReloadOutlined />}
+              style={{ marginLeft: 15, backgroundColor: "orange" }}
+              onClick={getData}
+            >
+              Reload
+            </Button>
           </Col>
         </Row>
         <table>
