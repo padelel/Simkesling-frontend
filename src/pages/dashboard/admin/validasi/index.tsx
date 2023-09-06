@@ -1,5 +1,5 @@
 import MainLayout from "@/components/MainLayout";
-import { Button, Space, Modal, Tag } from "antd";
+import { Button, Space, Modal, Tag, Row, Col, Input } from "antd";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { Table } from "antd";
@@ -21,6 +21,7 @@ import { parsingDate } from "@/utils/common";
 interface DataType {
   status: any;
   namaTransporter: any;
+  namaPuskesmas: any;
   tanggalPengajuan: any;
   key: React.Key;
   name: string;
@@ -175,10 +176,42 @@ const Index: React.FC = () => {
       }));
 
       setData(transformedData);
+      setData2(transformedData);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
+
+  // -- search -- \\
+  const [search, setSearch] = useState("");
+  const [data2, setData2] = useState<DataType[]>([]);
+  const handleChangeInput = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    console.log(event);
+    setSearch(event.target.value);
+  };
+  const doSearch = () => {
+    const tmpData = data2.filter((val) => {
+      if (
+        val.namaTransporter
+          .toString()
+          .toLowerCase()
+          .includes(search.toLowerCase()) ||
+        val.namaPuskesmas
+          .toString()
+          .toLowerCase()
+          .includes(search.toLowerCase())
+      ) {
+        return true;
+      }
+    });
+    setData(tmpData);
+  };
+
+  useEffect(() => {
+    doSearch();
+  }, [search]);
 
   useEffect(() => {
     getData();
@@ -186,6 +219,16 @@ const Index: React.FC = () => {
 
   return (
     <MainLayout title="Validasi Transporter">
+      <Row justify="end">
+        <Col span={6}>
+          <Input
+            onChange={handleChangeInput}
+            value={search}
+            name="search"
+            placeholder="Search"
+          />
+        </Col>
+      </Row>
       <div style={{ marginTop: "20px" }}>
         <Table
           scroll={{ x: 800 }}

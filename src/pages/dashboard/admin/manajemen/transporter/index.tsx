@@ -1,5 +1,5 @@
 import MainLayout from "@/components/MainLayout";
-import { Button, Space, Modal, Tag } from "antd";
+import { Button, Space, Modal, Tag, Row, Col, Input } from "antd";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { Table } from "antd";
@@ -84,12 +84,12 @@ const Index: React.FC = () => {
       sorter: (a: any, b: any) =>
         b.namaTransporter.length - a.namaTransporter.length,
     },
-    {
-      title: "Nama Puskesmas/RS",
-      dataIndex: "namaTempat",
-      // defaultSortOrder: "descend",
-      sorter: (a: any, b: any) => a.namaTempat.length - b.namaTempat.length,
-    },
+    // {
+    //   title: "Nama Puskesmas/RS",
+    //   dataIndex: "namaTempat",
+    //   // defaultSortOrder: "descend",
+    //   sorter: (a: any, b: any) => a.namaTempat.length - b.namaTempat.length,
+    // },
     {
       title: "Masa Berlaku MOU",
       dataIndex: "masaBerlakuBerakhir",
@@ -209,6 +209,7 @@ const Index: React.FC = () => {
       }));
 
       setData(transformedData);
+      setData2(transformedData);
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
@@ -216,12 +217,51 @@ const Index: React.FC = () => {
     }
   };
 
+  // -- search -- \\
+  const [search, setSearch] = useState("");
+  const [data2, setData2] = useState<DataType[]>([]);
+  const handleChangeInput = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    console.log(event);
+    setSearch(event.target.value);
+  };
+  const doSearch = () => {
+    const tmpData = data2.filter((val) => {
+      if (
+        val.namaTransporter
+          .toString()
+          .toLowerCase()
+          .includes(search.toLowerCase()) ||
+        val.status.toString().toLowerCase().includes(search.toLowerCase())
+      ) {
+        return true;
+      }
+    });
+    setData(tmpData);
+  };
+
+  useEffect(() => {
+    doSearch();
+  }, [search]);
+
   useEffect(() => {
     getData();
   }, []);
 
   return (
     <MainLayout title="Manajemen Transporter">
+      <Row justify="end">
+        <Col span={6}>
+          <Input
+            onChange={handleChangeInput}
+            value={search}
+            name="search"
+            placeholder="Search"
+          />
+        </Col>
+      </Row>
+
       {/* <div style={{ display: "flex", justifyContent: "center" }}>
         <Link
           href="/dashboard/admin/manajemen/transporter/PengajuanTransporter"

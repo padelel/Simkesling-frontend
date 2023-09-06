@@ -75,6 +75,20 @@ import { useGlobalStore } from "@/stores/globalStore";
 //   },
 // ];
 
+interface DataType {
+  statusBerlaku: any;
+  status: any;
+  namaTransporter: any;
+  namaPemusnah: any;
+  namaTempat: any;
+  tanggalPengajuan: any;
+  tanggalBerakhir: any;
+  key: React.Key;
+  name: string;
+  age: number;
+  address: string;
+}
+
 // const onChange: TableProps<DataType>["onChange"] = (
 const onChange = (pagination: any, filters: any, sorter: any, extra: any) => {
   console.log("params", pagination, filters, sorter, extra);
@@ -267,6 +281,7 @@ const Index: React.FC = () => {
       }));
 
       setData(transformedData);
+      setData2(transformedData);
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
@@ -298,6 +313,38 @@ const Index: React.FC = () => {
     let dataForm: any = new FormData();
   };
 
+  // -- search -- \\
+  const [search, setSearch] = useState("");
+  const [data2, setData2] = useState<DataType[]>([]);
+  const handleChangeInputs = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    console.log(event);
+    setSearch(event.target.value);
+  };
+  const doSearch = () => {
+    const tmpData = data2.filter((val) => {
+      if (
+        val.namaTransporter
+          .toString()
+          .toLowerCase()
+          .includes(search.toLowerCase()) ||
+        val.namaTempat
+          .toString()
+          .toLowerCase()
+          .includes(search.toLowerCase()) ||
+        val.namaPemusnah.toString().toLowerCase().includes(search.toLowerCase())
+      ) {
+        return true;
+      }
+    });
+    setData(tmpData);
+  };
+
+  useEffect(() => {
+    doSearch();
+  }, [search]);
+
   useEffect(() => {
     getData();
   }, []);
@@ -305,6 +352,16 @@ const Index: React.FC = () => {
   return (
     <MainLayout title="Tabel Laporan">
       <>
+        <Row justify="end">
+          <Col span={6}>
+            <Input
+              onChange={handleChangeInputs}
+              value={search}
+              name="search"
+              placeholder="Search"
+            />
+          </Col>
+        </Row>
         <table>
           <tr>
             <td>

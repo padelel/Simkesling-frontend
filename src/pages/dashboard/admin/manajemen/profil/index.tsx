@@ -1,5 +1,14 @@
 import MainLayout from "@/components/MainLayout";
-import { Button, Space, Modal, Popconfirm, notification } from "antd";
+import {
+  Button,
+  Space,
+  Modal,
+  Popconfirm,
+  notification,
+  Input,
+  Col,
+  Row,
+} from "antd";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { Table } from "antd";
@@ -204,6 +213,7 @@ const Index: React.FC = () => {
       }));
 
       setData(transformedData);
+      setData2(transformedData);
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
@@ -211,12 +221,52 @@ const Index: React.FC = () => {
     }
   };
 
+  // -- search -- \\
+  const [search, setSearch] = useState("");
+  const [data2, setData2] = useState<DataType[]>([]);
+  const handleChangeInput = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    console.log(event);
+    setSearch(event.target.value);
+  };
+  const doSearch = () => {
+    const tmpData = data2.filter((val) => {
+      if (
+        val.namaUser.toString().toLowerCase().includes(search.toLowerCase()) ||
+        val.tipeTempat
+          .toString()
+          .toLowerCase()
+          .includes(search.toLowerCase()) ||
+        val.kecamatan.toString().toLowerCase().includes(search.toLowerCase()) ||
+        val.kelurahan.toString().toLowerCase().includes(search.toLowerCase())
+      ) {
+        return true;
+      }
+    });
+    setData(tmpData);
+  };
+
+  useEffect(() => {
+    doSearch();
+  }, [search]);
+
   useEffect(() => {
     getData();
   }, []);
 
   return (
     <MainLayout title="Manajemen Akun Puskesmas / Rumah Sakit">
+      <Row justify="end">
+        <Col span={6}>
+          <Input
+            onChange={handleChangeInput}
+            value={search}
+            name="search"
+            placeholder="Search"
+          />
+        </Col>
+      </Row>
       <div style={{ display: "flex", justifyContent: "center" }}>
         <Link href="/dashboard/admin/manajemen/profil/TambahAkun" passHref>
           <Button type="primary">Tambah Akun Puskesmas / Rumah Sakit</Button>
