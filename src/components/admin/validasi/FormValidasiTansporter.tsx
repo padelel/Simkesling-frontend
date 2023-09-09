@@ -512,7 +512,9 @@ const FormValidasiTransporter: React.FC = () => {
         let val = pengajuanTransporterStore.files[index];
         let tmpfile = await getFile(val.file1);
         // let tmpawal = await setDateRangeList(val.tgl_mulai);
-        arrfile.push([tmpfile]);
+        if (tmpfile) {
+          arrfile.push([tmpfile]);
+        }
       }
     }
     console.log(arrfile);
@@ -564,6 +566,8 @@ const FormValidasiTransporter: React.FC = () => {
   const [formInstance] = Form.useForm();
 
   useLayoutEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const action = urlParams.get("action");
     getKecamatanData();
     console.log(router.query);
     console.log(Object.values(pengajuanTransporterStore));
@@ -573,15 +577,15 @@ const FormValidasiTransporter: React.FC = () => {
     formInstance.resetFields();
     setForm(cloneDeep(tmpForm));
 
-    if (
-      pengajuanTransporterStore.id_transporter_tmp == null ||
-      pengajuanTransporterStore.id_transporter_tmp == 0
-    ) {
-      router.push("/dashboard/admin/validasi");
-      return;
-    }
     // jika idnya kosong (dia melakukan refresh) balikin ke table
-    if (router.query.action === "edit" || router.query.action === "validasi") {
+    if (action === "edit" || action === "validasi") {
+      if (
+        pengajuanTransporterStore.id_transporter_tmp == null ||
+        pengajuanTransporterStore.id_transporter_tmp == 0
+      ) {
+        router.push("/dashboard/admin/validasi");
+        return;
+      }
       // jika edit set valuenya
       setForm({
         status_transporter:

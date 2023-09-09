@@ -645,27 +645,27 @@ const FormViewLaporan: React.FC = () => {
                 <td>{form.metodepemusnah}</td>
               </tr>
               <tr>
-                <td>Ukuran TPS</td>
+                <td>Ukuran TPS (&#13217;)</td>
                 <td>:</td>
                 <td>{form.ukurantps}</td>
               </tr>
               <tr>
-                <td>Ukuran Pemusnah Mandiri</td>
+                <td>Ukuran Pemusnah Mandiri (&#13217;)</td>
                 <td>:</td>
                 <td>{form.ukuranpemusnah}</td>
               </tr>
               <tr>
-                <td>Total Limbah Padat</td>
+                <td>Total Limbah Padat (Kg)</td>
                 <td>:</td>
                 <td>{form.totallimbahpadat}</td>
               </tr>
               <tr>
-                <td>Total Limbah Non Covid</td>
+                <td>Total Limbah Non Covid (Kg)</td>
                 <td>:</td>
                 <td>{form.totallimbahnoncovid}</td>
               </tr>
               <tr>
-                <td>Total Limbah Covid</td>
+                <td>Total Limbah Covid (Kg)</td>
                 <td>:</td>
                 <td>{form.totallimbahcovid}</td>
               </tr>
@@ -760,7 +760,7 @@ const FormViewLaporan: React.FC = () => {
               </tr>
 
               <tr>
-                <td>Debit Limbah Cair</td>
+                <td>Debit Limbah Cair (L)</td>
                 <td>:</td>
                 <td>{form.debitlimbahcair}</td>
               </tr>

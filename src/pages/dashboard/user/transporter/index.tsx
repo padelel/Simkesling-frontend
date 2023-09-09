@@ -100,11 +100,15 @@ const Index: React.FC = () => {
       render: (status: any) => {
         let sts = "-- ups --";
         let color = "-";
-        if (status == true) {
+        if (status == "harih") {
           color = "volcano";
           sts = "Kadaluarsa";
         }
-        if (status == false) {
+        if (status == "1bulan") {
+          color = "orange";
+          sts = "Segera Expire";
+        }
+        if (status == "belum") {
           color = "green";
           sts = "Berlaku";
         }

@@ -21,6 +21,7 @@ import {
 } from "@ant-design/icons";
 import { parsingDate } from "@/utils/common";
 import { useGlobalStore } from "@/stores/globalStore";
+import { ResponseLaporanRekapitulasi } from "@/models/MLaporanRekapitulasi";
 
 // interface DataType {
 //   idUser: any;
@@ -99,12 +100,14 @@ const Index: React.FC = () => {
   const globalStore = useGlobalStore();
   const laporanBulananStore = useLaporanBulananStore();
   const [data, setData] = useState<any[]>([]);
+  const [dataResp, setDataResp] = useState<ResponseLaporanRekapitulasi>();
   const [datacsv, setDatacsv] = useState<any[]>([]);
   const router = useRouter();
   const [formInstance] = Form.useForm();
   let tmpForm = {
     periode: "",
     tahun: "",
+    search_tempat: "",
   };
 
   const [form, setForm] = useState(cloneDeep(tmpForm));
@@ -136,153 +139,227 @@ const Index: React.FC = () => {
     console.log(dataCsv);
   };
 
-  const columns: any = [
+  const tmpArr: any[] = [
     {
-      title: "Nama Puskesmas",
-      dataIndex: "namaTempat",
-      // defaultSortOrder: "descend",
-      sorter: (a: any, b: any) =>
-        a.namaTempat.toUpperCase().localeCompare(b.namaTempat.toUpperCase()),
+      title: "Periode",
+      dataIndex: "periode_nama",
     },
     {
-      title: "Nama Transporter",
-      dataIndex: "namaTransporter",
-      // defaultSortOrder: "descend",
-      sorter: (a: any, b: any) =>
-        a.namaTransporter
-          .toUpperCase()
-          .localeCompare(b.namaTransporter.toUpperCase()),
+      title: "Total",
+      dataIndex: "total",
     },
     {
-      title: "Nama Pemusnah",
-      dataIndex: "namaPemusnah",
-      // defaultSortOrder: "descend",
-      sorter: (a: any, b: any) =>
-        a.namaPemusnah
-          .toUpperCase()
-          .localeCompare(b.namaPemusnah.toUpperCase()),
+      title: "Total B3Padat",
+      dataIndex: "total_b3padat",
     },
     {
-      title: "Tahun",
-      dataIndex: "tahun",
-      // defaultSortOrder: "descend",
-      sorter: (a: any, b: any) =>
-        a.tahun.toUpperCase().localeCompare(b.tahun.toUpperCase()),
+      title: "Total Covid",
+      dataIndex: "total_covid",
     },
     {
-      title: "periode",
-      dataIndex: "periode",
-      // defaultSortOrder: "descend",
-      sorter: (a: any, b: any) =>
-        a.periode.toUpperCase().localeCompare(b.periode.toUpperCase()),
-    },
-    {
-      title: "Tanggal Pengajuan",
-      dataIndex: "tanggalPengajuan",
-      // defaultSortOrder: "descend",
-      sorter: (a: any, b: any) =>
-        a.tanggalPengajuan
-          .toUpperCase()
-          .localeCompare(b.tanggalPengajuan.toUpperCase()),
-    },
-    {
-      title: "Tanggal Revisi",
-      dataIndex: "tanggalRevisi",
-      // defaultSortOrder: "descend",
-      sorter: (a: any, b: any) =>
-        a.tanggalRevisi
-          .toUpperCase()
-          .localeCompare(b.tanggalRevisi.toUpperCase()),
-    },
-    // {
-    //   title: "Metode Pemusnahan",
-    //   dataIndex: "metodePemusnahan",
-    //   defaultSortOrder: "descend",
-    //   sorter: (a: any, b: any) => a.metodePemusnahan - b.metodePemusnahan,
-    // },
-    // {
-    //   title: "Berat Limbah Padat",
-    //   dataIndex: "beratLimbah",
-    //   // defaultSortOrder: "descend",
-    //   sorter: (a: any, b: any) => b.beratLimbah.localeCompare(a.beratLimbah),
-    // },
-    // {
-    //   title: "Debit Limbah Cair",
-    //   dataIndex: "debitLimbahCair",
-    //   // defaultSortOrder: "descend",
-    //   sorter: (a: any, b: any) =>
-    //     b.debitLimbahCair.localeCompare(a.debitLimbahCair),
-    // },
-    // {
-    //   title: "Limbah B3 Non Covid",
-    //   dataIndex: "limbahB3NonCovid",
-    //   defaultSortOrder: "descend",
-    //   sorter: (a: any, b: any) =>
-    //     a.limbahB3NonCovid.localeCompare(b.limbahB3NonCovid),
-    // },
-
-    {
-      title: "Action",
-      key: "action",
-      // fixed: "right",
-      render: (_, record: MLaporanBulanan) => {
-        // console.log(record);
-        const toViewPage = (param: MLaporanBulanan) => {
-          if (laporanBulananStore.simpenSementara) {
-            laporanBulananStore.simpenSementara(param);
-            router.push("/dashboard/admin/manajemen/laporan/ViewLaporan");
-          }
-        };
-        return (
-          <Space size="middle">
-            <Button
-              onClick={() => toViewPage(record)}
-              icon={<EyeOutlined />}
-              type="primary"
-            >
-              View
-            </Button>
-          </Space>
-        );
-      },
+      title: "Total Non Covid",
+      dataIndex: "total_noncovid",
     },
   ];
+  const [columns, setColumns] = useState<any[]>(cloneDeep(tmpArr)) as any[];
 
   const getData = async () => {
     try {
       if (globalStore.setLoading) globalStore.setLoading(true);
       let dataForm: any = new FormData();
-      dataForm.append("periode", form.periode);
-      dataForm.append("tahun", form.tahun);
-      const response = await api.post("/user/laporan-bulanan/data", dataForm);
-      const responseData = response.data.data.values;
+      dataForm.append("periode", form.periode ?? null);
+      dataForm.append("tahun", form.tahun ?? null);
+      dataForm.append("search_tempat", form.search_tempat ?? null);
+      const response = await api.post<ResponseLaporanRekapitulasi>(
+        "/user/laporan-rekapitulasi/data",
+        dataForm
+      );
+      const responseData = response.data.data;
+      setDataResp(response.data);
       console.log(responseData);
 
-      const transformedData = responseData.map((item: any) => ({
-        ...item,
-        idUser: item.id_user,
-        namaTempat: item.user.nama_user,
-        namaTransporter: item.nama_transporter,
-        namaPemusnah: item.nama_pemusnah,
-        metodePemusnahan: item.metode_pemusnah,
-        ukuranPenyimpananTps: item.ukuran_penyimpanan_tps,
-        ukuranPemusnahanSendiri: item.ukuran_pemusnahan_sendiri,
-        beratLimbah: item.berat_limbah_total,
-        limbahB3Covid: item.limbah_b3_covid,
-        limbahB3NonCovid: item.limbah_b3_noncovid,
-        debitLimbahCair: item.debit_limbah_cair,
-        kapasitasIpal: item.kapasitasIpal,
-        memenuhiSyarat: item.memenuhi_syarat,
-        catatan: item.catatan,
-        periode: item.periode_nama,
-        tahun: item.tahun,
-        tanggalPengajuan: parsingDate(item.created_at),
-        tanggalRevisi: parsingDate(item.updated_at),
-        key: new Date().toISOString().toString(),
-      }));
+      let tmpColumns: any[] = [
+        {
+          title: "Periode",
+          dataIndex: "periode_nama",
+        },
+        {
+          title: "Total",
+          dataIndex: "total",
+        },
+        {
+          title: "Total B3Padat",
+          dataIndex: "total_b3padat",
+        },
+        {
+          title: "Total Covid",
+          dataIndex: "total_covid",
+        },
+        {
+          title: "Total Non Covid",
+          dataIndex: "total_noncovid",
+        },
+      ];
+      response.data.data.users.map((val) => {
+        let nama = val.nama_user
+          .toLowerCase()
+          .replaceAll(" ", "_")
+          .replaceAll("-", "_")
+          .replaceAll("'", "")
+          .replaceAll('"', "");
+        let jsn = {
+          title: val.nama_user,
+          dataIndex: `user_${val.id_user}`,
+          children: [
+            {
+              title: "B3Padat",
+              dataIndex: `b3padat_${val.id_user}_${nama}`,
+            },
+            {
+              title: "Limbah Covid",
+              dataIndex: `covid_${val.id_user}_${nama}`,
+            },
+            {
+              title: "Limbah Non Covid",
+              dataIndex: `noncovid_${val.id_user}_${nama}`,
+            },
+          ],
+        };
+        tmpColumns.push(jsn);
+      });
+      let tmpData: any[] = [];
+      responseData.laporan.forEach((val) => {
+        let jsn = {
+          periode_nama: "",
+          total: 0,
+          total_b3padat: 0,
+          total_covid: 0,
+          total_noncovid: 0,
+        } as any;
+        jsn.periode_nama = val.periode_nama;
+        jsn.total = val.total_limbah;
+        jsn.total_b3padat = val.total_limbah_b3;
+        jsn.total_covid = val.total_limbah_covid;
+        jsn.total_noncovid = val.total_limbah_noncovid;
 
-      setData(transformedData);
-      setData2(transformedData);
+        val.users.forEach((v) => {
+          let nama =
+            v.nama_user != null
+              ? v.nama_user
+                  .toLowerCase()
+                  .replaceAll(" ", "_")
+                  .replaceAll("-", "_")
+                  .replaceAll("'", "")
+                  .replaceAll('"', "")
+              : "";
+          // @ts-ignore
+          jsn[`b3padat_${v.id_user}_${nama}`] = v.limbah_b3;
+          // @ts-ignore
+          jsn[`covid_${v.id_user}_${nama}`] = v.limbah_covid;
+          // @ts-ignore
+          jsn[`noncovid_${v.id_user}_${nama}`] = v.limbah_noncovid;
+        });
+        tmpData.push(jsn);
+        // val.users.forEach(v => {
+        //   v.limbah_b3
+        //   v.limbah_covid
+        //   v.limbah_noncovid
+        // })
+        // let tmpJsn = {
+        //   title: val.periode_nama,
+        //   dataIndex: `periode_${val.periode}`,
+        // };
+        // tmpColumns.push(tmpJsn);
+      });
+      setData(tmpData);
+      console.log(tmpData);
+      // setColumns(tmpColumns);
+      // setColumns([
+      //   {
+      //     title: "Periode",
+      //     dataIndex: "periode_nama",
+      //   },
+      //   {
+      //     title: "Total",
+      //     dataIndex: "total",
+      //   },
+      //   {
+      //     title: "Total B3Padat",
+      //     dataIndex: "total_b3padat",
+      //   },
+      //   {
+      //     title: "Total Covid",
+      //     dataIndex: "total_covid",
+      //   },
+      //   {
+      //     title: "Total Non Covid",
+      //     dataIndex: "total_noncovid",
+      //   },
+      //   {
+      //     title: "RS A",
+      //     dataIndex: "rsa",
+      //     children: [
+      //       {
+      //         title: "B3Padat",
+      //         dataIndex: "b3padat",
+      //       },
+      //       {
+      //         title: "Limbah Covid",
+      //         dataIndex: "covid",
+      //       },
+      //       {
+      //         title: "Limbah Non Covid",
+      //         dataIndex: "noncovid",
+      //       },
+      //     ],
+      //   },
+      //   {
+      //     title: "RS B",
+      //     dataIndex: "rsb",
+      //     children: [
+      //       {
+      //         title: "B3Padat",
+      //         dataIndex: "b3padat",
+      //       },
+      //       {
+      //         title: "Limbah Covid",
+      //         dataIndex: "covid",
+      //       },
+      //       {
+      //         title: "Limbah Non Covid",
+      //         dataIndex: "noncovid",
+      //       },
+      //     ],
+      //   },
+      // ]);
+      setColumns(tmpColumns);
+      console.log(tmpColumns);
+
+      // const transformedData = responseData.map((item: any) => ({
+      //   ...item,
+      //   idUser: item.id_user,
+      //   namaTempat: item.user.nama_user,
+      //   namaTransporter: item.nama_transporter,
+      //   namaPemusnah: item.nama_pemusnah,
+      //   metodePemusnahan: item.metode_pemusnah,
+      //   ukuranPenyimpananTps: item.ukuran_penyimpanan_tps,
+      //   ukuranPemusnahanSendiri: item.ukuran_pemusnahan_sendiri,
+      //   beratLimbah: item.berat_limbah_total,
+      //   limbahB3Covid: item.limbah_b3_covid,
+      //   limbahB3NonCovid: item.limbah_b3_noncovid,
+      //   debitLimbahCair: item.debit_limbah_cair,
+      //   kapasitasIpal: item.kapasitasIpal,
+      //   memenuhiSyarat: item.memenuhi_syarat,
+      //   catatan: item.catatan,
+      //   periode: item.periode_nama,
+      //   tahun: item.tahun,
+      //   tanggalPengajuan: parsingDate(item.created_at),
+      //   tanggalRevisi: parsingDate(item.updated_at),
+      //   key: new Date().toISOString().toString(),
+      // }));
+
+      // setData(transformedData);
+      // setData2(transformedData);
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
@@ -351,17 +428,17 @@ const Index: React.FC = () => {
   }, []);
 
   return (
-    <MainLayout title="Tabel Laporan">
+    <MainLayout title="Tabel Laporan Rakapitulasi">
       <>
         <Row justify="end">
-          <Col span={6}>
+          {/* <Col span={6}>
             <Input
               onChange={handleChangeInputs}
               value={search}
               name="search"
               placeholder="Search"
             />
-          </Col>
+          </Col> */}
           <Col>
             <Button
               icon={<ReloadOutlined />}
@@ -417,6 +494,14 @@ const Index: React.FC = () => {
                         name="tahun"
                       />
                     </Form.Item>
+                    <Form.Item name="form_tempat" label="Search Nama Instansi">
+                      <Input
+                        allowClear={true}
+                        placeholder="Masukan Nama Instansi"
+                        onChange={handleChangeInput}
+                        name="search_tempat"
+                      />
+                    </Form.Item>
                     <Form.Item>
                       <Button type="primary" onClick={getData}>
                         Filter
@@ -454,11 +539,43 @@ const Index: React.FC = () => {
       </div> */}
       <div style={{ marginTop: "20px" }}>
         <Table
+          bordered
+          pagination={false}
           key={new Date().toISOString().toString()}
+          defaultExpandAllRows={true}
           scroll={{ x: 800 }}
           columns={columns}
           dataSource={data}
           onChange={onChange}
+          footer={() => {
+            return (
+              <>
+                <div>
+                  <span>
+                    Tahun: <b>{dataResp?.data.tahun}</b>
+                  </span>
+                  <ul>
+                    <li>
+                      Total Limbah B3Padat:{" "}
+                      <b>{dataResp?.data.total_seluruh_limbah_b3}</b>
+                    </li>
+                    <li>
+                      Total Limbah Covid:{" "}
+                      <b>{dataResp?.data.total_seluruh_limbah_covid}</b>
+                    </li>
+                    <li>
+                      Total Limbah NonCovid:{" "}
+                      <b>{dataResp?.data.total_seluruh_limbah_noncovid}</b>
+                    </li>
+                    <li>
+                      Total Limbah Seluruhnya:{" "}
+                      <b>{dataResp?.data.total_seluruh_limbah}</b>
+                    </li>
+                  </ul>
+                </div>
+              </>
+            );
+          }}
         />
       </div>
     </MainLayout>

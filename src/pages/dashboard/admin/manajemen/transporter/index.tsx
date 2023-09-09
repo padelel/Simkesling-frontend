@@ -85,12 +85,12 @@ const Index: React.FC = () => {
       sorter: (a: any, b: any) =>
         b.namaTransporter.length - a.namaTransporter.length,
     },
-    // {
-    //   title: "Nama Puskesmas/RS",
-    //   dataIndex: "namaTempat",
-    //   // defaultSortOrder: "descend",
-    //   sorter: (a: any, b: any) => a.namaTempat.length - b.namaTempat.length,
-    // },
+    {
+      title: "Nama Puskesmas/RS",
+      dataIndex: "namaTempat",
+      // defaultSortOrder: "descend",
+      sorter: (a: any, b: any) => a.namaTempat.length - b.namaTempat.length,
+    },
     {
       title: "Masa Berlaku MOU",
       dataIndex: "masaBerlakuBerakhir",
@@ -101,15 +101,22 @@ const Index: React.FC = () => {
       title: "Status MOU",
       dataIndex: "statusBerlaku",
       // defaultSortOrder: "descend",
-      // sorter: (a: any, b: any) => a.namaTempat.length - b.namaTempat.length,
+      sorter: (a: any, b: any) =>
+        a.masa_berlaku_sudah_berakhir
+          .toString()
+          .localeCompare(b.masa_berlaku_sudah_berakhir.toString()),
       render: (status: any) => {
         let sts = "-- ups --";
         let color = "-";
-        if (status == true) {
+        if (status == "harih") {
           color = "volcano";
           sts = "Kadaluarsa";
         }
-        if (status == false) {
+        if (status == "1bulan") {
+          color = "orange";
+          sts = "Segera Expire";
+        }
+        if (status == "belum") {
           color = "green";
           sts = "Berlaku";
         }

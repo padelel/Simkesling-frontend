@@ -303,8 +303,7 @@ const ViewPengajuanTransporter: React.FC = () => {
     // jika edit set valuenya
     setForm({
       status_transporter:
-        pengajuanTransporterStore.status_transporter?.toStrtransporterStoreing() ??
-        "",
+        pengajuanTransporterStore.status_transporter_tmp?.toString() ?? "",
       oldid: pengajuanTransporterStore.id_transporter_tmp?.toString() ?? "",
       namatransporter:
         pengajuanTransporterStore.nama_transporter?.toString() ?? "",
@@ -335,94 +334,96 @@ const ViewPengajuanTransporter: React.FC = () => {
   return (
     <>
       <table>
-        <tr>
-          <td>Nama Transporter</td>
-          <td>:</td>
-          <td>
-            <b>{form.namatransporter}</b>
-          </td>
-        </tr>
-        <tr>
-          <td>NPWP</td>
-          <td>:</td>
-          <td>
-            <b>{form.npwp}</b>
-          </td>
-        </tr>
-        <tr>
-          <td>Kecamatan</td>
-          <td>:</td>
-          <td>
-            <b>
-              {kecamatanOptions.length > 0 &&
-                (kecamatanOptions.find(
-                  (v) =>
-                    v.id_kecamatan.toString() == form.id_kecamatan.toString()
-                )?.label ??
-                  "")}
-            </b>
-          </td>
-        </tr>
-        <tr>
-          <td>Kelurahan</td>
-          <td>:</td>
-          <td>
-            <b>
-              {kelurahanOptions.length > 0 &&
-                (kelurahanOptions.find(
-                  (v) =>
-                    v.id_kelurahan.toString() == form.id_kelurahan.toString()
-                )?.label ??
-                  "")}
-            </b>
-          </td>
-        </tr>
-        <tr>
-          <td>Alamat</td>
-          <td>:</td>
-          <td>
-            <b>{form.alamat}</b>
-          </td>
-        </tr>
-        <tr>
-          <td>Nomor Handphone</td>
-          <td>:</td>
-          <td>
-            <b>{form.telp}</b>
-          </td>
-        </tr>
-        <tr>
-          <td>Email</td>
-          <td>:</td>
-          <td>
-            <b>{form.email}</b>
-          </td>
-        </tr>
-        <tr>
-          <td>File MOU</td>
-          <td>:</td>
-          <td>
-            <b>
-              {fileListList.map((val, index) => {
-                let item = val[0];
-                let dateAwalItem = dateRangeList[index][0];
-                let dateAkhirItem = dateRangeList[index][1];
-                return (
-                  <>
-                    {dateAwalItem.format("DD MMMM YYYY").toString()}
-                    {" - "}
-                    {dateAkhirItem.format("DD MMMM YYYY").toString()}
-                    <br />
-                    <a target="_blank" href={item.url}>
-                      {item.name}
-                    </a>
-                    <hr />
-                  </>
-                );
-              })}
-            </b>
-          </td>
-        </tr>
+        <tbody>
+          <tr>
+            <td>Nama Transporter</td>
+            <td>:</td>
+            <td>
+              <b>{form.namatransporter}</b>
+            </td>
+          </tr>
+          <tr>
+            <td>NPWP</td>
+            <td>:</td>
+            <td>
+              <b>{form.npwp}</b>
+            </td>
+          </tr>
+          <tr>
+            <td>Kecamatan</td>
+            <td>:</td>
+            <td>
+              <b>
+                {kecamatanOptions.length > 0 &&
+                  (kecamatanOptions.find(
+                    (v) =>
+                      v.id_kecamatan.toString() == form.id_kecamatan.toString()
+                  )?.label ??
+                    "")}
+              </b>
+            </td>
+          </tr>
+          <tr>
+            <td>Kelurahan</td>
+            <td>:</td>
+            <td>
+              <b>
+                {kelurahanOptions.length > 0 &&
+                  (kelurahanOptions.find(
+                    (v) =>
+                      v.id_kelurahan.toString() == form.id_kelurahan.toString()
+                  )?.label ??
+                    "")}
+              </b>
+            </td>
+          </tr>
+          <tr>
+            <td>Alamat</td>
+            <td>:</td>
+            <td>
+              <b>{form.alamat}</b>
+            </td>
+          </tr>
+          <tr>
+            <td>Nomor Handphone</td>
+            <td>:</td>
+            <td>
+              <b>{form.telp}</b>
+            </td>
+          </tr>
+          <tr>
+            <td>Email</td>
+            <td>:</td>
+            <td>
+              <b>{form.email}</b>
+            </td>
+          </tr>
+          <tr>
+            <td>File MOU</td>
+            <td>:</td>
+            <td>
+              <b>
+                {fileListList.map((val, index) => {
+                  let item = val[0];
+                  let dateAwalItem = dateRangeList[index][0];
+                  let dateAkhirItem = dateRangeList[index][1];
+                  return (
+                    <>
+                      {dateAwalItem.format("DD MMMM YYYY").toString()}
+                      {" - "}
+                      {dateAkhirItem.format("DD MMMM YYYY").toString()}
+                      <br />
+                      <a target="_blank" href={item.url}>
+                        {item.name}
+                      </a>
+                      <hr />
+                    </>
+                  );
+                })}
+              </b>
+            </td>
+          </tr>
+        </tbody>
       </table>
     </>
   );

@@ -4,7 +4,7 @@ import React from "react";
 
 const index = () => {
   return (
-    <MainLayout title="Profile Saya">
+    <MainLayout title="Profile">
       <FormProfile />
     </MainLayout>
   );

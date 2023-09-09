@@ -30,9 +30,10 @@ import { usePengajuanTransporterStore } from "@/stores/pengajuanTransporterStore
 import apifile from "@/utils/HttpRequestFile";
 import axios from "axios";
 import { fileTypeFromStream } from "file-type";
-import router from "next/router";
+import router, { useRouter } from "next/router";
 import cloneDeep from "clone-deep";
 import { useGlobalStore } from "@/stores/globalStore";
+import jwtDecode from "jwt-decode";
 
 type NotificationType = "success" | "info" | "warning" | "error";
 
@@ -434,7 +435,9 @@ const FormPengajuanTransporter: React.FC = () => {
         let val = pengajuanTransporterStore.files[index];
         let tmpfile = await getFile(val.file1);
         // let tmpawal = await setDateRangeList(val.tgl_mulai);
-        arrfile.push([tmpfile]);
+        if (tmpfile) {
+          arrfile.push([tmpfile]);
+        }
       }
     }
     console.log(arrfile);
@@ -485,6 +488,16 @@ const FormPengajuanTransporter: React.FC = () => {
 
   const [formInstance] = Form.useForm();
   useLayoutEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const action = urlParams.get("action");
+    let token = localStorage.getItem("token");
+    let user: any = jwtDecode(token ?? "");
+    if (!user) {
+      router.push("/");
+      return;
+    }
+    console.log(user);
+
     getKecamatanData();
     console.log(router.query);
     console.log(Object.values(pengajuanTransporterStore));
@@ -494,14 +507,21 @@ const FormPengajuanTransporter: React.FC = () => {
     formInstance.resetFields();
     setForm(cloneDeep(tmpForm));
 
-    if (
-      pengajuanTransporterStore.id_transporter_tmp == 0 ||
-      pengajuanTransporterStore.id_transporter_tmp == null
-    ) {
-      router.push("/dashboard/admin/manajemen/transporter");
-      return;
-    }
-    if (router.query.action === "edit") {
+    if (action === "edit") {
+      if (
+        pengajuanTransporterStore.id_transporter_tmp == 0 ||
+        pengajuanTransporterStore.id_transporter_tmp == null
+      ) {
+        console.log("masuk sini? #2");
+        if (user.level == "1") {
+          router.push("/dashboard/admin/manajemen/transporter");
+        } else {
+          router.push("/dashboard/user/pengajuantransporter");
+        }
+        // router.push("/dashboard/user/pengajuantransporter");
+        // router.push("/dashboard/admin/manajemen/transporter");
+        return;
+      }
       // jika edit set valuenya
       setForm({
         status_transporter:

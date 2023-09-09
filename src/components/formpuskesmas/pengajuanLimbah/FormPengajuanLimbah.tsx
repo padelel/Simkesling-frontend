@@ -453,6 +453,9 @@ const FormPengajuanLimbah: React.FC = () => {
   };
 
   useLayoutEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const action = urlParams.get("action");
+
     getTransporterData();
     console.log(transporterOptions);
     console.log(Object.values(laporanBulananStore));
@@ -465,7 +468,7 @@ const FormPengajuanLimbah: React.FC = () => {
 
     formInstance.setFieldsValue({
       form_tahun: new Date().getFullYear(),
-      form_periode: new Date().getMonth() + 1,
+      form_periode: (new Date().getMonth() + 1).toString(),
     });
     setForm({
       ...form,
@@ -473,16 +476,16 @@ const FormPengajuanLimbah: React.FC = () => {
       periode: (new Date().getMonth() + 1).toString(),
     });
 
-    if (
-      laporanBulananStore.id_laporan_bulanan == null ||
-      laporanBulananStore.id_laporan_bulanan == 0
-    ) {
-      console.log("masuk sini? #2");
-      router.push("/dashboard/user/limbah");
-      return;
-    }
-    if (router.query.action === "edit") {
+    if (action === "edit") {
       console.log("masuk sini? #1");
+      if (
+        laporanBulananStore.id_laporan_bulanan == null ||
+        laporanBulananStore.id_laporan_bulanan == 0
+      ) {
+        console.log("masuk sini? #2");
+        router.push("/dashboard/user/limbah");
+        return;
+      }
       // jika edit set valuenya
       // setForm({
       //   oldid: laporanBulananStore.id_laporan_bulanan?.toString() ?? "",
@@ -661,7 +664,7 @@ const FormPengajuanLimbah: React.FC = () => {
             value={form.ukurantps}
             name="ukurantps"
           />{" "}
-          Ukuran
+          Ukuran &#13217;
         </Form.Item>
         <Form.Item name="form_pemusnah" label="Memiliki Pemusnah Mandiri?">
           <Checkbox
@@ -680,7 +683,7 @@ const FormPengajuanLimbah: React.FC = () => {
             value={form.ukuranpemusnah}
             name="ukuranpemusnah"
           />{" "}
-          Ukuran
+          Ukuran &#13217;
         </Form.Item>
         <Divider />
         <Form.Item
@@ -901,7 +904,7 @@ const FormPengajuanLimbah: React.FC = () => {
         <h2 style={{ display: "flex", justifyContent: "center" }}>
           Pencatatan Limbah Cair
         </h2>
-        <Form.Item name="form_debitLimbah" label="Debit Limbah Cair">
+        <Form.Item name="form_debitLimbah" label="Debit Limbah Cair (L)">
           <Input
             onChange={handleChangeInput}
             name="debitlimbahcair"

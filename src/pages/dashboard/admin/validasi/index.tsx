@@ -99,11 +99,12 @@ const Index: React.FC = () => {
       dataIndex: "tanggalPengajuan",
       // defaultSortOrder: "descend",
       sorter: (a: any, b: any) =>
-        a.tanggalPengajuan.localeCompare(b.tanggalPengajuan),
+        a.tanggalPengajuan.toString().localeCompare(b.tanggalPengajuan),
     },
     {
       title: "Status Pengajuan",
       dataIndex: "status",
+      sorter: (a: any, b: any) => a.status.toString().localeCompare(b.status),
 
       // specify the condition of filtering result
       // here is that finding the name started with `value`

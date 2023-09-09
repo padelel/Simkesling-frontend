@@ -333,7 +333,7 @@ const FormProfile = () => {
   return (
     <>
       <div style={{ display: "flex", justifyContent: "center" }}>
-        <h2>Profile Saya</h2>
+        <h2>Profile</h2>
         {/* <Button onClick={() => getDataProfile()}>GetProfile</Button> */}
       </div>
       <div style={{ justifyContent: "center" }}>

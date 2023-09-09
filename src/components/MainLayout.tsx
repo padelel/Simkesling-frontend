@@ -67,7 +67,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
     },
     {
       icon: <ProfileOutlined />,
-      label: "Profil Saya",
+      label: "Profil",
       path: "/dashboard/user/profile",
       level: "user",
     },
@@ -99,6 +99,12 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
       icon: <TableOutlined />,
       label: "Manajemen Laporan",
       path: "/dashboard/admin/manajemen/laporan",
+      level: "admin",
+    },
+    {
+      icon: <TableOutlined />,
+      label: "Manajemen Laporan Rekapitulasi",
+      path: "/dashboard/admin/manajemen/laporan-rekapitulasi",
       level: "admin",
     },
     {

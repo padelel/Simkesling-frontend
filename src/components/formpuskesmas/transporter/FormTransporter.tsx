@@ -431,7 +431,9 @@ const FormPengajuanTransporter: React.FC = () => {
         let val = transporterStore.files[index];
         let tmpfile = await getFile(val.file1);
         // let tmpawal = await setDateRangeList(val.tgl_mulai);
-        arrfile.push([tmpfile]);
+        if (tmpfile) {
+          arrfile.push([tmpfile]);
+        }
       }
     }
     console.log(arrfile);
@@ -482,6 +484,9 @@ const FormPengajuanTransporter: React.FC = () => {
 
   const [formInstance] = Form.useForm();
   useLayoutEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const action = urlParams.get("action");
+
     getKecamatanData();
     console.log(router.query);
     console.log(Object.values(transporterStore));
@@ -491,14 +496,14 @@ const FormPengajuanTransporter: React.FC = () => {
     formInstance.resetFields();
     setForm(cloneDeep(tmpForm));
 
-    if (
-      transporterStore.id_transporter == null ||
-      transporterStore.id_transporter == 0
-    ) {
-      router.push("/dashboard/user/transporter");
-      return;
-    }
-    if (router.query.action === "edit") {
+    if (action === "edit") {
+      if (
+        transporterStore.id_transporter == null ||
+        transporterStore.id_transporter == 0
+      ) {
+        router.push("/dashboard/user/transporter");
+        return;
+      }
       // jika edit set valuenya
       setForm({
         status_transporter:

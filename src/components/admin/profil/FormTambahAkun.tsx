@@ -180,6 +180,9 @@ const FormTambahAkun: React.FC = () => {
   };
 
   useLayoutEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const action = urlParams.get("action");
+
     getKecamatanData();
     console.log(router.query);
     console.log(Object.values(tambahAkunStore));
@@ -189,7 +192,7 @@ const FormTambahAkun: React.FC = () => {
     formInstance.resetFields();
     setForm(cloneDeep(tmpForm));
 
-    if (router.query.action === "edit") {
+    if (action === "edit") {
       // jika edit set valuenya
       // jika idnya kosong (dia melakukan refresh) balikin ke table
       if (tambahAkunStore.id_user == null || tambahAkunStore.id_user == 0) {

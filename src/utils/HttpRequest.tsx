@@ -6,6 +6,7 @@ import { useRouter } from "next/router";
 // Create an instance of Axios with custom configurations
 const api = axios.create({
   // baseURL: 'http://localhost:8000/api',
+  // baseURL: "http://192.168.128.190:8000/api/v1", // Your API base URL
   // baseURL: "http://localhost:8000/api/v1", // Your API base URL
   baseURL: "https://be-simkesling.lalapan-depok.com/api/v1", // Your API base URL
   // baseURL: "http://192.168.228.190:8000/api/v1", // Your API base URL
