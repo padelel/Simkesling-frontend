@@ -67,7 +67,7 @@ const DashboardPage: React.FC = () => {
     },
     title: {
       text: judulChart, // Judul chart "Berat Total Limbah"
-      align: "center",
+      align: "center" as "center",
     },
   };
 

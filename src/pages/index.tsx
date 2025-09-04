@@ -1,3 +1,4 @@
+// login page
 import React, { useEffect, useState } from "react";
 import MainLayout from "../components/MainLayout";
 import { Button, Carousel, Layout, Space } from "antd";
@@ -80,45 +81,21 @@ const LandingPage: React.FC = () => {
               <h2 style={{ color: "#fff" }}>Kontak</h2>
               <p>
                 <PhoneOutlined style={{ color: "#fff", marginRight: "5px" }} />
-                Nomor Telepon: +1234567890
+                Nomor Telepon: 02129402281
               </p>
               <p>
                 <MailOutlined style={{ color: "#fff", marginRight: "5px" }} />
-                Email: your@email.com
+                Email: dinkes@depok.go.id
               </p>
               <p>
                 <EnvironmentOutlined
                   style={{ color: "#fff", marginRight: "5px" }}
                 />
-                Lokasi: Nama Lokasi, Kota
+                Lokasi: Gedung Baleka II, Jl. Margonda Raya No.54, Depok, Kec. Pancoran Mas, Kota Depok, Jawa Barat 16431
               </p>
+              <p>&copy; 2023 D’Smiling Dinkes Kota Depok</p>
             </div>
           </div>
-          <div style={{ marginTop: "20px" }}>
-            <a
-              href="https://www.facebook.com/your-facebook-page"
-              target="_blank"
-              rel="noopener noreferrer">
-              <FacebookOutlined
-                style={{ fontSize: "24px", color: "#fff", marginRight: "10px" }}
-              />
-            </a>
-            <a
-              href="https://www.instagram.com/your-instagram-page"
-              target="_blank"
-              rel="noopener noreferrer">
-              <InstagramOutlined
-                style={{ fontSize: "24px", color: "#fff", marginRight: "10px" }}
-              />
-            </a>
-            <a
-              href="https://www.youtube.com/your-youtube-channel"
-              target="_blank"
-              rel="noopener noreferrer">
-              <YoutubeOutlined style={{ fontSize: "24px", color: "#fff" }} />
-            </a>
-          </div>
-          <p>&copy; {new Date().getFullYear()} Pengmas PNJ</p>
         </Footer>
       </Space>
     </>

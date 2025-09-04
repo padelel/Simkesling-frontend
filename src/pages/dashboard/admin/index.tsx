@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
-// import Chart from "react-apexcharts";
 import MainLayout from "@/components/MainLayout";
-import Diagram from "@/components/admin/dashboard/Diagram";
 import {
   Button,
   Card,
@@ -13,35 +11,44 @@ import {
   Space,
   Spin,
   Table,
-  TableProps,
   Tag,
 } from "antd";
-import TabelNotifikasi from "@/components/admin/dashboard/TabelNotifikasi";
-import CardTahunan from "@/components/admin/dashboard/CardTahunan";
-import CardBulanan from "@/components/admin/dashboard/Cardbulanan";
 import dynamic from "next/dynamic";
 import cloneDeep from "clone-deep";
 import api from "@/utils/HttpRequest";
 import { useGlobalStore } from "@/stores/globalStore";
 
-const onChange = (pagination: any, filters: any, sorter: any, extra: any) => {
-  console.log("params", pagination, filters, sorter, extra);
-};
-
 const DashboardPage: React.FC = () => {
   const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
   const globalStore = useGlobalStore();
+
   const [data, setData] = useState<any[]>([]);
-  const [tahunChart, setTahunChart] = useState("");
-  const [periode, setPeriode] = useState("");
   const [formInstance] = Form.useForm();
   const [chartWidth, setChartWidth] = useState(800);
   const [chartHeight, setChartHeight] = useState(400);
   const [judulChart, setJudulChart] = useState("");
-  const options = {
-    chart: {
-      id: "simple-bar",
-    },
+
+  const tmpForm = {
+    laporan_periode: "",
+    laporan_periode_nama: "",
+    laporan_periode_tahun: "",
+    total_laporan_perperiode: 0,
+    total_puskesmas_rs_belum_lapor: 0,
+    total_puskesmas_rs_sudah_lapor: 0,
+    total_transporter: 0,
+    total_puskesmas_rs: 0,
+  };
+  const [form, setForm] = useState(cloneDeep(tmpForm));
+
+  const tmpSeries = [
+    { name: "Total Puskesmas Belum Lapor", data: [] },
+    { name: "Total Puskesmas", data: [] },
+    { name: "Total Puskesmas Sudah Lapor", data: [] },
+  ];
+  const [series, setSeries] = useState(cloneDeep(tmpSeries));
+
+  const chartOptions = {
+    chart: { id: "simple-bar" },
     colors: ["#feb019d9", "#008ffbd9", "#00e396d9"],
     xaxis: {
       categories: [
@@ -59,177 +66,89 @@ const DashboardPage: React.FC = () => {
         "Desember",
       ],
     },
-    yaxis: {
-      title: {
-        text: "Jumlah Laporan",
-      },
-    },
+    yaxis: { title: { text: "Jumlah Laporan" } },
     title: {
-      text: `Grafik Pelaporan Limbah Puskesmas & RS ${judulChart}`, // Judul chart "Berat Total Limbah"
-      align: "center",
+      text: `Grafik Pelaporan Limbah Puskesmas & RS ${judulChart}`,
+      align: "center" as "center",
     },
   };
 
-  let tmp_form = {
-    laporan_periode: "",
-    laporan_periode_nama: "",
-    laporan_periode_tahun: "",
-    total_laporan_perperiode: 0,
-    total_puskesmas_rs_belum_lapor: 0,
-    total_puskesmas_rs_sudah_lapor: 0,
-    total_transporter: 0,
-    total_puskesmas_rs: 0,
-  };
-  const [form, setForm] = useState(cloneDeep(tmp_form));
-
-  const tmpSeries = [
-    {
-      name: "Total Puskesmas Belum Lapor", //will be displayed on the y-axis
-      data: [],
-    },
-    {
-      name: "Total Puskesmas", //will be displayed on the y-axis
-      data: [],
-    },
-    {
-      name: "Total Puskesmas Sudah Lapor", //will be displayed on the y-axis
-      data: [],
-    },
-  ];
-
-  const [series, setSeries] = useState(cloneDeep(tmpSeries));
-
-  const handleChangePeriode = (val: any, name: string, event: any) => {
-    const periode = parseInt(val);
-    console.log(val);
-    console.log(periode);
-    setForm({
-      ...form,
-      [name]: val,
-    });
-  };
-
-  const handleChangeInput = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    // console.log(event);
-    setForm({
-      ...form,
-      [event.target.name]: event.target.value,
-    });
-  };
-
-  const hitDashboard = async () => {
-    if (globalStore.setLoading) globalStore.setLoading(true);
-    try {
-      let dataForm: any = new FormData();
-      dataForm.append("periode", form.laporan_periode);
-      dataForm.append("tahun", form.laporan_periode_tahun);
-      let url = "/user/dashboard-admin/data";
-      let responsenya = await api.post(url, dataForm);
-      let tmpData = cloneDeep(tmpSeries);
-      tmpData[1].data = responsenya.data.data.values.total_chart_puskesmas_rs;
-      tmpData[2].data =
-        responsenya.data.data.values.total_chart_puskesmas_rs_sudah_lapor;
-      tmpData[0].data =
-        responsenya.data.data.values.total_chart_puskesmas_rs_belum_lapor;
-      setSeries(tmpData);
-      let tahun = responsenya.data.data.values.laporan_periode_tahun;
-      setJudulChart(tahun);
-      console.log(tahunChart);
-      setForm({
-        laporan_periode: responsenya.data.data.values.laporan_periode,
-        laporan_periode_nama: responsenya.data.data.values.laporan_periode_nama,
-        laporan_periode_tahun: responsenya.data.data.values.laporan_periode_tahun,
-        total_laporan_perperiode:
-          responsenya.data.data.values.total_laporan_perperiode,
-        total_puskesmas_rs_belum_lapor:
-          responsenya.data.data.values.total_puskesmas_rs_belum_lapor,
-        total_puskesmas_rs_sudah_lapor:
-          responsenya.data.data.values.total_puskesmas_rs_sudah_lapor,
-        total_transporter: responsenya.data.data.values.total_transporter,
-        total_puskesmas_rs: responsenya.data.data.values.total_puskesmas_rs,
-      });
-  
-      const responseData =
-        responsenya.data.data.values.notif_user_laporan_bulanan;
-      const transformedData = responseData.map((item: any) => ({
-        ...item,
-        namaUser: item.nama_user,
-        namaTempat: item.tipe_tempat,
-        kec: item.kecamatan,
-        kel: item.kelurahan,
-        sudahLapor: item.sudah_lapor,
-      }));
-  
-      setData(transformedData);
-    }catch(e) {
-      console.error(e)
-    }finally{
-      if (globalStore.setLoading) globalStore.setLoading(false);
-    }
-  };
-
-  const columns: any = [
+  const columns = [
     {
       title: "Nama Tempat",
       dataIndex: "namaUser",
-      // defaultSortOrder: "descend",
       sorter: (a: any, b: any) =>
         a.namaUser.toUpperCase().localeCompare(b.namaUser.toUpperCase()),
     },
     {
       title: "Jenis Instansi",
       dataIndex: "namaTempat",
-      // defaultSortOrder: "descend",
       sorter: (a: any, b: any) =>
         a.namaTempat.toUpperCase().localeCompare(b.namaTempat.toUpperCase()),
     },
     {
       title: "Kecamatan",
       dataIndex: "kec",
-      // defaultSortOrder: "descend",
       sorter: (a: any, b: any) =>
         a.kec.toUpperCase().localeCompare(b.kec.toUpperCase()),
     },
     {
       title: "Kelurahan",
       dataIndex: "kel",
-      // defaultSortOrder: "descend",
       sorter: (a: any, b: any) =>
         a.kel.toUpperCase().localeCompare(b.kel.toUpperCase()),
     },
     {
       title: "Status Laporan",
       dataIndex: "sudahLapor",
-      render: (status: any) => {
-        let sts = "-- ups --";
-        let color = "-";
-        if (status == false) {
-          color = "volcano";
-          sts = "Belum lapor";
-        }
-        if (status == true) {
-          color = "green";
-          sts = "Sudah Lapor";
-        }
-
-        return (
-          <>
-            <Tag color={color}>{sts.toUpperCase()}</Tag>
-          </>
-        );
+      render: (status: boolean) => {
+        const color = status ? "green" : "volcano";
+        const text = status ? "Sudah Lapor" : "Belum Lapor";
+        return <Tag color={color}>{text.toUpperCase()}</Tag>;
       },
     },
   ];
 
-  const getData = async () => {
+  const handleChangePeriode = (val: any, name: string) => {
+    setForm({ ...form, [name]: val });
+  };
+
+  const handleChangeInput = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setForm({ ...form, [event.target.name]: event.target.value });
+  };
+
+  const hitDashboard = async () => {
     if (globalStore.setLoading) globalStore.setLoading(true);
     try {
-      const response = await api.post("/user/dashboard-admin/data");
-      const responseData = response.data.data.values.notif_user_laporan_bulanan;
+      const dataForm = new FormData();
+      dataForm.append("periode", form.laporan_periode);
+      dataForm.append("tahun", form.laporan_periode_tahun);
 
-      const transformedData = responseData.map((item: any) => ({
+      const response = await api.post("/user/dashboard-admin/data", dataForm);
+      const values = response.data.data.values;
+
+      const updatedSeries = cloneDeep(tmpSeries);
+      updatedSeries[1].data = values.total_chart_puskesmas_rs;
+      updatedSeries[2].data = values.total_chart_puskesmas_rs_sudah_lapor;
+      updatedSeries[0].data = values.total_chart_puskesmas_rs_belum_lapor;
+      setSeries(updatedSeries);
+
+      setJudulChart(values.laporan_periode_tahun);
+
+      setForm({
+        laporan_periode: values.laporan_periode,
+        laporan_periode_nama: values.laporan_periode_nama,
+        laporan_periode_tahun: values.laporan_periode_tahun,
+        total_laporan_perperiode: values.total_laporan_perperiode,
+        total_puskesmas_rs_belum_lapor: values.total_puskesmas_rs_belum_lapor,
+        total_puskesmas_rs_sudah_lapor: values.total_puskesmas_rs_sudah_lapor,
+        total_transporter: values.total_transporter,
+        total_puskesmas_rs: values.total_puskesmas_rs,
+      });
+
+      const notifData = values.notif_user_laporan_bulanan.map((item: any) => ({
         ...item,
         namaUser: item.nama_user,
         namaTempat: item.tipe_tempat,
@@ -238,40 +157,35 @@ const DashboardPage: React.FC = () => {
         sudahLapor: item.sudah_lapor,
       }));
 
-      setData(transformedData);
-      console.log(transformedData);
-    } catch (error) {
-      console.error("Error fetching data:", error);
+      setData(notifData);
+    } catch (e) {
+      console.error(e);
     } finally {
       if (globalStore.setLoading) globalStore.setLoading(false);
     }
   };
 
   useEffect(() => {
-    // getData();
     hitDashboard();
 
     const handleResize = () => {
-      // Periksa lebar layar dan atur lebar chart sesuai dengan kondisi tertentu
       if (window.innerWidth < 700) {
         setChartWidth(300);
         setChartHeight(400);
       } else {
         setChartWidth(800);
+        setChartHeight(400);
       }
     };
 
-    // Tambahkan event listener untuk mengikuti perubahan ukuran layar
     window.addEventListener("resize", handleResize);
-
-    // Panggil handleResize saat komponen pertama kali dimuat
     handleResize();
 
-    // Hapus event listener saat komponen dibongkar
     return () => {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
+
   return (
     <MainLayout title="Dashboard">
       <Spin spinning={globalStore.isloading}>
@@ -281,15 +195,9 @@ const DashboardPage: React.FC = () => {
             <Form.Item name="form_periode" label="Periode">
               <Select
                 placeholder="Pilih Bulan Periode"
-                onChange={(v) =>
-                  handleChangePeriode(v, "laporan_periode", event)
-                }
+                onChange={(v) => handleChangePeriode(v, "laporan_periode")}
                 style={{ width: 200 }}
-                allowClear={true}
-                onClear={(v) =>
-                  handleChangePeriode("", "laporan_periode", event)
-                }
-                // onChange={handleChange}
+                allowClear
                 options={[
                   { value: 1, label: "Januari" },
                   { value: 2, label: "Februari" },
@@ -312,8 +220,7 @@ const DashboardPage: React.FC = () => {
                 onChange={handleChangeInput}
                 maxLength={4}
                 name="laporan_periode_tahun"
-                allowClear={true}
-                onClear={handleChangeInput}
+                allowClear
               />
             </Form.Item>
             <Form.Item>
@@ -324,7 +231,7 @@ const DashboardPage: React.FC = () => {
           </Space>
         </Form>
         <Space direction="vertical" size={16}>
-          <Row style={{ display: "flex", justifyContent: "space-between" }}>
+          <Row justify="space-between">
             <Col>
               <Card
                 title="Total Instansi Kesehatan"
@@ -363,7 +270,7 @@ const DashboardPage: React.FC = () => {
               <Col>
                 {typeof window !== undefined && (
                   <Chart
-                    options={options}
+                    options={chartOptions}
                     type="bar"
                     width={chartWidth}
                     height={chartHeight}
@@ -378,7 +285,7 @@ const DashboardPage: React.FC = () => {
               <tbody>
                 <tr>
                   <td>
-                    <h4 style={{ display: "flex", justifyContent: "center" }}>
+                    <h4 style={{ textAlign: "center" }}>
                       Notifikasi Laporan Limbah
                     </h4>
                   </td>
@@ -389,7 +296,6 @@ const DashboardPage: React.FC = () => {
                       scroll={{ x: 800 }}
                       columns={columns}
                       dataSource={data}
-                      onChange={onChange}
                     />
                   </td>
                 </tr>
