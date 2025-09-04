@@ -3,10 +3,10 @@ import Notif from "./Notif";
 // Create an instance of Axios with custom configurations
 const apifile = axios.create({
   // baseURL: 'http://localhost:8000/api',
-  // baseURL: "http://localhost:8000/api/v1", // Your API base URL
+  baseURL: "http://localhost:8000/api/v1", // Your API base URL
   // baseURL: "http://192.168.128.190:8009", // Your API base URL
   // baseURL: "http://localhost:8009", // Your API base URL
-  baseURL: "https://be-simkesling.lalapan-depok.com", // Your API base URL
+  // baseURL: "https://be-simkesling.lalapan-depok.com", // Your API base URL
   // baseURL: "http://192.168.228.190:8009/", //
   timeout: 30000, // Request timeout in milliseconds
   headers: {

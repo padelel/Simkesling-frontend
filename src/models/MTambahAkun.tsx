@@ -23,6 +23,14 @@ export interface MUser {
   uid: string;
   created_at: string;
   updated_at: string;
+  link_manifest: string;
+  link_logbook: string;
+  link_lab_ipal: string;
+  link_lab_lain: string;
+  link_dokumen_lingkungan_rs: string;
+  link_izin_transporter: string;
+  link_mou_transporter: string;
+  kapasitas_ipal: string;
 
   simpenBentaran?: Function;
 }

@@ -27,6 +27,14 @@ const tmpTambahAkun = {
   uid: "",
   created_at: "",
   updated_at: "",
+  link_manifest: "",
+  link_logbook: "",
+  link_lab_ipal: "",
+  link_lab_lain: "",
+  link_dokumen_lingkungan_rs: "",
+  link_izin_transporter: "",
+  link_mou_transporter: "",
+  kapasitas_ipal: "",
 };
 export const useTambahAkunStore = create<MUser>((set) => ({
   ...tmpTambahAkun,

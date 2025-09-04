@@ -53,6 +53,14 @@ const FormTambahAkun: React.FC = () => {
     email: "",
     username: "",
     password: "",
+    link_manifest: "",
+    link_logbook: "",
+    link_lab_ipal: "",
+    link_lab_lain: "",
+    link_dokumen_lingkungan_rs: "",
+    link_izin_transporter: "",
+    link_mou_transporter: "",
+    kapasitas_ipal: "",
   };
 
   const [form, setForm] = useState(cloneDeep(tmpForm));
@@ -216,6 +224,14 @@ const FormTambahAkun: React.FC = () => {
         notelp: tambahAkunStore.nohp?.toString() ?? "",
         email: tambahAkunStore.email?.toString() ?? "",
         password: tambahAkunStore.email?.toString() ?? "",
+        link_manifest: tambahAkunStore.link_manifest?.toString() ?? "",
+        link_logbook: tambahAkunStore.link_logbook?.toString() ?? "",
+        link_lab_ipal: tambahAkunStore.link_lab_ipal?.toString() ?? "",
+        link_lab_lain: tambahAkunStore.link_lab_lain?.toString() ?? "",
+        link_dokumen_lingkungan_rs: tambahAkunStore.link_dokumen_lingkungan_rs?.toString() ?? "",
+        link_izin_transporter: tambahAkunStore.link_izin_transporter?.toString() ?? "",
+        link_mou_transporter: tambahAkunStore.link_mou_transporter?.toString() ?? "",
+        kapasitas_ipal: tambahAkunStore.kapasitas_ipal?.toString() ?? "",
       });
 
       formInstance.setFieldsValue({
@@ -253,6 +269,18 @@ const FormTambahAkun: React.FC = () => {
     dataForm.append("alamat_tempat", form.alamat_tempat);
     dataForm.append("notlp", form.notelp);
     dataForm.append("email", form.email);
+    dataForm.append("link_manifest", form.link_manifest);
+    dataForm.append("link_logbook", form.link_logbook);
+    dataForm.append("link_lab_ipal", form.link_lab_ipal);
+    dataForm.append("link_lab_lain", form.link_lab_lain);
+    dataForm.append("link_dokumen_lingkungan_rs", form.link_dokumen_lingkungan_rs);
+    dataForm.append("link_izin_transporter", form.link_izin_transporter);
+    dataForm.append("link_mou_transporter", form.link_mou_transporter);
+    dataForm.append("kapasitas_ipal", form.kapasitas_ipal);
+    
+    // HAPUS/COMMENT baris ini karena tidak perlu kirim nama kelurahan/kecamatan
+    // dataForm.append("kelurahan", kelurahanOptions.find(k => k.value === form.id_kelurahan)?.label || "");
+    // dataForm.append("kecamatan", kecamatanOptions.find(k => k.value === form.id_kecamatan)?.label || "");
 
     let url = "/user/puskesmas-rumahsakit/create";
     if (router.query.action == "edit") {
@@ -262,7 +290,6 @@ const FormTambahAkun: React.FC = () => {
     try {
       if (globalStore.setLoading) globalStore.setLoading(true);
       let responsenya = await api.post(url, dataForm);
-
       router.push("/dashboard/admin/manajemen/profil");
     } catch (e) {
       console.error(e);
@@ -322,8 +349,7 @@ const FormTambahAkun: React.FC = () => {
         <Form.Item
           name="level"
           label="Jenis Instansi"
-          initialValue={form.level}
-          rules={[{ required: true }]}
+          rules={[{ required: true, message: "Jenis instansi wajib diisi." }]}
         >
           <Select
             style={{ width: 250 }}
@@ -335,39 +361,34 @@ const FormTambahAkun: React.FC = () => {
               { value: "3", label: "Puskesmas" },
               { value: "2", label: "Rumah Sakit" },
             ]}
+            value={form.level}
           />
         </Form.Item>
         <Form.Item
-          name="form_kecamatan"
+          name="id_kecamatan"
           label="Kecamatan"
-          initialValue={form.id_kecamatan}
-          rules={[{ required: false }]}
+          rules={[{ required: true, message: "Kecamatan wajib diisi." }]}
         >
           <Select
             style={{ width: 250 }}
             showSearch
             value={form.id_kecamatan}
-            onChange={(v) =>
-              handleKecamatanSelectChange(v, "id_kecamatan", event)
-            }
+            onChange={(v) => handleKecamatanSelectChange(v, "id_kecamatan", event)}
             placeholder="Silahkan Pilih Kecamatan"
             allowClear
             options={kecamatanOptions}
           />
         </Form.Item>
         <Form.Item
-          name="form_kelurahan"
+          name="id_kelurahan"
           label="Kelurahan"
-          initialValue={form.id_kelurahan}
-          rules={[{ required: false }]}
+          rules={[{ required: true, message: "Kelurahan wajib diisi." }]}
         >
           <Select
             style={{ width: 250 }}
             showSearch
             value={form.id_kelurahan}
-            onChange={(v) =>
-              handleKelurahanSelectChange(v, "id_kelurahan", event)
-            }
+            onChange={(v) => handleKelurahanSelectChange(v, "id_kelurahan", event)}
             placeholder="Silahkan Pilih Kelurahan"
             allowClear
             options={kelurahanOptions}
@@ -404,6 +425,109 @@ const FormTambahAkun: React.FC = () => {
           rules={[{ required: false }]}
         >
           <Input onChange={handleChangeInput} value={form.email} name="email" />
+        </Form.Item>
+        <Form.Item
+          name="link_manifest"
+          label="Link Manifest"
+          rules={[{ required: true, message: "Link manifest wajib diisi" }]}
+        >
+          <Input
+            onChange={handleChangeInput}
+            value={form.link_manifest}
+            name="link_manifest"
+            placeholder="Link manifest wajib diisi."
+          />
+        </Form.Item>
+
+        <Form.Item
+          name="link_logbook"
+          label="Link Logbook"
+          rules={[{ required: true, message: "Link logbook wajib diisi" }]}
+        >
+          <Input
+            onChange={handleChangeInput}
+            value={form.link_logbook}
+            name="link_logbook"
+            placeholder="Link logbook wajib diisi."
+          />
+        </Form.Item>
+
+        <Form.Item
+          name="link_lab_ipal"
+          label="Link Lab IPAL"
+          rules={[{ required: true, message: "Link lab IPAL wajib diisi" }]}
+        >
+          <Input
+            onChange={handleChangeInput}
+            value={form.link_lab_ipal}
+            name="link_lab_ipal"
+            placeholder="Link lab ipal wajib diisi."
+          />
+        </Form.Item>
+
+        <Form.Item
+          name="link_lab_lain"
+          label="Link Lab Lain"
+          rules={[{ required: true, message: "Link lab lain wajib diisi" }]}
+        >
+          <Input
+            onChange={handleChangeInput}
+            value={form.link_lab_lain}
+            name="link_lab_lain"
+            placeholder="Link lab lain wajib diisi."
+          />
+        </Form.Item>
+
+        <Form.Item
+          name="link_dokumen_lingkungan_rs"
+          label="Link Dokumen Lingkungan RS"
+          rules={[{ required: true, message: "Link dokumen lingkungan RS wajib diisi" }]}
+        >
+          <Input
+            onChange={handleChangeInput}
+            value={form.link_dokumen_lingkungan_rs}
+            name="link_dokumen_lingkungan_rs"
+            placeholder="Link dokumen lingkungan rs wajib diisi."
+          />
+        </Form.Item>
+
+        <Form.Item
+          name="link_izin_transporter"
+          label="Link Izin Transporter"
+          rules={[{ required: true, message: "Link izin transporter wajib diisi" }]}
+        >
+          <Input
+            onChange={handleChangeInput}
+            value={form.link_izin_transporter}
+            name="link_izin_transporter"
+            placeholder="Link izin transporter wajib diisi."
+          />
+        </Form.Item>
+
+        <Form.Item
+          name="link_mou_transporter"
+          label="Link MOU Transporter"
+          rules={[{ required: true, message: "Link MOU transporter wajib diisi" }]}
+        >
+          <Input
+            onChange={handleChangeInput}
+            value={form.link_mou_transporter}
+            name="link_mou_transporter"
+            placeholder="Link mou transporter wajib diisi."
+          />
+        </Form.Item>
+
+        <Form.Item
+          name="kapasitas_ipal"
+          label="Kapasitas IPAL"
+          rules={[{ required: true, message: "Kapasitas IPAL wajib diisi" }]}
+        >
+          <Input
+            onChange={handleChangeInput}
+            value={form.kapasitas_ipal}
+            name="kapasitas_ipal"
+            placeholder="Kapasitas ipal wajib diisi."
+          />
         </Form.Item>
 
         <Form.Item {...tailLayoutUpload}>
