@@ -1,104 +1,79 @@
-import React, { useState, useEffect } from "react";
-import { Button, Modal, Space, Spin } from "antd";
+import React, { useState } from "react";
+import { Button, Modal, Spin, Typography } from "antd";
 import { LoginOutlined } from "@ant-design/icons";
-import { InfoCircleOutlined } from "@ant-design/icons";
-import bg from "../../../public/gambar-carousel/Balaikota-Depok.jpg";
 import bg2 from "../../../public/gambar-carousel/limbah-ilustration.jpg";
-import { SizeType } from "antd/es/config-provider/SizeContext";
-import { SpaceSize } from "antd/es/space";
-import Link from "next/link";
 import FormLogin from "../login/FormLogin";
-import { Roboto } from "next/font/google";
 import { useGlobalStore } from "@/stores/globalStore";
 
-const CarrouselLanding = () => {
+const { Title, Paragraph } = Typography;
+
+const HeroSection = () => {
   const globalStore = useGlobalStore();
-  const [sizeButton, setSizeButton] = useState<SizeType>("large"); // default is 'middle'
-  const [size, setSize] = useState<SpaceSize | [SpaceSize, SpaceSize]>("small");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [bgImage, setBgImage] = useState(bg2.src);
 
   const showModal = () => {
     setIsModalOpen(true);
-  };
-
-  const handleOk = () => {
-    setIsModalOpen(false);
   };
 
   const handleCancel = () => {
     setIsModalOpen(false);
   };
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      // Berganti gambar latar belakang setiap 5 detik
-      setBgImage((prevImage) => (prevImage === bg.src ? bg2.src : bg.src));
-    }, 5000);
-
-    return () => {
-      clearInterval(interval);
-    };
-  }, []);
-
   return (
-    <div
-      className="flex"
-      style={{
-        color: "#fff",
-        width: "100%",
-        textAlign: "center",
-        backgroundImage: `url(${bgImage})`,
-        backgroundPosition: "center",
-        backgroundSize: "cover",
-        backgroundRepeat: "no-repeat",
-        position: "relative", // Add this line
-      }}
-    >
+    <>
       <div
         style={{
-          backgroundColor: "rgba(0,0,0, 0.60)",
-          top: 0,
-          paddingTop: 100,
-          paddingBottom: 100,
-          left: 0,
-          height: "100%",
+          width: "100%",
+          height: "calc(100vh - 80px)", // Full viewport height minus header
+          backgroundImage: `url(${bg2.src})`,
+          backgroundPosition: "center",
+          backgroundSize: "cover",
+          backgroundRepeat: "no-repeat",
+          position: "relative",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
         }}
       >
-        <h2 style={{ fontFamily: "Roboto" }}>
-          SISTEM INFORMASI MANAJEMEN KESEHATAN LINGKUNGAN
-          <br />
-          Kota Depok - Jawa Barat
-        </h2>
-        <Space size={size}>
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0, 123, 255, 0.3)", // Lighter, branded overlay
+          }}
+        />
+        <div style={{ zIndex: 1, textAlign: "center", color: "white", padding: "20px" }}>
+          <Title style={{ color: "white", fontWeight: "bold", textShadow: "1px 1px 4px rgba(0,0,0,0.5)" }} level={1}>
+            D&apos;SMILING
+          </Title>
+          <Paragraph style={{ color: "white", fontSize: "1.2rem", maxWidth: "800px", margin: "0 auto 30px auto", textShadow: "1px 1px 4px rgba(0,0,0,0.5)" }}>
+            (Depok Sistem Manajemen Kesehatan Lingkungan)
+            <br/>Solusi terintegrasi untuk pengelolaan limbah medis yang efisien, transparan, dan ramah lingkungan di Kota Depok.
+          </Paragraph>
           <Button
             type="primary"
             icon={<LoginOutlined />}
             onClick={showModal}
-            size={sizeButton}
+            size="large"
           >
-            Login
+            Login Aplikasi
           </Button>
-
-          {/* <Button type="primary" icon={<InfoCircleOutlined />} size={sizeButton}>
-          Tentang Kami
-        </Button> */}
-        </Space>
-
-        <Modal
-          open={isModalOpen}
-          onOk={handleOk}
-          onCancel={handleCancel}
-          footer={null}
-        >
-          <h2 style={{ textAlign: "center" }}>Login Simkesling</h2>
-          <Spin spinning={globalStore.isloading}>
-          <FormLogin />
-          </Spin>
-        </Modal>
+        </div>
       </div>
-    </div>
+
+      <Modal open={isModalOpen} onCancel={handleCancel} footer={null} centered>
+        <Title level={3} style={{ textAlign: "center", marginBottom: "24px" }}>
+          Login D&apos;SMILING
+        </Title>
+        <Spin spinning={globalStore.isloading}>
+          <FormLogin />
+        </Spin>
+      </Modal>
+    </>
   );
 };
 
-export default CarrouselLanding;
+export default HeroSection;

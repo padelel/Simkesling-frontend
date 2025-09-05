@@ -1,88 +1,71 @@
-import { Footer } from "antd/es/layout/layout";
+import { Layout, Row, Col, Typography } from "antd";
 import {
   MailOutlined,
   PhoneOutlined,
   EnvironmentOutlined,
-  FacebookOutlined,
-  InstagramOutlined,
-  YoutubeOutlined,
 } from "@ant-design/icons";
 import React from "react";
+
+const { Footer } = Layout;
+const { Title, Text, Link } = Typography;
 
 const FooterLanding = () => {
   return (
     <Footer
       style={{
+        backgroundColor: "#f7f7f7", // Light grey background
+        color: "#555", // Darker text for readability
+        padding: "50px",
         borderTop: "1px solid #e8e8e8",
-        backgroundColor: "#007BFF",
-        color: "#fff",
-        textAlign: "center",
       }}
     >
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          flexDirection: "column", // Mengubah tata letak menjadi kolom di ponsel
-        }}
-      >
-        <div style={{ width: "100%" }}>
-          <h2 style={{ color: "#fff" }}>Lokasi Dinas Kesehatan Kota Depok</h2>
-          <iframe
-            src="https://maps.google.com/maps?q=dinas%20kesehatan%20kota%20depok&amp;t=&amp;z=13&amp;ie=UTF8&amp;iwloc=&amp;output=embed"
-            width="300"
-            height="200"
-            style={{ border: "0" }}
-            loading="lazy"
-          ></iframe>
-        </div>
-        <div style={{ width: "100%" }}>
-          <h2 style={{ color: "#fff" }}>Kontak</h2>
-          <p>
-            <PhoneOutlined style={{ color: "#fff", marginRight: "5px" }} />
-            Nomor Telepon: +1234567890
-          </p>
-          <p>
-            <MailOutlined style={{ color: "#fff", marginRight: "5px" }} />
-            Email: your@email.com
-          </p>
-          <p>
-            <EnvironmentOutlined
-              style={{ color: "#fff", marginRight: "5px" }}
-            />
-            Lokasi: Nama Lokasi, Kota
-          </p>
+      <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
+        <Row gutter={[48, 48]} justify="center">
+          <Col xs={24} md={12}>
+            <Title level={4} style={{ color: "#333" }}>
+              Lokasi Kami
+            </Title>
+            <div style={{ height: "250px", width: "100%", borderRadius: "8px", overflow: "hidden" }}>
+              <iframe
+                src="https://maps.google.com/maps?q=dinas%20kesehatan%20kota%20depok&amp;t=&amp;z=13&amp;ie=UTF8&amp;iwloc=&amp;output=embed"
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                loading="lazy"
+                title="Lokasi Dinas Kesehatan Kota Depok"
+              ></iframe>
+            </div>
+          </Col>
+          <Col xs={24} md={12}>
+            <Title level={4} style={{ color: "#333" }}>
+              Kontak & Informasi
+            </Title>
+            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+              <Text>
+                <EnvironmentOutlined style={{ color: "#007BFF", marginRight: "10px" }} />
+                Gedung Baleka II, Jl. Margonda Raya No.54, Depok, Kec. Pancoran Mas, Kota Depok, Jawa Barat 16431
+              </Text>
+              <Text>
+                <PhoneOutlined style={{ color: "#007BFF", marginRight: "10px" }} />
+                <Link href="tel:02129402281" style={{ color: "#555" }}>
+                  021-29402281
+                </Link>
+              </Text>
+              <Text>
+                <MailOutlined style={{ color: "#007BFF", marginRight: "10px" }} />
+                <Link href="mailto:dinkes@depok.go.id" style={{ color: "#555" }}>
+                  dinkes@depok.go.id
+                </Link>
+              </Text>
+            </div>
+          </Col>
+        </Row>
+        <div style={{ textAlign: "center", marginTop: "50px", paddingTop: "20px", borderTop: "1px solid #e8e8e8" }}>
+          <Text type="secondary">
+            &copy; {new Date().getFullYear()} D&apos;SMILING - Dinas Kesehatan Kota Depok. All Rights Reserved.
+          </Text>
         </div>
       </div>
-      <div style={{ marginTop: "20px" }}>
-        <a
-          href="https://www.facebook.com/your-facebook-page"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <FacebookOutlined
-            style={{ fontSize: "24px", color: "#fff", marginRight: "10px" }}
-          />
-        </a>
-        <a
-          href="https://www.instagram.com/your-instagram-page"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <InstagramOutlined
-            style={{ fontSize: "24px", color: "#fff", marginRight: "10px" }}
-          />
-        </a>
-        <a
-          href="https://www.youtube.com/your-youtube-channel"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <YoutubeOutlined style={{ fontSize: "24px", color: "#fff" }} />
-        </a>
-      </div>
-      <p>&copy; {new Date().getFullYear()} Pengmas PNJ</p>
     </Footer>
   );
 };

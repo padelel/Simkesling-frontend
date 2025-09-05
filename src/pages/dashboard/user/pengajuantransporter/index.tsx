@@ -31,7 +31,6 @@ import { useRouter } from "next/router";
 import { useGlobalStore } from "@/stores/globalStore";
 import cloneDeep from "clone-deep";
 import { url } from "inspector";
-// import Search from "antd/es/input/Search"
 import { parsingDate } from "@/utils/common";
 import Search from "antd/es/input/Search";
 
@@ -79,10 +78,6 @@ const Index: React.FC = () => {
   const router = useRouter();
 
   const { confirm } = Modal;
-  // const handleViewClick = (idTransporter: string) => {
-  //   // console.log("View clicked for id_transporter:", idTransporter);
-
-  // };
 
   const handleDelete = async (idTransporter: string) => {
     try {
@@ -120,29 +115,6 @@ const Index: React.FC = () => {
       title: "Status Pengajuan",
       dataIndex: "status",
       defaultSortOrder: "descend",
-      // filterSearch: true,
-      // onFilter: (value: boolean, record) => record.name.includes("1"),
-      // filters: [
-      //   {
-      //     text: "Menunggu",
-      //     value: "1",
-      //   },
-      //   {
-      //     text: "Ditolak",
-      //     value: "0",
-      //   },
-      //   {
-      //     text: "Menunggu",
-      //     value: "MENUNGGU",
-      //   },
-      //   {
-      //     text: "Ditolak",
-      //     value: "DITOLAK",
-      //   },
-      // ],
-
-      // specify the condition of filtering result
-      // here is that finding the name started with `value`
       render: (status: any) => {
         let sts = "-- ups --";
         let color = "-";
@@ -253,20 +225,6 @@ const Index: React.FC = () => {
       if (globalStore.setLoading) globalStore.setLoading(false);
     }
   };
-
-  // const doSearch = async (e: any) => {
-  //   const searchTerm = e.target.value.toLowerCase(); // Konversi ke huruf kecil
-
-  //   let tmpdata = dataSearch.filter((val) => {
-  //     const namaTransporterLowerCase = val.namaTransporter
-  //       .toString()
-  //       .toLowerCase(); // Konversi ke huruf kecil
-  //     return namaTransporterLowerCase.includes(searchTerm);
-  //   });
-
-  //   console.log(tmpdata);
-  //   setData(cloneDeep(tmpdata));
-  // };
 
   // -- search -- \\
   const [search, setSearch] = useState("");

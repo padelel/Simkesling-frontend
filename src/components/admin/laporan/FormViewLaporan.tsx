@@ -210,10 +210,10 @@ const FormViewLaporan: React.FC = () => {
     });
 
     setIsCheckboxChecked(
-      laporanBulananStore.punya_penyimpanan_tps && [1, "1"].includes(laporanBulananStore.punya_penyimpanan_tps)
+      Boolean(laporanBulananStore.punya_penyimpanan_tps && [1, "1"].includes(laporanBulananStore.punya_penyimpanan_tps))
     );
     setIsCheckboxChecked1(
-      laporanBulananStore.punya_pemusnahan_sendiri && [1, "1"].includes(laporanBulananStore.punya_pemusnahan_sendiri)
+      Boolean(laporanBulananStore.punya_pemusnahan_sendiri && [1, "1"].includes(laporanBulananStore.punya_pemusnahan_sendiri))
     );
 
     formInstance.setFieldsValue({

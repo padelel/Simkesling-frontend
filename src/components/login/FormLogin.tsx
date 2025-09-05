@@ -1,82 +1,42 @@
-import React, { useState } from "react";
-import {
-  Button,
-  Card,
-  Checkbox,
-  Form,
-  Input,
-  Row,
-  notification,
-  Space,
-} from "antd";
+import React from "react";
+import { Button, Form, Input } from "antd";
 import { LoginOutlined } from "@ant-design/icons";
-import Link from "next/link";
 import { useUserLoginStore } from "@/stores/userLoginStore";
-import cloneDeep from "clone-deep";
 import { useRouter } from "next/router";
 import { useGlobalStore } from "@/stores/globalStore";
+import { User } from "@/models/MUser";
 
 const onFinishFailed = (errorInfo: any) => {
   console.log("Failed:", errorInfo);
 };
 
-const cardStyle = {
-  width: "500px",
-  height: "202px",
-  borderRadius: "16px",
-  marginRight: "24px",
-  boxShadow: "5px 8px 24px 5px rgba(208, 216, 243, 0.6)",
-};
-
 const FormLogin = () => {
-  const globalStore = useGlobalStore();
-  let tmpForm = {
-    username: "",
-    password: "",
-  };
-
-  const [form, setForm] = useState(cloneDeep(tmpForm));
   const router = useRouter();
-
+  const globalStore = useGlobalStore();
   const userLogin = useUserLoginStore();
-  const handleChangeInput = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    // console.log(event);
-    setForm({
-      ...form,
-      [event.target.name]: event.target.value,
-    });
-  };
 
-  const onFinish = async (values: any) => {
-    console.log("Success:", values);
+  const onFinish = async (values: {
+    form_username: string;
+    form_password: string;
+  }) => {
+    if (!userLogin.prosesLogin || !globalStore.setLoading) return;
 
-    if (userLogin.prosesLogin) {
-      if (globalStore.setLoading) {
-        globalStore.setLoading(true);
-      }
-      let usernya = await userLogin.prosesLogin(
+    globalStore.setLoading(true);
+    try {
+      const usernya: User | null = await userLogin.prosesLogin(
         values.form_username,
         values.form_password
       );
-      if (globalStore.setLoading) {
-        globalStore.setLoading(false);
-      }
-      if (usernya == null) return;
 
-      console.log(usernya);
-      // let token = Cookies.get("token") ?? "";
-      // let user = jwt_decode(token) ?? undefined;
-      userLogin.user = usernya;
-      let url = "/dashboard/user";
       if (usernya) {
-        if (usernya.level == "1") {
-          url = "/dashboard/admin";
-        }
+        userLogin.user = usernya;
+        const url =
+          usernya.level === "1" ? "/dashboard/admin" : "/dashboard/user";
+        await router.push(url);
       }
-      globalStore.setLoading(true);
-      await router.push(url);
+    } catch (error) {
+      console.error("Login process failed:", error);
+    } finally {
       globalStore.setLoading(false);
     }
   };
@@ -87,42 +47,35 @@ const FormLogin = () => {
       initialValues={{ remember: true }}
       onFinish={onFinish}
       onFinishFailed={onFinishFailed}
-      autoComplete="off">
+      autoComplete="off"
+    >
       <Form.Item
         label="Username"
         name="form_username"
-        rules={[{ required: true, message: "Please input your username!" }]}>
-        <Input
-          placeholder="Masukan Username"
-          name="username"
-          onChange={handleChangeInput}
-          value={form.username}
-        />
+        rules={[{ required: true, message: "Please input your username!" }]}
+      >
+        <Input placeholder="Masukan Username" />
       </Form.Item>
 
       <Form.Item
         label="Password"
         name="form_password"
-        rules={[{ required: true, message: "Please input your password!" }]}>
-        <Input.Password
-          placeholder="Masukan Password"
-          name="password"
-          onChange={handleChangeInput}
-          value={form.password}
-        />
+        rules={[{ required: true, message: "Please input your password!" }]}
+      >
+        <Input.Password placeholder="Masukan Password" />
       </Form.Item>
 
       <Form.Item>
-        {/* <Link href="/dashboard/user" passHref> */}
         <Button
           size="large"
           block
           icon={<LoginOutlined />}
           type="primary"
-          htmlType="submit">
+          htmlType="submit"
+          loading={globalStore.isloading}
+        >
           Login
         </Button>
-        {/* </Link> */}
       </Form.Item>
     </Form>
   );

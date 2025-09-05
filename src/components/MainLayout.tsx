@@ -11,7 +11,7 @@ import {
   SafetyCertificateOutlined,
   TableOutlined,
 } from "@ant-design/icons";
-import Image from "next/image";
+import { Image } from "antd";
 import { useRouter } from "next/router";
 import { useUserLoginStore } from "@/stores/userLoginStore";
 import { useGlobalStore } from "@/stores/globalStore";
@@ -163,18 +163,17 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
       >
         <div style={{ justifyContent: "center", display: "flex", marginTop: 30 }}>
           <Image
-            preview={false}
             width={75}
             height={85}
             src="/icon-navbar/kotadepok.png"
             alt="icon-depok"
           />
         </div>
-        <h4 style={{ textAlign: "center" }}>
-          Sistem Informasi Manajemen Kesehatan Lingkungan
+        <h3 style={{ textAlign: "center" }}>
+          D&apos;SMILING
           <br />
-          Kota Depok
-        </h4>
+          <small style={{ fontSize: '12px', fontWeight: 'normal' }}>(Depok Sistem Manajemen Kesehatan Lingkungan)</small>
+        </h3>
         <Menu
           mode="inline"
           defaultSelectedKeys={[router.pathname]}
@@ -192,7 +191,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
             <div style={{ padding: 8, background: colorBgContainer }}>{children}</div>
           </Content>
         </Spin>
-        <Footer style={{ textAlign: "center" }}>SIMKESLING ©2023</Footer>
+        <Footer style={{ textAlign: "center" }}>D&apos;SMILING ©{new Date().getFullYear()}</Footer>
       </Layout>
     </Layout>
   );
