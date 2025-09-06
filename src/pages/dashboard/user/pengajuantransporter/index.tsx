@@ -9,55 +9,50 @@ import {
   Row,
   Col,
   Input,
+  Table,
 } from "antd";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
-import { Table } from "antd";
-import type { ColumnsType, TableProps } from "antd/es/table";
-import api from "../../../../utils/HttpRequest";
+import type { ColumnsType } from "antd/es/table";
+import api from "@/utils/HttpRequest";
 import {
-  LoginOutlined,
   EditOutlined,
   EyeOutlined,
   DeleteOutlined,
-  ExclamationCircleFilled,
-  PlusSquareTwoTone,
   ReloadOutlined,
   PlusCircleOutlined,
 } from "@ant-design/icons";
-import { MPengajuanTransporter } from "../../../../models/MPengajuanTransporter";
+import { MPengajuanTransporter } from "@/models/MPengajuanTransporter";
 import { usePengajuanTransporterStore } from "@/stores/pengajuanTransporterStore";
 import { useRouter } from "next/router";
 import { useGlobalStore } from "@/stores/globalStore";
-import cloneDeep from "clone-deep";
-import { url } from "inspector";
 import { parsingDate } from "@/utils/common";
-import Search from "antd/es/input/Search";
 
 type NotificationType = "success" | "info" | "warning" | "error";
 
-interface DataType {
-  status: any;
-  namaTransporter: any;
-  tanggalPengajuan: any;
-  key: React.Key;
-  name: string;
-  age: number;
-  address: string;
+interface PengajuanTransporterData {
+  id_transporter_tmp: number;
+  nama_transporter: string;
+  created_at: string;
+  status_transporter_tmp: string;
+  catatan: string;
+  // Properti yang ditransformasi
+  namaTransporter: string;
+  tanggalPengajuan: string;
+  status: string;
+  key: string;
 }
-
-const onChange: TableProps<DataType>["onChange"] = (
-  pagination: any,
-  filters: any,
-  sorter: any,
-  extra: any
-) => {
-  console.log("params", pagination, filters, sorter, extra);
-};
 
 const Index: React.FC = () => {
   const [apicontext, contextHolder] = notification.useNotification();
-  const [dataSearch, setDataSearch] = useState<DataType[]>([]);
+  const [data, setData] = useState<PengajuanTransporterData[]>([]);
+  const [filteredData, setFilteredData] = useState<PengajuanTransporterData[]>([]);
+  const [search, setSearch] = useState("");
+  
+  const pengajuanTransporterStore = usePengajuanTransporterStore();
+  const globalStore = useGlobalStore();
+  const router = useRouter();
+
   const openNotificationWithIcon = (type: NotificationType) => {
     apicontext[type]({
       message: "Transporter Berhasil Dihapus",
@@ -66,26 +61,13 @@ const Index: React.FC = () => {
     });
   };
 
-  let tmpForm = {
-    oldid: "",
-  };
-
-  const [form, setForm] = useState({ oldid: 0 });
-  const [data, setData] = useState<DataType[]>([]);
-  const pengajuanTransporterStore = usePengajuanTransporterStore();
-  const globalStore = useGlobalStore();
-
-  const router = useRouter();
-
   const { confirm } = Modal;
 
   const handleDelete = async (idTransporter: string) => {
     try {
-      let dataForm: any = new FormData();
-      console.log(idTransporter);
+      const dataForm = new FormData();
       dataForm.append("oldid", idTransporter);
-      let url = "/user/pengajuan-transporter/delete";
-      let responsenya = await api.post(url, dataForm);
+      await api.post("/user/pengajuan-transporter/delete", dataForm);
       openNotificationWithIcon("success");
     } catch (error) {
       console.error("Error hapus Data:", error);
@@ -94,12 +76,11 @@ const Index: React.FC = () => {
     }
   };
 
-  const columns: ColumnsType<DataType> = [
+  const columns: ColumnsType<PengajuanTransporterData> = [
     {
       title: "Nama Transporter",
       dataIndex: "namaTransporter",
-      // defaultSortOrder: "ascend",
-      sorter: (a: any, b: any) =>
+      sorter: (a, b) =>
         a.namaTransporter
           .toUpperCase()
           .localeCompare(b.namaTransporter.toUpperCase()),
@@ -107,77 +88,62 @@ const Index: React.FC = () => {
     {
       title: "Tanggal Pengajuan",
       dataIndex: "tanggalPengajuan",
-      // defaultSortOrder: "descend",
-      sorter: (a: any, b: any) =>
+      sorter: (a, b) =>
         b.tanggalPengajuan.localeCompare(a.tanggalPengajuan),
     },
     {
       title: "Status Pengajuan",
       dataIndex: "status",
-      defaultSortOrder: "descend",
-      render: (status: any) => {
-        let sts = "-- ups --";
-        let color = "-";
-        if (status == 1) {
-          color = "geekblue";
-          sts = "Menunggu";
-        }
-        if (status == 2) {
-          color = "green";
-          sts = "Diterima";
-        }
-        if (status == 0) {
-          color = "volcano";
-          sts = "Ditolak";
-        }
-        return (
-          <>
-            <Tag color={color}>{sts.toUpperCase()}</Tag>
-          </>
-        );
+      render: (status: string) => {
+        const statusConfig: Record<string, { color: string; text: string }> = {
+          "0": { color: "volcano", text: "DITOLAK" },
+          "1": { color: "geekblue", text: "MENUNGGU" },
+          "2": { color: "green", text: "DITERIMA" },
+        };
+        
+        const config = statusConfig[status] || { color: "-", text: "-- UPS --" };
+        return <Tag color={config.color}>{config.text}</Tag>;
       },
-      sorter: (a: any, b: any) => a.status.localeCompare(b.status),
+      sorter: (a, b) => a.status.localeCompare(b.status),
     },
     {
       title: "Catatan",
       dataIndex: "catatan",
-      defaultSortOrder: "ascend",
-      // sorter: (a: any, b: any) => a.catatan.length - b.catatan.length,
     },
 
     {
       title: "Action",
       key: "action",
-      render: (_: any, record: any) => {
-        // console.log(record)
-
-        const toFormPage = (param: MPengajuanTransporter) => {
+      render: (_, record: PengajuanTransporterData) => {
+        const toFormPage = () => {
           if (pengajuanTransporterStore.simpenSementara) {
-            pengajuanTransporterStore.simpenSementara(param);
+            pengajuanTransporterStore.simpenSementara(record as MPengajuanTransporter);
             router.push(
               "/dashboard/user/pengajuantransporter/PagePengajuanTransporter?action=edit"
             );
           }
         };
-        const toViewPage = (param: MPengajuanTransporter) => {
+        
+        const toViewPage = () => {
           if (pengajuanTransporterStore.simpenSementara) {
-            pengajuanTransporterStore.simpenSementara(param);
+            pengajuanTransporterStore.simpenSementara(record as MPengajuanTransporter);
             router.push(
               "/dashboard/user/pengajuantransporter/view-pengajuan-transporter"
             );
           }
         };
+        
         return (
           <Space size="middle">
             <Button
-              onClick={() => toFormPage(record)}
+              onClick={toFormPage}
               icon={<EditOutlined />}
               style={{ backgroundColor: "yellow" }}
             >
               Edit
             </Button>
             <Button
-              onClick={() => toViewPage(record)}
+              onClick={toViewPage}
               icon={<EyeOutlined />}
               type="primary"
             >
@@ -186,10 +152,7 @@ const Index: React.FC = () => {
             <Popconfirm
               title="Hapus Transporter"
               description="Apakah anda yakin untuk menghapus Transporter Anda?"
-              onConfirm={() => {
-                // setForm({ oldid: record.id_transporter_tmp }) // Set oldid when delete button is clicked
-                handleDelete(record.id_transporter_tmp?.toString() ?? "");
-              }}
+              onConfirm={() => handleDelete(record.id_transporter_tmp?.toString() ?? "")}
             >
               <Button icon={<DeleteOutlined />} type="primary" danger>
                 Delete
@@ -217,8 +180,7 @@ const Index: React.FC = () => {
       }));
 
       setData(transformedData);
-      setData2(transformedData);
-      setDataSearch(transformedData);
+      setFilteredData(transformedData);
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
@@ -226,33 +188,26 @@ const Index: React.FC = () => {
     }
   };
 
-  // -- search -- \\
-  const [search, setSearch] = useState("");
-  const [data2, setData2] = useState<DataType[]>([]);
+  // Fungsi pencarian yang dioptimalkan
   const handleChangeInput = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    console.log(event);
-    setSearch(event.target.value);
+    const searchValue = event.target.value;
+    setSearch(searchValue);
+    
+    // Filter data berdasarkan input pencarian
+    if (searchValue.trim() === "") {
+      setFilteredData(data); // Jika pencarian kosong, tampilkan semua data
+    } else {
+      const lowercaseSearch = searchValue.toLowerCase();
+      const filtered = data.filter(
+        (item) =>
+          item.namaTransporter.toLowerCase().includes(lowercaseSearch) ||
+          item.status.toLowerCase().includes(lowercaseSearch)
+      );
+      setFilteredData(filtered);
+    }
   };
-  const doSearch = () => {
-    const tmpData = data2.filter((val) => {
-      if (
-        val.namaTransporter
-          .toString()
-          .toLowerCase()
-          .includes(search.toLowerCase()) ||
-        val.status.toString().toLowerCase().includes(search.toLowerCase())
-      ) {
-        return true;
-      }
-    });
-    setData(tmpData);
-  };
-
-  useEffect(() => {
-    doSearch();
-  }, [search]);
 
   useEffect(() => {
     getData();
@@ -260,13 +215,15 @@ const Index: React.FC = () => {
 
   return (
     <MainLayout title="Pengajuan Transporter">
-      <Row justify="end">
+      {contextHolder}
+      <Row justify="end" style={{ marginBottom: 16 }}>
         <Col span={6}>
           <Input
             onChange={handleChangeInput}
             value={search}
             name="search"
-            placeholder="Search"
+            placeholder="Cari nama atau status"
+            allowClear
           />
         </Col>
         <Col>
@@ -279,42 +236,30 @@ const Index: React.FC = () => {
           </Button>
         </Col>
       </Row>
-      <div>
+      
+      <div style={{ margin: "20px 0", display: "flex", justifyContent: "center" }}>
         <Link
           href="/dashboard/user/pengajuantransporter/PagePengajuanTransporter"
           passHref
         >
-          <div style={{ display: "flex", justifyContent: "center" }}>
-            <Button
-              type="primary"
-              size="large"
-              icon={<PlusCircleOutlined />}
-              style={{ boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)" }}
-            >
-              Tambah Transporter
-            </Button>
-          </div>
+          <Button
+            type="primary"
+            size="large"
+            icon={<PlusCircleOutlined />}
+            style={{ boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)" }}
+          >
+            Tambah Transporter
+          </Button>
         </Link>
       </div>
 
-      <div
-        style={{
-          overflowX: "auto",
-        }}
-      >
-        {/* <Search
-          style={{
-            width: 300,
-            marginBottom: 20,
-          }}
-          placeholder="Cari Nama Transporter"
-          onChange={(e) => doSearch(e)}
-        /> */}
+      <div style={{ overflowX: "auto" }}>
         <Table
-          scroll={{ x: 800 }} // Set a minimum width to trigger horizontal scrolling
+          scroll={{ x: 800 }}
           columns={columns}
-          dataSource={data}
-          onChange={onChange}
+          dataSource={filteredData}
+          rowKey="key"
+          pagination={{ pageSize: 10 }}
         />
       </div>
     </MainLayout>

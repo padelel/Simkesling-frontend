@@ -20,6 +20,10 @@ export interface MPengajuanTransporter {
   created_at?: string;
   updated_at?: string;
   files?: File[];
+  nama_pemusnah?: string;
+  metode_pemusnah?: string;
+  link_input_izin?: string;
+  link_input_mou_transporter?: string;
 
   // add more attribute
   simpenSementara?: Function;

@@ -24,6 +24,10 @@ const tmpPengajuanTransporter = {
   created_at: undefined,
   updated_at: undefined,
   files: [],
+  nama_pemusnah: "",
+  metode_pemusnah: "",
+  link_input_izin: "",
+  link_input_mou_transporter: "",
 };
 
 export const usePengajuanTransporterStore = create<MPengajuanTransporter>(
